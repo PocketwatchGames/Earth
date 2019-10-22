@@ -8,7 +8,7 @@ public class Toolbar : MonoBehaviour
 	public List<UnityEngine.UI.Button> Buttons;
 
 	// Start is called before the first frame update
-	public void Start()
+	virtual public void Start()
     {
 		Buttons[ActiveToolIndex].interactable = false;
 		int i = 0;

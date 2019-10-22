@@ -32,8 +32,6 @@ public class WorldGUI
 	//};
 
 
-	public Texture2D whiteTex;
-
 	public int ActiveTool = -1;
 
 	public List<Tool> Tools = new List<Tool>();
@@ -42,12 +40,6 @@ public class WorldGUI
 
 	public World World;
 
-	public Vector2 CameraPos = new Vector2(50,50);
-	public float Zoom { get { return 0.5f + 2.5f * (float)Math.Pow(ZoomLevel + 0.5f, 4); } }
-	public float ZoomLevel = 0.5f;
-
-	public long _tickTimer;
-	public int _ticksLastSecond, _ticksToDisplay;
 
 	public WorldGUI(World world)
 	{

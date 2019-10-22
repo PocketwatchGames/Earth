@@ -9,7 +9,7 @@ public class TimeScaleToolbar : Toolbar
 	private float[] _timeScales = new float[] { 0, 5, 20, 200 };
 
 
-	public void Start()
+	override public void Start()
 	{
 		base.Start();
 		World.World.TimeScale = _timeScales[ActiveToolIndex];

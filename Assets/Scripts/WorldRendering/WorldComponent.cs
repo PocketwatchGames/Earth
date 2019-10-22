@@ -28,8 +28,15 @@ public partial class WorldComponent : MonoBehaviour
 		Plates = 1 << 20,
 	}
 
+	public Camera camera;
 	public World World;
 	public Layers ShowLayers;
+	public Vector2Int TileInfoPoint;
+
+	public Vector2 CameraPos = new Vector2(50, 50);
+	public float Zoom { get { return 0.5f + 2.5f * (float)Mathf.Pow(ZoomLevel + 0.5f, 4); } }
+	public float ZoomLevel = 0.5f;
+
 
 	int size = 100;
 
@@ -47,8 +54,16 @@ public partial class WorldComponent : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
+
+		Vector2 move = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+		float zoom = Input.GetAxis("Zoom");
+		camera.transform.position += new Vector3(move.x, move.y, 0) * Time.deltaTime;
+		ZoomLevel = Mathf.Clamp01(ZoomLevel + zoom * Time.deltaTime);
+
+		camera.orthographicSize = Zoom;
+
 		World.Update(Time.deltaTime);
-		UpdateMesh((Layers)ShowLayers, Time.deltaTime);
+		UpdateMesh(ShowLayers, Time.deltaTime);
 	}
 
 
