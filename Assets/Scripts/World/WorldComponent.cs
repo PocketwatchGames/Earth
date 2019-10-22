@@ -28,7 +28,7 @@ public partial class WorldComponent : MonoBehaviour
 		Plates = 1 << 20,
 	}
 
-	World World;
+	public World World;
 	public Layers ShowLayers;
 
 	int size = 100;
