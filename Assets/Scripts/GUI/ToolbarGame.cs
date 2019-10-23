@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameToolbar : Toolbar
+public class ToolbarGame : Toolbar
 {
 	override public void Start()
 	{

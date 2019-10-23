@@ -164,7 +164,6 @@ public partial class WorldComponent {
 				{
 					color = Lerp(new List<CVP>() { new CVP(new Color(0.4f, 0.4f, 1.0f), -500 + World.Data.FreezingTemperature), new CVP(color, World.Data.FreezingTemperature), new CVP(Color.red, 500 + World.Data.FreezingTemperature) }, state.Temperature[index]);
 				}
-				cols[index] = color;
 
 				//		if (showLayers.HasFlag(Layers.Water))
 				//		{
@@ -183,71 +182,64 @@ public partial class WorldComponent {
 				//			}
 				//		}
 
-				//		if (showLayers.HasFlag(Layers.Temperature))
-				//		{
-				//			color = Lerp(new List<CVP> {
-				//							new CVP(Color.Black, -45+Data.FreezingTemperature),
-				//							new CVP(Color.Blue, -15 + Data.FreezingTemperature),
-				//							new CVP(Color.Green, 15+Data.FreezingTemperature),
-				//							new CVP(Color.Red, 45+Data.FreezingTemperature),
-				//							new CVP(Color.White, 75+Data.FreezingTemperature) },
-				//				state.Temperature[index]);
-				//			spriteBatch.Draw(whiteTex, rect, color);
-				//		}
-				//		else if (showLayers.HasFlag(Layers.Pressure))
-				//		{
-				//			float minPressure = Data.StaticPressure - 40000;
-				//			float maxPressure = Data.StaticPressure + 10000;
-				//			color = Lerp(new List<CVP> { new CVP(Color.Pink, minPressure), new CVP(Color.White, (maxPressure + minPressure) / 2), new CVP(Color.LightBlue, maxPressure) }, state.Pressure[index]);
-				//			spriteBatch.Draw(whiteTex, rect, color);
-				//		}
-				//		else if (showLayers.HasFlag(Layers.WaterVapor))
-				//		{
-				//			float maxHumidity = 15;
-				//			color = Color.Lerp(Color.Black, Color.Blue, Math.Min(1.0f, state.Humidity[index] / maxHumidity));
-				//			spriteBatch.Draw(whiteTex, rect, color);
-				//		}
-				//		else if (showLayers.HasFlag(Layers.RelativeHumidity))
-				//		{
-				//			color = Color.Lerp(Color.Black, Color.Blue, Math.Min(1.0f, GetRelativeHumidity(GetLocalTemperature(Math.Max(0, GetSunVector(state.Ticks, GetLatitude(y)).Z), state.CloudCover[index], state.Temperature[index]), state.Humidity[index], state.CloudElevation[index], Math.Max(elevation, state.SeaLevel)) / Data.dewPointRange));
-				//			spriteBatch.Draw(whiteTex, rect, color);
-				//		}
-				//		else if (showLayers.HasFlag(Layers.Rainfall))
-				//		{
-				//			float maxRainfall = 5.0f / Data.TicksPerYear;
-				//			color = Color.Lerp(Color.Black, Color.Blue, Math.Min(1.0f, state.Rainfall[index] / maxRainfall));
-				//			spriteBatch.Draw(whiteTex, rect, color);
-				//		}
-				//		else if (showLayers.HasFlag(Layers.GroundWater))
-				//		{
-				//			color = Color.Lerp(Color.DarkBlue, Color.Gray, Math.Min(1.0f, state.GroundWater[index] / (Data.MaxWaterTableDepth * Data.MaxSoilPorousness)));
-				//			spriteBatch.Draw(whiteTex, rect, color);
-				//		}
-				//		else if (showLayers.HasFlag(Layers.WaterTableDepth))
-				//		{
-				//			color = Color.Lerp(Color.Black, Color.White, (state.WaterTableDepth[index] - Data.MinWaterTableDepth) / (Data.MaxWaterTableDepth - Data.MinWaterTableDepth));
-				//			spriteBatch.Draw(whiteTex, rect, color);
-				//		}
-				//		else if (showLayers.HasFlag(Layers.Elevation))
-				//		{
-				//			color = Lerp(
-				//				new List<CVP> {
-				//							new CVP(Color.Black, Data.MinElevation),
-				//							new CVP(Color.DarkBlue, (state.SeaLevel - Data.MinElevation)/2+Data.MinElevation),
-				//							new CVP(Color.LightBlue, state.SeaLevel),
-				//							new CVP(Color.SaddleBrown, state.SeaLevel+1),
-				//							new CVP(Color.LightGray, (Data.MaxElevation-state.SeaLevel)/4+state.SeaLevel),
-				//							new CVP(Color.White, Data.MaxElevation) },
-				//				elevation);
-				//			spriteBatch.Draw(whiteTex, rect, color);
-				//		}
-				//		else if (showLayers.HasFlag(Layers.Plates))
-				//		{
-				//			float elevationT = elevation / Data.MaxElevation;
-				//			color = Color.Lerp(Color.Black, Color.White, Math.Sign(elevation) * (float)Math.Sqrt(Math.Abs(elevationT)) / 2 + 0.5f);
-				//			color = Color.Lerp(color, PlateColors[state.Plate[index] % MaxPlateColors], 0.25f);
-				//			spriteBatch.Draw(whiteTex, rect, color);
-				//		}
+				if (showLayers.HasFlag(Layers.Temperature))
+				{
+					color = Lerp(new List<CVP> {
+											new CVP(Color.black, -45+World.Data.FreezingTemperature),
+											new CVP(Color.blue, -15 + World.Data.FreezingTemperature),
+											new CVP(Color.green, 15+World.Data.FreezingTemperature),
+											new CVP(Color.red, 45+World.Data.FreezingTemperature),
+											new CVP(Color.white, 75+World.Data.FreezingTemperature) },
+						state.Temperature[index]);
+				}
+				else if (showLayers.HasFlag(Layers.Pressure))
+				{
+					float minPressure = World.Data.StaticPressure - 40000;
+					float maxPressure = World.Data.StaticPressure + 10000;
+					color = Lerp(new List<CVP> { new CVP(Color.magenta, minPressure), new CVP(Color.white, (maxPressure + minPressure) / 2), new CVP(new Color(0.4f, 0.4f, 1.0f), maxPressure) }, state.Pressure[index]);
+				}
+				else if (showLayers.HasFlag(Layers.WaterVapor))
+				{
+					float maxHumidity = 15;
+					color = Color.Lerp(Color.black, Color.blue, Math.Min(1.0f, state.Humidity[index] / maxHumidity));
+				}
+				else if (showLayers.HasFlag(Layers.RelativeHumidity))
+				{
+					color = Color.Lerp(Color.black, Color.blue, Math.Min(1.0f, World.GetRelativeHumidity(World.GetLocalTemperature(Math.Max(0, World.GetSunVector(state.Ticks, World.GetLatitude(y)).z), state.CloudCover[index], state.Temperature[index]), state.Humidity[index], state.CloudElevation[index], Math.Max(elevation, state.SeaLevel)) / World.Data.dewPointRange));
+				}
+				else if (showLayers.HasFlag(Layers.Rainfall))
+				{
+					float maxRainfall = 5.0f / World.Data.TicksPerYear;
+					color = Color.Lerp(Color.black, Color.blue, Math.Min(1.0f, state.Rainfall[index] / maxRainfall));
+				}
+				else if (showLayers.HasFlag(Layers.GroundWater))
+				{
+					color = Color.Lerp(new Color(0, 0, 0.5f), Color.gray, Math.Min(1.0f, state.GroundWater[index] / (World.Data.MaxWaterTableDepth * World.Data.MaxSoilPorousness)));
+				}
+				else if (showLayers.HasFlag(Layers.WaterTableDepth))
+				{
+					color = Color.Lerp(Color.black, Color.white, (state.WaterTableDepth[index] - World.Data.MinWaterTableDepth) / (World.Data.MaxWaterTableDepth - World.Data.MinWaterTableDepth));
+				}
+				else if (showLayers.HasFlag(Layers.Elevation))
+				{
+					color = Lerp(
+						new List<CVP> {
+											new CVP(Color.black, World.Data.MinElevation),
+											new CVP(new Color(0, 0, 0.5f), (state.SeaLevel - World.Data.MinElevation)/2+World.Data.MinElevation),
+											new CVP(new Color(0.4f, 0.4f, 1.0f), state.SeaLevel),
+											new CVP(Color.yellow, state.SeaLevel+1),
+											new CVP(new Color(0.5f, 0.5f, 0.5f), (World.Data.MaxElevation-state.SeaLevel)/4+state.SeaLevel),
+											new CVP(Color.white, World.Data.MaxElevation) },
+						elevation);
+				}
+				else if (showLayers.HasFlag(Layers.Plates))
+				{
+					float elevationT = elevation / World.Data.MaxElevation;
+					color = Color.Lerp(Color.black, Color.white, Math.Sign(elevation) * (float)Math.Sqrt(Math.Abs(elevationT)) / 2 + 0.5f);
+					color = Color.Lerp(color, PlateColors[state.Plate[index] % MaxPlateColors], 0.25f);
+				}
+
+				cols[index] = color;
 			}
 		}
 

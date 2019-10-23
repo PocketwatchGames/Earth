@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TimeScaleToolbar : Toolbar
+public class ToolbarTimeScale : Toolbar
 {
 	public WorldComponent World;
 

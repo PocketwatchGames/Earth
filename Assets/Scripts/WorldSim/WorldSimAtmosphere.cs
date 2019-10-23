@@ -104,7 +104,7 @@ public partial class World
 
 	}
 
-	private float GetLocalTemperature(float sunAngle, float cloudCover, float temperature)
+	public float GetLocalTemperature(float sunAngle, float cloudCover, float temperature)
 	{
 		return temperature + (1.0f - Math.Min(cloudCover / Data.cloudContentFullAbsorption, 1.0f)) * sunAngle * Data.localSunHeat;
 	}
@@ -124,7 +124,7 @@ public partial class World
 	}
 
 
-	Vector3 GetSunVector(int ticks, float latitude)
+	public Vector3 GetSunVector(int ticks, float latitude)
 	{
 
 		float angleOfInclination = Data.planetTiltAngle * (float)Math.Sin(Math.PI * 2 * (GetTimeOfYear(ticks) - 0.25f));
@@ -335,7 +335,7 @@ public partial class World
 		return evapRate;
 	}
 
-	private float GetRelativeHumidity(float localTemperature, float humidity, float cloudElevation, float elevationOrSeaLevel)
+	public float GetRelativeHumidity(float localTemperature, float humidity, float cloudElevation, float elevationOrSeaLevel)
 	{
 		float atmosphereMass = (cloudElevation - elevationOrSeaLevel) * Data.MolarMassEarthAir;
 		float maxHumidity = atmosphereMass * Data.dewPointRange * Mathf.Clamp((localTemperature - Data.dewPointZero) / Data.dewPointTemperatureRange, 0, 1);
