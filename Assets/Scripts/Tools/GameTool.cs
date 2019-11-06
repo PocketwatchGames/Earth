@@ -4,6 +4,8 @@ using UnityEngine;
 
 public abstract class GameTool : MonoBehaviour
 {
+	public bool Active;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -16,7 +18,13 @@ public abstract class GameTool : MonoBehaviour
         
     }
 
-	public abstract void OnSelect();
-	public abstract void OnDeselect();
+	virtual public void OnSelect()
+	{
+		Active = true;
+	}
+	virtual public void OnDeselect()
+	{
+		Active = false;
+	}
 }
 

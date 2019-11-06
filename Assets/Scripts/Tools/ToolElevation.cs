@@ -21,6 +21,10 @@ public class ToolElevation : GameTool
 	// Update is called once per frame
 	void Update()
 	{
+		if (!Active)
+		{
+			return;
+		}
 		var p = World.ScreenToWorld(Input.mousePosition);
 
 		if (Input.GetMouseButton(0))
@@ -46,7 +50,7 @@ public class ToolElevation : GameTool
 								continue;
 							}
 							int index = World.World.GetIndex(x, y);
-							nextState.Elevation[index] += distT * DeltaPerSecond * Time.deltaTime;
+							nextState.Elevation[index] += Direction * distT * DeltaPerSecond * Time.deltaTime;
 						}
 					}
 				}
@@ -59,10 +63,12 @@ public class ToolElevation : GameTool
 
 	public override void OnSelect()
 	{
+		base.OnSelect();
 		ElevationInfoPanel.gameObject.SetActive(true);
 	}
 	public override void OnDeselect()
 	{
+		base.OnDeselect();
 		ElevationInfoPanel.gameObject.SetActive(false);
 	}
 }

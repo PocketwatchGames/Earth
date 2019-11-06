@@ -14,14 +14,21 @@ public class ToolTectonic : GameTool
 	private WorldComponent.Layers oldLayers;
 
 	override public void OnSelect() {
+		base.OnSelect();
 		oldLayers = World.ShowLayers;
 		World.ShowLayers = WorldComponent.Layers.Plates;
 	}
 	override public void OnDeselect() {
+		base.OnDeselect();
 		World.ShowLayers = oldLayers;
 	}
 	public void Update()
 	{
+		if (!Active)
+		{
+			return;
+		}
+
 		var p = World.ScreenToWorld(Input.mousePosition);
 		if (Input.GetMouseButtonDown(0))
 		{
