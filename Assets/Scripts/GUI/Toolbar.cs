@@ -24,9 +24,7 @@ public class Toolbar : MonoBehaviour
 	virtual public void OnClick(int index)
 	{
 		Buttons[ActiveToolIndex].interactable = true;
-		Buttons[ActiveToolIndex].GetComponent<GameTool>()?.OnDeselect();
 		Buttons[index].interactable = false;
-		Buttons[index].GetComponent<GameTool>()?.OnSelect();
 		ActiveToolIndex = index;
 	}
 }

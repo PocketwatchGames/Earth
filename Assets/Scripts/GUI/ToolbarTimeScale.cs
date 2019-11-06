@@ -8,10 +8,19 @@ public class ToolbarTimeScale : Toolbar
 
 	private float[] _timeScales = new float[] { 0, 5, 20, 200 };
 
-
 	override public void Start()
 	{
 		base.Start();
+
+		if (World.World != null)
+		{
+			OnWorldStart();
+		}
+		World.WorldStartedEvent += OnWorldStart;
+	}
+
+	public void OnWorldStart()
+	{
 		World.World.TimeScale = _timeScales[ActiveToolIndex];
 	}
 	public override void OnClick(int index)

@@ -32,10 +32,6 @@ public class WorldGUI
 	//};
 
 
-	public int ActiveTool = -1;
-
-	public List<Tool> Tools = new List<Tool>();
-	public Vector2Int TileInfoPoint;
 	public List<int> AnimalsSelected = new List<int>();
 
 	public World World;
@@ -59,27 +55,6 @@ public class WorldGUI
 
 	}
 
-	//public void LoadContent(GraphicsDevice graphics, ContentManager content)
-	//{
-	//	viewport = new Vector2Int(graphics.Viewport.Width, graphics.Viewport.Height);
-
-	//	Font = content.Load<SpriteFont>("fonts/infofont");
-	//	whiteTex = new Texture2D(graphics, 1, 1);
-	//	Color[] c = new Color[] { Color.white };
-	//	whiteTex.SetData(c);
-
-	//	_worldRenderTarget = new RenderTarget2D(graphics, 1000, 1000);
-	//}
-
-	//bool WasKeyJustPressed(Keys k, ref KeyboardState state, ref KeyboardState lastState)
-	//{
-	//	return state.IsKeyDown(k) && !lastState.IsKeyDown(k);
-	//}
-	//bool IsKeyPressed(Keys k, ref KeyboardState state)
-	//{
-	//	return state.IsKeyDown(k);
-	//}
-
 	//Vector2Int ScreenToWorld(Vector2Int screenPoint)
 	//{
 	//	return new Vector2Int((int)Mathf.Clamp((screenPoint.X - viewport.X / 2) / (Zoom * World.tileRenderSize) + CameraPos.X, 0, World.Size - 1), (int)MathHelper.Clamp((screenPoint.Y - viewport.Y / 2) / (Zoom * World.tileRenderSize) + CameraPos.Y, 0, World.Size - 1));
@@ -90,85 +65,7 @@ public class WorldGUI
 	//	var mouseState = Mouse.GetState();
 	//	TileInfoPoint = ScreenToWorld(mouseState.Position);
 
-	//	foreach (var k in LayerDisplayKeys)
-	//	{
-	//		if (WasKeyJustPressed(k.Item2, ref keyboardState, ref _lastKeyboardState))
-	//		{
-	//			ShowLayers ^= k.Item1;
-	//		}
-	//	}
-	//	for (int i=0;i<Tools.Count;i++)
-	//	{
-	//		if (WasKeyJustPressed(Tools[i].HotKey, ref keyboardState, ref _lastKeyboardState))
-	//		{
-	//			SelectTool(i);
-	//			break;
-	//		}
-	//	}
-	//	if (WasKeyJustPressed(Keys.OemOpenBrackets, ref keyboardState, ref _lastKeyboardState))
-	//	{
 
-	//		_timeScaleIndex = _timeScaleIndex - 1;
-	//		if (_timeScaleIndex < 0)
-	//		{
-	//			_timeScaleIndex = 0;
-	//			World.TimeTillTick = 0;
-	//		}
-	//		World.TimeScale = _timeScales[_timeScaleIndex];
-	//	}
-	//	if (WasKeyJustPressed(Keys.OemCloseBrackets, ref keyboardState, ref _lastKeyboardState))
-	//	{
-	//		_timeScaleIndex = Mathf.Min(_timeScales.Count - 1, _timeScaleIndex + 1);
-	//		World.TimeScale = _timeScales[_timeScaleIndex];
-	//	}
-
-	//	if (WasKeyJustPressed(Keys.Q, ref keyboardState, ref _lastKeyboardState))
-	//	{
-	//		ZoomLevel = Math.Max(0, ZoomLevel - 0.25f);
-	//	}
-	//	if (WasKeyJustPressed(Keys.E, ref keyboardState, ref _lastKeyboardState))
-	//	{
-	//		ZoomLevel = Math.Min(1, ZoomLevel + 0.25f);
-	//	}
-	//	Vector2 cameraMove = Vector2.Zero;
-	//	if (IsKeyPressed(Keys.W, ref keyboardState))
-	//	{
-	//		cameraMove.y--;
-	//	}
-	//	if (IsKeyPressed(Keys.A, ref keyboardState))
-	//	{
-	//		cameraMove.x--;
-	//	}
-	//	if (IsKeyPressed(Keys.S, ref keyboardState))
-	//	{
-	//		cameraMove.y++;
-	//	}
-	//	if (IsKeyPressed(Keys.D, ref keyboardState))
-	//	{
-	//		cameraMove.x++;
-	//	}
-	//	float cameraSpeed = 100 / Zoom;
-	//	CameraPos += cameraSpeed * cameraMove * dt;
-	//	CameraPos.x = Mathf.Clamp(CameraPos.x, 0, World.Size);
-	//	CameraPos.y = Mathf.Clamp(CameraPos.y, 0, World.Size);
-
-	//	var curTool = GetTool(ActiveTool);
-	//	if (curTool != null)
-	//	{
-	//		if (mouseState.LeftButton == ButtonState.Pressed && _lastMouseState.LeftButton != ButtonState.Pressed)
-	//		{
-	//			curTool.OnMouseDown(TileInfoPoint);
-	//		} else if (mouseState.LeftButton != ButtonState.Pressed && _lastMouseState.LeftButton == ButtonState.Pressed)
-	//		{
-	//			curTool.OnMouseUp(TileInfoPoint);
-	//		}
-	//		float wheelDelta = mouseState.ScrollWheelValue - _lastMouseState.ScrollWheelValue;
-	//		if (wheelDelta != 0)
-	//		{
-	//			curTool.OnMouseWheel(wheelDelta);
-	//		}
-	//		curTool.Update(dt, TileInfoPoint);
-	//	}
 
 	//	_lastKeyboardState = keyboardState;
 	//	_lastMouseState = mouseState;
@@ -185,23 +82,6 @@ public class WorldGUI
 	//	}
 	//}
 
-	Tool GetTool(int index)
-	{
-		return (ActiveTool >= 0 && ActiveTool < Tools.Count) ? Tools[ActiveTool] : null;
-	}
-
-	public void SelectTool(int t)
-	{
-		if (t != ActiveTool)
-		{
-			var curTool = GetTool(ActiveTool);
-			curTool?.OnDeselect();
-
-			ActiveTool = t;
-			curTool = GetTool(ActiveTool);
-			curTool?.OnSelect();
-		}
-	}
 
 	//public void Draw(float dt, SpriteBatch spriteBatch, GraphicsDevice graphics )
 	//{
