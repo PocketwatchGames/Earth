@@ -19,7 +19,6 @@ public partial class WorldComponent {
 	Color[] oceanCols;
 	int[] oceanTris;
 
-
 	struct CVP {
 		public Color Color;
 		public float Value;

@@ -20,7 +20,7 @@ public partial class World {
 	{
 		return noise.GetPerlin((float)x / Size * frequency + hash, (float)y / Size * frequency);
 	}
-	public void Generate()
+	public void Generate(List<Sprite> speciesSprites)
 	{
 		ref var state = ref States[0];
 		FastNoise noise = new FastNoise(67687);
@@ -29,7 +29,9 @@ public partial class World {
 		int numPlates = 12;
 
 		int numSpecies = 4;
-		state.Species[0].Name = "Hot Herb";
+		SpeciesDisplay[0].Name = "Hot Herb";
+		SpeciesDisplay[0].Color = new Color(100, 60, 20);
+		SpeciesDisplay[0].Sprite = speciesSprites[0];
 		state.Species[0].Food = SpeciesType.FoodType.Herbivore;
 		state.Species[0].Lifespan = 10 * Data.TicksPerYear;
 		state.Species[0].MovementSpeed = 0.1f / Data.tileSize * Data.SecondsPerTick;
@@ -40,9 +42,10 @@ public partial class World {
 		state.Species[0].speciesEatRate = 1.0f / Data.TicksPerYear / 10000;
 		state.Species[0].starvationSpeed = 12.0f / Data.TicksPerYear;
 		state.Species[0].dehydrationSpeed = 12.0f / Data.TicksPerYear;
-		state.Species[0].Color = new Color(100, 60, 20);
 
-		state.Species[1].Name = "Basic Beast";
+		SpeciesDisplay[1].Name = "Basic Beast";
+		SpeciesDisplay[1].Color = new Color(120, 100, 20);
+		SpeciesDisplay[1].Sprite = speciesSprites[0];
 		state.Species[1].Food = SpeciesType.FoodType.Herbivore;
 		state.Species[1].RestingTemperature = Data.FreezingTemperature + 35;
 		state.Species[1].Lifespan = 20 * Data.TicksPerYear;
@@ -53,9 +56,10 @@ public partial class World {
 		state.Species[1].speciesEatRate = 1.0f / Data.TicksPerYear / 10000;
 		state.Species[1].starvationSpeed = 12.0f / Data.TicksPerYear;
 		state.Species[1].dehydrationSpeed = 12.0f / Data.TicksPerYear;
-		state.Species[1].Color = new Color(120, 100, 20);
 
-		state.Species[2].Name = "Supacold";
+		SpeciesDisplay[2].Name = "Supacold";
+		SpeciesDisplay[2].Color = new Color(60, 20, 100);
+		SpeciesDisplay[2].Sprite = speciesSprites[0];
 		state.Species[2].Food = SpeciesType.FoodType.Herbivore;
 		state.Species[2].Lifespan = 15 * Data.TicksPerYear;
 		state.Species[2].MovementSpeed = 0.1f / Data.tileSize * Data.SecondsPerTick;
@@ -66,9 +70,10 @@ public partial class World {
 		state.Species[2].speciesEatRate = 1.0f / Data.TicksPerYear / 10000;
 		state.Species[2].starvationSpeed = 12.0f / Data.TicksPerYear;
 		state.Species[2].dehydrationSpeed = 12.0f / Data.TicksPerYear;
-		state.Species[2].Color = new Color(60, 20, 100);
 
-		state.Species[3].Name = "Eatasaurus";
+		SpeciesDisplay[3].Name = "Eatasaurus";
+		SpeciesDisplay[3].Color = new Color(255, 0, 50);
+		SpeciesDisplay[3].Sprite = speciesSprites[0];
 		state.Species[3].Food = SpeciesType.FoodType.Carnivore;
 		state.Species[3].RestingTemperature = Data.FreezingTemperature + 30;
 		state.Species[3].Lifespan = 15 * Data.TicksPerYear;
@@ -79,7 +84,6 @@ public partial class World {
 		state.Species[3].speciesEatRate = 1.0f / Data.TicksPerYear;
 		state.Species[3].starvationSpeed = 12.0f / Data.TicksPerYear;
 		state.Species[3].dehydrationSpeed = 12.0f / Data.TicksPerYear;
-		state.Species[3].Color = new Color(255, 0, 50);
 		int animalCount = 0;
 		for (int y = 0; y < Size; y++)
 		{

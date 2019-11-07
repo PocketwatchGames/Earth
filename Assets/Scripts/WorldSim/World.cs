@@ -13,9 +13,7 @@ public struct SpeciesType {
 		Omnivore,
 		Carnivore
 	}
-	public String Name;
 	public FoodType Food;
-	public Color Color;
 	public float RestingTemperature;
 	public float TemperatureRange;
 	public float Lifespan;
@@ -27,19 +25,22 @@ public struct SpeciesType {
 	public float MovementSpeed;
 }
 
-public struct AnimalGroup {
-	public int Species;
-	public Vector2 Position;
-	public Vector2 Destination;
-	public float Population;
-}
 
 public struct SpeciesStat {
 	public float Population;
 }
+
+public struct SpeciesDisplayData {
+	public string Name;
+	public Color Color;
+	public Sprite Sprite;
+	public int SpeciesIndex;
+}
+
+
 public partial class World {
 	//		float MaxCloudElevation = ;
-	public int MaxAnimals;
+	public int MaxHerds;
 	public int Size;
 	public float TimeTillTick = 0.00001f;
 	public float TimeScale = 1.0f;
@@ -54,6 +55,7 @@ public partial class World {
 	public int LastRenderStateIndex;
 	public object DrawLock = new object();
 	public object InputLock = new object();
+	public SpeciesDisplayData[] SpeciesDisplay;
 	private Task _simTask;
 
 	public class State : ICloneable {
@@ -66,7 +68,7 @@ public partial class World {
 
 		public SpeciesType[] Species;
 		public SpeciesStat[] SpeciesStats;
-		public AnimalGroup[] Animals;
+		public Herd[] Herds;
 
 		public int[] Plate;
 		public float[] Elevation;
@@ -104,7 +106,7 @@ public partial class World {
 
 			o.Species = (SpeciesType[])Species.Clone();
 			o.SpeciesStats = (SpeciesStat[])SpeciesStats.Clone();
-			o.Animals = (AnimalGroup[])Animals.Clone();
+			o.Herds = (Herd[])Herds.Clone();
 			o.Plate = (int[])Plate.Clone();
 			o.Elevation = (float[])Elevation.Clone();
 			o.Temperature = (float[])Temperature.Clone();
@@ -136,13 +138,14 @@ public partial class World {
 	{
 		Size = size;
 		int s = Size * Size;
-		MaxAnimals = s * 8;
+		MaxHerds = 256;
 
 		Data = new SimData();
 		ActiveFeatures = SimFeature.All;
 		ActiveFeatures &= ~(SimFeature.Evaporation);
 		Data.Init(ActiveFeatures, size);
 
+		SpeciesDisplay = new SpeciesDisplayData[MaxSpecies];
 
 		for (int i = 0; i < StateCount; i++)
 		{
@@ -175,7 +178,7 @@ public partial class World {
 				States[i].AnimalsPerTile[j] = -1;
 			}
 
-			States[i].Animals = new AnimalGroup[MaxAnimals];
+			States[i].Herds = new Herd[MaxHerds];
 			States[i].Species = new SpeciesType[MaxSpecies];
 			States[i].SpeciesStats = new SpeciesStat[MaxSpecies];
 		}

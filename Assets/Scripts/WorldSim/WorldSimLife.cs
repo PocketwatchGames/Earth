@@ -57,187 +57,130 @@ public partial class World
 			}
 		}
 
-		for (int i = 0;i<MaxAnimals;i++)
-		{
-			float population = state.Animals[i].Population;
-			if (population > 0)
-			{
-				int tileIndex = GetIndex((int)state.Animals[i].Position.x, (int)state.Animals[i].Position.y);
-				float newPopulation = population;
+		//for (int i = 0;i<MaxHerds;i++)
+		//{
+		//	float population = state.Herds[i].Population;
+		//	if (population > 0)
+		//	{
+		//		int tileIndex = GetIndex((int)state.Herds[i].Position.x, (int)state.Herds[i].Position.y);
+		//		float newPopulation = population;
 
-				if (state.Elevation[tileIndex] <= state.SeaLevel)
-				{
-					newPopulation = 0;
-				}
-				else
-				{
-
-					var species = state.Species[state.Animals[i].Species];
-					float populationDensity = population / species.speciesMaxPopulation;
-
-					float babiesBorn = population * species.speciesGrowthRate;
-					newPopulation += babiesBorn;
-
-					float diedOfOldAge = Math.Max(0, population * 1.0f / (species.Lifespan * Data.TicksPerYear));
-					newPopulation -= diedOfOldAge;
-
-					float diedFromTemperature = population * Math.Abs((state.Temperature[tileIndex] - species.RestingTemperature) / species.TemperatureRange);
-					newPopulation -= diedFromTemperature;
-
-					float freshWaterAvailability = GetFreshWaterAvailability(state.SurfaceWater[tileIndex], GetGroundWaterSaturation(state.GroundWater[tileIndex], state.WaterTableDepth[tileIndex], state.SoilFertility[tileIndex] * Data.MaxSoilPorousness));
-					float diedOfDehydration = Math.Max(0, population * (populationDensity - freshWaterAvailability / Data.freshWaterMaxAvailability) * species.dehydrationSpeed);
-					newPopulation -= diedOfDehydration;
-
-					if (species.Food == SpeciesType.FoodType.Herbivore)
-					{
-						float canopy = nextState.Canopy[tileIndex];
-						float diedOfStarvation = Math.Max(0, population * (populationDensity - canopy) * species.starvationSpeed);
-						newPopulation -= diedOfStarvation;
-						canopy -= population * species.speciesEatRate;
-						nextState.Canopy[tileIndex] = canopy;
-					}
-					else
-					{
-						float availableMeat = 0;
-						for (int m = 0; m < MaxGroupsPerTile; m++)
-						{
-							int meatGroupIndex = state.AnimalsPerTile[tileIndex * MaxGroupsPerTile + m];
-							if (meatGroupIndex >= 0 && state.Species[state.Animals[meatGroupIndex].Species].Food == SpeciesType.FoodType.Herbivore)
-							{
-								availableMeat += state.Animals[meatGroupIndex].Population;
-							}
-						}
-						float diedOfStarvation = Math.Max(0, population * (population - availableMeat) * species.starvationSpeed);
-						newPopulation -= diedOfStarvation;
-
-						float meatEaten = Math.Min(availableMeat, population * species.speciesEatRate);
-						for (int m = 0; m < MaxGroupsPerTile; m++)
-						{
-							int meatGroupIndex = state.AnimalsPerTile[tileIndex * MaxGroupsPerTile + m];
-							if (meatGroupIndex >= 0 && state.Species[state.Animals[meatGroupIndex].Species].Food == SpeciesType.FoodType.Herbivore)
-							{
-								float meatPop = nextState.Animals[meatGroupIndex].Population;
-								nextState.Animals[meatGroupIndex].Population = Math.Max(0, meatPop - meatEaten * meatPop / availableMeat);
-							}
-						}
-					}
-
-					if (state.Animals[i].Destination != state.Animals[i].Position)
-					{
-						Vector2 diff = state.Animals[i].Destination - state.Animals[i].Position;
-						float dist = diff.magnitude;
-						var dir = diff.normalized;
-						Vector2 move = dist <= species.MovementSpeed ? diff : (species.MovementSpeed * dir);
-						Vector2 newPos = state.Animals[i].Position + move;
-						Vector2Int newTile = new Vector2Int((int)newPos.x, (int)newPos.y);
-						int newTileIndex = GetIndex(newTile.x, newTile.y);
-
-						// Don't walk into water
-						Vector2 nextPos = state.Animals[i].Position + dir;
-						if (state.Elevation[GetIndex((int)nextPos.x,(int)nextPos.y)] <= state.SeaLevel)
-						{
-							nextState.Animals[i].Destination = new Vector2((int)state.Animals[i].Position.x + 0.5f, (int)state.Animals[i].Position.y + 0.5f);
-						}
-							
-						// move tiles
-						if ((int)state.Animals[i].Position.x != newTile.x || (int)state.Animals[i].Position.y != newTile.y)
-						{
-							for (int j = 0; j < MaxGroupsPerTile; j++)
-							{
-								int newGroupIndex = newTileIndex * MaxGroupsPerTile + j;
-								if (nextState.AnimalsPerTile[newGroupIndex] == -1)
-								{
-									nextState.AnimalsPerTile[newGroupIndex] = i;
-									nextState.Animals[i].Position = newPos;
-									for (int k = 0; k < MaxGroupsPerTile; k++)
-									{
-										int groupIndex = tileIndex * MaxGroupsPerTile + k;
-										if (nextState.AnimalsPerTile[groupIndex] == i)
-										{
-											nextState.AnimalsPerTile[groupIndex] = -1;
-											break;
-										}
-									}
-									break;
-								}
-							}
-						} else
-						{
-							nextState.Animals[i].Position = newPos;
-						}
-					}
-
-				}
-				nextState.Animals[i].Population = Math.Max(0, newPopulation);
-				if (newPopulation <= 0)
-				{
-					for (int j = 0; j < MaxGroupsPerTile; j++)
-					{
-						int groupIndex = tileIndex * MaxGroupsPerTile + j;
-						if (nextState.AnimalsPerTile[groupIndex] == i)
-						{
-							nextState.AnimalsPerTile[groupIndex] = -1;
-						}
-					}
-				}
-					
-			}
-		}
-		//		// ANIMALS
-		//		for (int s = 0; s < MaxSpecies; s++)
+		//		if (state.Elevation[tileIndex] <= state.SeaLevel)
 		//		{
-		//			int speciesIndex = GetSpeciesIndex(x, y, s);
-		//			float p = population[s];
-		//			if (p > 0)
+		//			newPopulation = 0;
+		//		}
+		//		else
+		//		{
+
+		//			var species = state.Species[state.Herds[i].Species];
+		//			float populationDensity = population / species.speciesMaxPopulation;
+
+		//			float babiesBorn = population * species.speciesGrowthRate;
+		//			newPopulation += babiesBorn;
+
+		//			float diedOfOldAge = Math.Max(0, population * 1.0f / (species.Lifespan * Data.TicksPerYear));
+		//			newPopulation -= diedOfOldAge;
+
+		//			float diedFromTemperature = population * Math.Abs((state.Temperature[tileIndex] - species.RestingTemperature) / species.TemperatureRange);
+		//			newPopulation -= diedFromTemperature;
+
+		//			float freshWaterAvailability = GetFreshWaterAvailability(state.SurfaceWater[tileIndex], GetGroundWaterSaturation(state.GroundWater[tileIndex], state.WaterTableDepth[tileIndex], state.SoilFertility[tileIndex] * Data.MaxSoilPorousness));
+		//			float diedOfDehydration = Math.Max(0, population * (populationDensity - freshWaterAvailability / Data.freshWaterMaxAvailability) * species.dehydrationSpeed);
+		//			newPopulation -= diedOfDehydration;
+
+		//			if (species.Food == SpeciesType.FoodType.Herbivore)
 		//			{
-		//				var species = state.Species[s];
-
-		//				if (state.Species[s].Food == SpeciesType.FoodType.Herbivore)
+		//				float canopy = nextState.Canopy[tileIndex];
+		//				float diedOfStarvation = Math.Max(0, population * (populationDensity - canopy) * species.starvationSpeed);
+		//				newPopulation -= diedOfStarvation;
+		//				canopy -= population * species.speciesEatRate;
+		//				nextState.Canopy[tileIndex] = canopy;
+		//			}
+		//			else
+		//			{
+		//				float availableMeat = 0;
+		//				for (int m = 0; m < MaxGroupsPerTile; m++)
 		//				{
-		//					float populationDensity = p / species.speciesMaxPopulation;
-		//					float diedOfStarvation = Math.Max(0, p * (populationDensity - canopy) * species.starvationSpeed);
-		//					population[s] -= diedOfStarvation;
+		//					int meatGroupIndex = state.AnimalsPerTile[tileIndex * MaxGroupsPerTile + m];
+		//					if (meatGroupIndex >= 0 && state.Species[state.Herds[meatGroupIndex].Species].Food == SpeciesType.FoodType.Herbivore)
+		//					{
+		//						availableMeat += state.Herds[meatGroupIndex].Population;
+		//					}
+		//				}
+		//				float diedOfStarvation = Math.Max(0, population * (population - availableMeat) * species.starvationSpeed);
+		//				newPopulation -= diedOfStarvation;
 
-		//					newCanopy -= population[s] * species.speciesEatRate;
+		//				float meatEaten = Math.Min(availableMeat, population * species.speciesEatRate);
+		//				for (int m = 0; m < MaxGroupsPerTile; m++)
+		//				{
+		//					int meatGroupIndex = state.AnimalsPerTile[tileIndex * MaxGroupsPerTile + m];
+		//					if (meatGroupIndex >= 0 && state.Species[state.Herds[meatGroupIndex].Species].Food == SpeciesType.FoodType.Herbivore)
+		//					{
+		//						float meatPop = nextState.Herds[meatGroupIndex].Population;
+		//						nextState.Herds[meatGroupIndex].Population = Math.Max(0, meatPop - meatEaten * meatPop / availableMeat);
+		//					}
+		//				}
+		//			}
+
+		//			if (state.Herds[i].Destination != state.Herds[i].Position)
+		//			{
+		//				Vector2 diff = state.Herds[i].Destination - state.Herds[i].Position;
+		//				float dist = diff.magnitude;
+		//				var dir = diff.normalized;
+		//				Vector2 move = dist <= species.MovementSpeed ? diff : (species.MovementSpeed * dir);
+		//				Vector2 newPos = state.Herds[i].Position + move;
+		//				Vector2Int newTile = new Vector2Int((int)newPos.x, (int)newPos.y);
+		//				int newTileIndex = GetIndex(newTile.x, newTile.y);
+
+		//				// Don't walk into water
+		//				Vector2 nextPos = state.Herds[i].Position + dir;
+		//				if (state.Elevation[GetIndex((int)nextPos.x, (int)nextPos.y)] <= state.SeaLevel)
+		//				{
+		//					nextState.Herds[i].Destination = new Vector2((int)state.Herds[i].Position.x + 0.5f, (int)state.Herds[i].Position.y + 0.5f);
+		//				}
+
+		//				// move tiles
+		//				if ((int)state.Herds[i].Position.x != newTile.x || (int)state.Herds[i].Position.y != newTile.y)
+		//				{
+		//					for (int j = 0; j < MaxGroupsPerTile; j++)
+		//					{
+		//						int newGroupIndex = newTileIndex * MaxGroupsPerTile + j;
+		//						if (nextState.AnimalsPerTile[newGroupIndex] == -1)
+		//						{
+		//							nextState.AnimalsPerTile[newGroupIndex] = i;
+		//							nextState.Herds[i].Position = newPos;
+		//							for (int k = 0; k < MaxGroupsPerTile; k++)
+		//							{
+		//								int groupIndex = tileIndex * MaxGroupsPerTile + k;
+		//								if (nextState.AnimalsPerTile[groupIndex] == i)
+		//								{
+		//									nextState.AnimalsPerTile[groupIndex] = -1;
+		//									break;
+		//								}
+		//							}
+		//							break;
+		//						}
+		//					}
 		//				}
 		//				else
 		//				{
-		//					float availableMeat = 0;
-		//					for (int m = 0; m < MaxSpecies; m++)
-		//					{
-		//						if (state.Species[m].Food == SpeciesType.FoodType.Herbivore)
-		//						{
-		//							availableMeat += population[m];
-		//						}
-		//					}
-		//					float diedOfStarvation = Math.Max(0, p * (p - availableMeat) * species.starvationSpeed);
-		//					population[s] -= diedOfStarvation;
-
-		//					float meatEaten = Math.Min(availableMeat, p * species.speciesEatRate);
-		//					for (int m = 0; m < MaxSpecies; m++)
-		//					{
-		//						if (state.Species[m].Food == SpeciesType.FoodType.Herbivore)
-		//						{
-		//							population[m] -= meatEaten * (float)population[m] / availableMeat;
-		//						}
-		//					}
+		//					nextState.Herds[i].Position = newPos;
 		//				}
-
 		//			}
-		//		}
 
-		//		for (int s = 0; s < MaxSpecies; s++)
+		//		}
+		//		nextState.Herds[i].Population = Math.Max(0, newPopulation);
+		//		if (newPopulation <= 0)
 		//		{
-		//			int speciesIndex = GetSpeciesIndex(x, y, s);
-		//			var species = state.Species[s];
-		//			if (population[s] < 1)
+		//			for (int j = 0; j < MaxGroupsPerTile; j++)
 		//			{
-		//				population[s] = 0;
+		//				int groupIndex = tileIndex * MaxGroupsPerTile + j;
+		//				if (nextState.AnimalsPerTile[groupIndex] == i)
+		//				{
+		//					nextState.AnimalsPerTile[groupIndex] = -1;
+		//				}
 		//			}
-		//			nextState.Population[speciesIndex] = population[s];
-		//			nextState.SpeciesStats[s].Population += population[s];
 		//		}
-
 
 		//	}
 		//}

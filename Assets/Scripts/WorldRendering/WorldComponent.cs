@@ -48,20 +48,26 @@ public partial class WorldComponent : MonoBehaviour
 	[Header("Internal")]
 	public Camera MainCamera;
 	public World World;
+	public GameObject WorldIcons;
 	public MeshFilter LandMesh;
 	public MeshFilter CloudMesh;
 	public MeshFilter OceanMesh;
 	public GameObject ArrowPrefab;
+	public HerdIcon HerdIconPrefab;
+	public List<Sprite> SpeciesSprites;
 
 	// events
 	public event Action WorldStartedEvent;
+	public event Action HerdSelectedEvent;
 
+	public int HerdSelected { get; private set; }
 
 	#region private vars
 
 	private int _size = 100;
 	private GameObject[] _windArrows;
-	
+	private HerdIcon[] _herdIcons;
+
 	#endregion
 
 
@@ -70,7 +76,7 @@ public partial class WorldComponent : MonoBehaviour
     {
 		World = new World();
 		World.Init(_size);
-		World.Generate();
+		World.Generate(SpeciesSprites);
 		CreateWorldMesh();
 		MainCamera.transform.position = new Vector3(World.Size / 2, World.Size / 2, MainCamera.transform.position.z);
 
@@ -82,13 +88,24 @@ public partial class WorldComponent : MonoBehaviour
 				var a = GameObject.Instantiate<GameObject>(ArrowPrefab);
 				a.transform.position = new Vector3(i, j, 0);
 				a.transform.parent = this.transform;
-				a.active = false;
+				a.SetActive(false);
 				a.hideFlags = HideFlags.HideInHierarchy;
 				_windArrows[i+j*_size] = a;
 			}
 		}
 
+		_herdIcons = new HerdIcon[World.MaxHerds];
+		for (int i = 0; i < World.MaxHerds; i++)
+		{
+			var icon = HerdIcon.Instantiate<HerdIcon>(HerdIconPrefab);
+			icon.transform.parent = WorldIcons.transform;
+			icon.GetComponent<Canvas>().worldCamera = MainCamera;
+			icon.gameObject.SetActive(false);
+			_herdIcons[i] = icon;
+		}
+
 		WorldStartedEvent?.Invoke();
+		HerdSelected = -1;
 	}
 
 
@@ -106,6 +123,19 @@ public partial class WorldComponent : MonoBehaviour
 
 		World.Update(Time.deltaTime);
 		UpdateMesh(ShowLayers, Time.deltaTime);
+
+		for (int i=0;i<World.MaxHerds;i++)
+		{
+			bool isActive = World.States[World.CurRenderStateIndex].Herds[i].Status.Population > 0;
+			_herdIcons[i].gameObject.SetActive(isActive);
+			if (isActive)
+			{
+				int speciesIndex = World.States[World.CurRenderStateIndex].Herds[i].SpeciesIndex;
+				_herdIcons[i].SpeciesImage.sprite = World.SpeciesDisplay[speciesIndex].Sprite;
+				var herdPos = World.States[World.CurRenderStateIndex].Herds[i].Status.Position;
+				_herdIcons[i].transform.position = new Vector3(herdPos.x,herdPos.y,10);
+			}
+		}
 
 	}
 
@@ -135,7 +165,6 @@ public partial class WorldComponent : MonoBehaviour
 		{
 			_windArrows[i].active = value;
 		}
-
 	}
 
 	public float ConvertTemperature(float kelvin, TemperatureDisplayType displayType)
@@ -150,4 +179,10 @@ public partial class WorldComponent : MonoBehaviour
 		return kelvin;
 	}
 
+	public void SelectHerd(int index)
+	{
+		HerdSelected = index;
+		HerdSelectedEvent?.Invoke();
+	}
+	
 }
