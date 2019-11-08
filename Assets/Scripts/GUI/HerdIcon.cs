@@ -7,6 +7,11 @@ public class HerdIcon : MonoBehaviour
 {
 	public Image SpeciesImage;
 
+	[HideInInspector]
+	public WorldComponent World;
+	[HideInInspector]
+	public int HerdIndex;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,5 +26,6 @@ public class HerdIcon : MonoBehaviour
 
 	public void OnSelected()
 	{
+		World.SelectHerd(HerdIndex);
 	}
 }

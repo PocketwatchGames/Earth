@@ -99,7 +99,8 @@ public partial class WorldComponent : MonoBehaviour
 		{
 			var icon = HerdIcon.Instantiate<HerdIcon>(HerdIconPrefab);
 			icon.transform.parent = WorldIcons.transform;
-			icon.GetComponent<Canvas>().worldCamera = MainCamera;
+			//icon.gameObject.hideFlags = HideFlags.HideInHierarchy;
+			icon.World = this;
 			icon.gameObject.SetActive(false);
 			_herdIcons[i] = icon;
 		}
@@ -126,14 +127,15 @@ public partial class WorldComponent : MonoBehaviour
 
 		for (int i=0;i<World.MaxHerds;i++)
 		{
-			bool isActive = World.States[World.CurRenderStateIndex].Herds[i].Status.Population > 0;
+			int speciesIndex = World.States[World.CurRenderStateIndex].Herds[i].SpeciesIndex;
+			bool isActive = World.States[World.CurRenderStateIndex].Herds[i].Status.Population > 0 && speciesIndex >= 0;
 			_herdIcons[i].gameObject.SetActive(isActive);
 			if (isActive)
 			{
-				int speciesIndex = World.States[World.CurRenderStateIndex].Herds[i].SpeciesIndex;
 				_herdIcons[i].SpeciesImage.sprite = World.SpeciesDisplay[speciesIndex].Sprite;
 				var herdPos = World.States[World.CurRenderStateIndex].Herds[i].Status.Position;
-				_herdIcons[i].transform.position = new Vector3(herdPos.x,herdPos.y,10);
+				_herdIcons[i].transform.position = new Vector3(herdPos.x, herdPos.y, -10);
+				_herdIcons[i].HerdIndex = i;
 			}
 		}
 
@@ -163,7 +165,7 @@ public partial class WorldComponent : MonoBehaviour
 	{
 		for (int i = 0; i < _size * _size; i++)
 		{
-			_windArrows[i].active = value;
+			_windArrows[i].SetActive(value);
 		}
 	}
 

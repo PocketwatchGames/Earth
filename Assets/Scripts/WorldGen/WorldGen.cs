@@ -85,6 +85,7 @@ public partial class World {
 		state.Species[3].starvationSpeed = 12.0f / Data.TicksPerYear;
 		state.Species[3].dehydrationSpeed = 12.0f / Data.TicksPerYear;
 		int animalCount = 0;
+
 		for (int y = 0; y < Size; y++)
 		{
 			for (int x = 0; x < Size; x++)
@@ -109,30 +110,28 @@ public partial class World {
 					state.SurfaceWater[index] = GetPerlinMinMax(noise, x, y, 1.0f, 100, 0, 10.0f);
 					state.GroundWater[index] = GetPerlinMinMax(noise, x, y, 1.0f, 300, 0, state.WaterTableDepth[index] * state.SoilFertility[index] * Data.MaxSoilPorousness);
 					state.Canopy[index] = GetPerlinNormalized(noise, x, y, 2.0f, 1000);
-
-					//for (int s = 0; s < numSpecies; s++)
-					//{
-					//	float p = (short)Math.Max(0, GetPerlinMinMax(noise, x, y, 1.0f, 10000 + 1000 * s, -state.Species[s].speciesMaxPopulation, state.Species[s].speciesMaxPopulation));
-					//	if (p > 0)
-					//	{
-					//		int animalTileIndex = index * MaxGroupsPerTile;
-					//		for (int j=0;j<MaxGroupsPerTile;j++)
-					//		{
-					//			if (state.AnimalsPerTile[animalTileIndex + j] == -1)
-					//			{
-					//				int groupIndex = animalCount++;
-					//				state.AnimalsPerTile[animalTileIndex + j] = groupIndex;
-					//				state.Animals[groupIndex] = new AnimalGroup() { Species = s, Population = p, Position = new Vector2(x + 0.5f, y + 0.5f) };
-					//				state.Animals[groupIndex].Destination = state.Animals[groupIndex].Position;
-					//				break;
-					//			}
-					//		}
-					//	}
-					//}
-
 				}
 			}
 		}
+
+		int numHerds = 20;
+		for (int h = 0; h < numHerds; h++)
+		{
+			int s = (int)(numSpecies * (noise.GetWhiteNoiseInt(h, 0) / 2 + 0.5f));
+			int p = (int)((noise.GetWhiteNoiseInt(h, 1) * 0.5f + 0.5f) * state.Species[s].speciesMaxPopulation);
+			if (p > 0)
+			{
+				state.Herds[h] = new Herd() {
+					SpeciesIndex = s,
+					Status = new Herd.DisplayStatus() {
+						Population = p,
+						Position = new Vector2((noise.GetWhiteNoiseInt(h, 2) * 0.5f + 0.5f) * Size + 0.5f, (noise.GetWhiteNoiseInt(h, 3) * 0.5f + 0.5f) * Size + 0.5f)
+					}
+				};
+			}
+		}
+
+
 
 		for (int i = 1; i < numPlates; i++)
 		{

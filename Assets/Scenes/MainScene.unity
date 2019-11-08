@@ -3036,6 +3036,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
+  - component: {fileID: 870706487}
   - component: {fileID: 870706486}
   m_Layer: 0
   m_Name: WorldIcons
@@ -3044,20 +3045,46 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &870706486
-Transform:
+--- !u!223 &870706486
+Canvas:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 870706485}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 510.29236, y: 363.6946, z: -96.7683}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 963194227}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!224 &870706487
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 870706485}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 520, y: 317}
+  m_SizeDelta: {x: 1040, y: 634}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &891798449
 GameObject:
   m_ObjectHideFlags: 0
@@ -9835,7 +9862,7 @@ PrefabInstance:
         type: 3}
       propertyPath: HerdIconPrefab
       value: 
-      objectReference: {fileID: 4098031109956379955, guid: f76c51d7a61574348b77fedab3b30a57,
+      objectReference: {fileID: 7673265916172706938, guid: f76c51d7a61574348b77fedab3b30a57,
         type: 3}
     - target: {fileID: 6973225747509538569, guid: 6e826876a3d70764d947395c4824a82c,
         type: 3}
