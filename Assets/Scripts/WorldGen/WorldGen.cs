@@ -121,13 +121,37 @@ public partial class World {
 			int p = (int)((noise.GetWhiteNoiseInt(h, 1) * 0.5f + 0.5f) * state.Species[s].speciesMaxPopulation);
 			if (p > 0)
 			{
+				Vector2Int position = new Vector2Int((int)((noise.GetWhiteNoiseInt(h, 2) * 0.5f + 0.5f) * Size), (int)((noise.GetWhiteNoiseInt(h, 3) * 0.5f + 0.5f) * Size));
 				state.Herds[h] = new Herd() {
 					SpeciesIndex = s,
+					ActiveTiles = new Vector2Int[Herd.MaxActiveTiles],
+					TilePopulation = new float[Herd.MaxActiveTiles],
+					DesiredTiles = new Vector2Int[Herd.MaxDesiredTiles],
+					Units = new Herd.Unit[Herd.MaxUnits],
+					Population = p,
+
 					Status = new Herd.DisplayStatus() {
-						Population = p,
-						Position = new Vector2((noise.GetWhiteNoiseInt(h, 2) * 0.5f + 0.5f) * Size + 0.5f, (noise.GetWhiteNoiseInt(h, 3) * 0.5f + 0.5f) * Size + 0.5f)
+						Position = new Vector2(position.x+0.5f,position.y+0.5f)
 					}
 				};
+
+				state.Herds[h].ActiveTileCount = 1;
+				state.Herds[h].ActiveTiles[0] = position;
+				state.Herds[h].DesiredTiles[0] = position;
+
+				state.Herds[h].UnitCount = 8;
+				for (int i=0;i< state.Herds[h].UnitCount; i++)
+				{
+					state.Herds[h].Units[i] = new Herd.Unit
+					{
+						Maturity = i == 0 ? Herd.UnitMaturity.Juvenile : ((i == 7) ? Herd.UnitMaturity.Elderly : Herd.UnitMaturity.Adult),
+						Food = 0.5f,
+						Water = 0.3f,
+						Social = 0.1f,
+						Disease = 0.05f,
+						Comfort = 0.8f,						
+					};
+				}
 			}
 		}
 

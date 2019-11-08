@@ -57,6 +57,118 @@ public partial class World
 			}
 		}
 
+		for (int i = 0; i < MaxHerds; i++)
+		{
+			var species = state.Species[state.Herds[i].SpeciesIndex];
+
+			// Migrate tiles
+
+			// Generate tile-based shared herd resources
+			float water = 0;
+			float comfort = 0;
+			float food = 0;
+			float social = 0;
+			float populationDensity = 0;
+			float radiation = 0;
+			if (state.Herds[i].ActiveTileCount > 0)
+			{
+				for (int j = 0; j < state.Herds[j].ActiveTileCount; j++)
+				{
+					var tile = state.Herds[j].ActiveTiles[j];
+					if (tile.x < 0)
+					{
+						// TODO: the active tiles should prob be a list, not a sparse array
+						continue;
+					}
+					int tileIndex = GetIndex(tile.x, tile.y);
+					water += state.SurfaceWater[tileIndex];
+					comfort += Mathf.Clamp01((species.RestingTemperature + species.TemperatureRange - state.Temperature[tileIndex]) / species.TemperatureRange);
+					food += state.Canopy[tileIndex];
+					radiation += state.Radiation[tileIndex];
+				}
+				populationDensity = (float)state.Herds[i].Population / state.Herds[i].ActiveTileCount;
+				social += populationDensity;
+			}
+
+
+			// Per-unit:
+			for (int j=0;j<nextState.Herds[i].UnitCount; j++)
+			{
+				nextState.Herds[i].Units[j].Age++;
+
+				// Consume water
+				float waterConsumptionRate = 0.1f;
+				float maxWaterHeld = 1.0f;
+				float waterConsumed = Mathf.Clamp(nextState.Herds[i].Units[j].Population * waterConsumptionRate, water, maxWaterHeld - state.Herds[i].Units[j].Water);
+				nextState.Herds[i].Units[j].Water += waterConsumed;
+				water -= waterConsumed;
+
+				// Consume food
+				float foodConsumptionRate = 0.1f;
+				float maxFoodHeld = 1.0f;
+				float foodConsumed = Mathf.Clamp(nextState.Herds[i].Units[j].Population * foodConsumptionRate, food, maxFoodHeld - state.Herds[i].Units[j].Food);
+				nextState.Herds[i].Units[j].Food += foodConsumed;
+				food -= foodConsumed;
+
+				// Update unit resources (disease)
+				float immuneSystem = 1;
+				// Immune system strength is based on water/food/comfort consumed
+				//				if (state.Herds[i].Units[j].Maturity)
+				//nextState.Herds[i].Units[j].Disease += immuneSystem * populationDensity;
+
+			}
+
+			// Rebalance unit populations
+			for (int j = 0; j < Herd.MaxUnits; j++)
+			{
+				// Death
+				//				if (nextState.Herds[i].Units[j].Water)
+
+				// Birth
+				if (nextState.Herds[i].Units[j].Maturity == Herd.UnitMaturity.Adult && 
+					nextState.Herds[i].Units[j].Social > 0 && 
+					nextState.Herds[i].Units[j].Water > 0 && 
+					nextState.Herds[i].Units[j].Food > 0)
+				{
+					int births = 0;
+
+
+					// Mutation and evolution
+					float mutationSpeed = radiation * births;
+					nextState.Herds[i].EvolutionProgress += mutationSpeed;
+
+					float mutationHealthDelta = state.Herds[i].DesiredMutationHealth - state.Herds[i].MutationHealth;
+					nextState.Herds[i].MutationHealth += Math.Sign(mutationHealthDelta) * Math.Min(mutationSpeed, Math.Abs(mutationHealthDelta));
+
+					float mutationReproductionDelta = state.Herds[i].DesiredMutationReproduction - state.Herds[i].MutationReproduction;
+					nextState.Herds[i].MutationReproduction += Math.Sign(mutationReproductionDelta) * Math.Min(mutationSpeed, Math.Abs(mutationReproductionDelta));
+
+					float mutationSizeDelta = state.Herds[i].DesiredMutationSize - state.Herds[i].MutationSize;
+					nextState.Herds[i].MutationSize += Math.Sign(mutationSizeDelta) * Math.Min(mutationSpeed, Math.Abs(mutationSizeDelta));
+				}
+
+				// Promote units that reach maturity
+				if (nextState.Herds[i].Units[j].Maturity == Herd.UnitMaturity.Juvenile)
+				{
+					float adultAge = 10.0f;
+					if (nextState.Herds[i].Units[j].Age >= adultAge)
+					{
+					}
+				} else if (nextState.Herds[i].Units[j].Maturity == Herd.UnitMaturity.Adult)
+				{
+					float elderlyAge = 100.0f;
+					if (nextState.Herds[i].Units[j].Age >= elderlyAge)
+					{
+					}
+				}
+
+			}
+
+			// Collapse units if they can be combined
+			// Split units if they hit population cap
+
+		}
+
 		//for (int i = 0;i<MaxHerds;i++)
 		//{
 		//	float population = state.Herds[i].Population;
@@ -195,7 +307,5 @@ public partial class World
 	{
 		return surfaceWater > 0 ? 1.0f : Math.Min(1.0f, groundWaterSaturation);
 	}
-
-
 
 }

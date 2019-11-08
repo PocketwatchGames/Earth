@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class HerdIcon : MonoBehaviour
 {
+	public Button SpeciesButton;
 	public Image SpeciesImage;
 	public Text SpeciesName;
 
@@ -22,7 +23,7 @@ public class HerdIcon : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+		SpeciesButton.GetComponent<Image>().color = World.HerdSelected == HerdIndex ? Color.magenta : Color.gray;
     }
 
 	public void OnSelected()

@@ -94,6 +94,7 @@ public partial class World {
 		public float[] SoilFertility;
 		public float[] Canopy;
 		public float[] Pressure;
+		public float[] Radiation;
 		public int[] AnimalsPerTile;
 		public Vector3[] WindCloud;
 		public Vector3[] WindSurface;
@@ -131,6 +132,7 @@ public partial class World {
 			o.SoilFertility = (float[])SoilFertility.Clone();
 			o.Canopy = (float[])Canopy.Clone();
 			o.Pressure = (float[])Pressure.Clone();
+			o.Radiation = (float[])Radiation.Clone();
 			o.AnimalsPerTile = (int[])AnimalsPerTile.Clone();
 			o.WindCloud = (Vector3[])WindCloud.Clone();
 			o.WindSurface = (Vector3[])WindSurface.Clone();
@@ -191,6 +193,7 @@ public partial class World {
 			States[i].WindCloud = new Vector3[s];
 			States[i].WindSurface = new Vector3[s];
 			States[i].Pressure = new float[s];
+			States[i].Radiation = new float[s];
 			States[i].FlowDirection = new Vector2[s];
 			States[i].Normal = new Vector3[s];
 			States[i].AnimalsPerTile = new int[s * MaxGroupsPerTile];

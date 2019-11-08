@@ -25,5 +25,9 @@ public class LifeView : MonoBehaviour
 		HerdInfo.gameObject.SetActive(World.HerdSelected >= 0);
 	}
 
+	public void OnEnable()
+	{
+		OnHerdSelected();
+	}
 
 }

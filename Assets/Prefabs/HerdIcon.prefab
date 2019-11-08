@@ -373,6 +373,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 435514cde3361c146b480bad2b58752a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SpeciesButton: {fileID: 3836348340360640360}
   SpeciesImage: {fileID: 1503065642421381014}
   SpeciesName: {fileID: 3959615052121669701}
   World: {fileID: 0}

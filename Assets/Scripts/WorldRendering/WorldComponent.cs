@@ -128,7 +128,7 @@ public partial class WorldComponent : MonoBehaviour
 		for (int i=0;i<World.MaxHerds;i++)
 		{
 			int speciesIndex = World.States[World.CurRenderStateIndex].Herds[i].SpeciesIndex;
-			bool isActive = World.States[World.CurRenderStateIndex].Herds[i].Status.Population > 0 && speciesIndex >= 0;
+			bool isActive = World.States[World.CurRenderStateIndex].Herds[i].Population > 0 && speciesIndex >= 0;
 			_herdIcons[i].gameObject.SetActive(isActive);
 			if (isActive)
 			{
@@ -206,5 +206,10 @@ public partial class WorldComponent : MonoBehaviour
 			}
 
 		});
+	}
+
+	public void OnWorldClick()
+	{
+		HerdSelected = -1;
 	}
 }

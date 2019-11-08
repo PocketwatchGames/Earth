@@ -51,6 +51,7 @@ public partial class World
 				float waterTableDepth = state.WaterTableDepth[index];
 				float soilFertility = state.SoilFertility[index];
 				float surfaceIce = state.SurfaceIce[index];
+				float radiation = 0.001f;
 
 				float newEvaporation;
 				float newGroundWater = groundWater;
@@ -61,6 +62,7 @@ public partial class World
 				float newTemperature = temperature;
 				float newCloudElevation = cloudElevation;
 				float rainfall = 0;
+				float newRadiation = radiation;
 
 
 				float atmosphereMass = GetAtmosphereMass(elevation, elevationOrSeaLevel);
@@ -98,7 +100,7 @@ public partial class World
 				nextState.Rainfall[index] = rainfall;
 				nextState.CloudCover[index] = newCloudCover;
 				nextState.CloudElevation[index] = newCloudElevation;
-
+				nextState.Radiation[index] = newRadiation;
 			}
 		}
 
