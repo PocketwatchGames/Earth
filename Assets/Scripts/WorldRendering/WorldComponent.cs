@@ -99,7 +99,7 @@ public partial class WorldComponent : MonoBehaviour
 		{
 			var icon = HerdIcon.Instantiate<HerdIcon>(HerdIconPrefab);
 			icon.transform.parent = WorldIcons.transform;
-			//icon.gameObject.hideFlags = HideFlags.HideInHierarchy;
+			icon.gameObject.hideFlags = HideFlags.HideInHierarchy;
 			icon.World = this;
 			icon.gameObject.SetActive(false);
 			_herdIcons[i] = icon;
@@ -186,5 +186,25 @@ public partial class WorldComponent : MonoBehaviour
 		HerdSelected = index;
 		HerdSelectedEvent?.Invoke();
 	}
-	
+
+	public void SetDesiredMutation(int herdIndex, World.MutationType mutation, float value)
+	{
+		World.ApplyInput((nextState) =>
+		{
+
+			switch (mutation)
+			{
+				case World.MutationType.Health:
+					nextState.Herds[herdIndex].DesiredMutationHealth = value;
+					break;
+				case World.MutationType.Reproduction:
+					nextState.Herds[herdIndex].DesiredMutationReproduction = value;
+					break;
+				case World.MutationType.Size:
+					nextState.Herds[herdIndex].DesiredMutationSize = value;
+					break;
+			}
+
+		});
+	}
 }

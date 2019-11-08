@@ -43,7 +43,7 @@ public class ToolTectonic : GameTool
 		}
 		if (Input.GetMouseButton(0) && StartPlate >= 0)
 		{
-			lock (World.World.InputLock)
+			World.World.ApplyInput((nextState) =>
 			{
 				if (p != Start)
 				{
@@ -54,20 +54,18 @@ public class ToolTectonic : GameTool
 					if (Math.Abs(diff.x) > Math.Abs(diff.y))
 					{
 						move = new Vector2Int(Math.Sign(diff.x), 0);
-					} else
+					}
+					else
 					{
 						move = new Vector2Int(0, Math.Sign(diff.y));
 					}
-					World.World.MovePlate(World.World.States[World.World.CurStateIndex], World.World.States[nextStateIndex], StartPlate, move);
+					World.World.MovePlate(World.World.States[World.World.CurStateIndex], nextState, StartPlate, move);
 
 					Start = p;
 
 					World.World.CurStateIndex = nextStateIndex;
 				}
-
-
-
-			}
+			});
 		}
 	}
 }

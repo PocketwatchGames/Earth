@@ -23,6 +23,11 @@ public struct Herd {
 	public float MutationHealth;
 	public float MutationReproduction;
 	public float MutationSize;
+	public float DesiredMutationHealth;
+	public float DesiredMutationReproduction;
+	public float DesiredMutationSize;
+
+
 	public float EvolutionProgress;
 
 }

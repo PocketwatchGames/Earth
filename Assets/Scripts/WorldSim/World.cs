@@ -39,6 +39,13 @@ public struct SpeciesDisplayData {
 
 
 public partial class World {
+
+	public enum MutationType {
+		Size,
+		Reproduction,
+		Health
+	}
+
 	//		float MaxCloudElevation = ;
 	public int MaxHerds;
 	public int Size;
@@ -131,6 +138,20 @@ public partial class World {
 			o.FlowDirection = (Vector2[])FlowDirection.Clone();
 			o.Normal = (Vector3[])Normal.Clone();
 			return o;
+		}
+	}
+
+	public void ApplyInput(Action<State> action)
+	{
+		lock (InputLock)
+		{
+			var nextStateIndex = AdvanceState();
+			var state = States[CurStateIndex];
+			var nextState = States[nextStateIndex];
+
+			action.Invoke(nextState);
+
+			CurStateIndex = nextStateIndex;
 		}
 	}
 

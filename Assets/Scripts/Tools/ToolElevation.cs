@@ -29,20 +29,16 @@ public class ToolElevation : GameTool
 
 		if (Input.GetMouseButton(0))
 		{
-			lock (World.World.InputLock)
+			World.World.ApplyInput((nextState) =>
 			{
-				var nextStateIndex = World.World.AdvanceState();
-				var state = World.World.States[World.World.CurStateIndex];
-				var nextState = World.World.States[nextStateIndex];
-
 				for (int i = -Mathf.CeilToInt(BrushSize); i <= Mathf.CeilToInt(BrushSize); i++)
 				{
 					for (int j = -Mathf.CeilToInt(BrushSize); j <= Mathf.CeilToInt(BrushSize); j++)
 					{
-						float dist = (float)Mathf.Sqrt(i * i + j * j);
+						float dist = Mathf.Sqrt(i * i + j * j);
 						if (dist <= BrushSize)
 						{
-							float distT = (BrushSize == 0) ? 1.0f : (1.0f - (float)Mathf.Pow(dist / BrushSize, 2));
+							float distT = (BrushSize == 0) ? 1.0f : (1.0f - Mathf.Pow(dist / BrushSize, 2));
 							int x = World.World.WrapX(p.x + i);
 							int y = p.y + j;
 							if (y < 0 || y >= World.World.Size)
@@ -54,10 +50,7 @@ public class ToolElevation : GameTool
 						}
 					}
 				}
-
-				World.World.CurStateIndex = nextStateIndex;
-
-			}
+			});
 		}
 	}
 

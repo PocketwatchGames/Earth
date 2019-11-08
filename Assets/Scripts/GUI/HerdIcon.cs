@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class HerdIcon : MonoBehaviour
 {
 	public Image SpeciesImage;
+	public Text SpeciesName;
 
 	[HideInInspector]
 	public WorldComponent World;
@@ -15,7 +16,7 @@ public class HerdIcon : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+		SpeciesName.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -27,5 +28,17 @@ public class HerdIcon : MonoBehaviour
 	public void OnSelected()
 	{
 		World.SelectHerd(HerdIndex);
+	}
+
+	public void OnHoverEnter()
+	{
+		int speciesIndex = World.World.States[World.World.CurRenderStateIndex].Herds[HerdIndex].SpeciesIndex;
+		SpeciesName.text = World.World.SpeciesDisplay[speciesIndex].Name;
+		SpeciesName.gameObject.SetActive(true);
+	}
+
+	public void OnHoverExit()
+	{
+		SpeciesName.gameObject.SetActive(false);
 	}
 }
