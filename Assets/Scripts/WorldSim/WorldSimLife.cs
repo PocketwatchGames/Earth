@@ -86,9 +86,9 @@ public partial class World
 					food += state.Canopy[tileIndex];
 					radiation += state.Radiation[tileIndex];
 				}
-				populationDensity = (float)state.Herds[i].Population / state.Herds[i].ActiveTileCount;
-				social += populationDensity;
 			}
+			populationDensity = (float)state.Herds[i].Population / state.Herds[i].ActiveTileCount;
+			social += populationDensity;
 
 
 			// Per-unit:
@@ -98,17 +98,16 @@ public partial class World
 
 				// Consume water
 				float waterConsumptionRate = 0.1f;
-				float maxWaterHeld = 1.0f;
-				float waterConsumed = Mathf.Clamp(nextState.Herds[i].Units[j].Population * waterConsumptionRate, water, maxWaterHeld - state.Herds[i].Units[j].Water);
+				float waterConsumed = Mathf.Clamp(nextState.Herds[i].Units[j].Population * waterConsumptionRate, water, GetMaxWaterHeld() - state.Herds[i].Units[j].Water);
 				nextState.Herds[i].Units[j].Water += waterConsumed;
 				water -= waterConsumed;
 
 				// Consume food
 				float foodConsumptionRate = 0.1f;
-				float maxFoodHeld = 1.0f;
-				float foodConsumed = Mathf.Clamp(nextState.Herds[i].Units[j].Population * foodConsumptionRate, food, maxFoodHeld - state.Herds[i].Units[j].Food);
+				float foodConsumed = Mathf.Clamp(nextState.Herds[i].Units[j].Population * foodConsumptionRate, food, GetMaxFoodHeld() - state.Herds[i].Units[j].Food);
 				nextState.Herds[i].Units[j].Food += foodConsumed;
 				food -= foodConsumed;
+
 
 				// Update unit resources (disease)
 				float immuneSystem = 1;
@@ -306,6 +305,23 @@ public partial class World
 	public float GetFreshWaterAvailability(float surfaceWater, float groundWaterSaturation)
 	{
 		return surfaceWater > 0 ? 1.0f : Math.Min(1.0f, groundWaterSaturation);
+	}
+
+	public float GetMaxFoodHeld()
+	{
+		return 1.0f;
+	}
+	public float GetMaxWaterHeld()
+	{
+		return 1.0f;
+	}
+	public float GetMaxComfortHeld()
+	{
+		return 1.0f;
+	}
+	public float GetMaxPopulationDensity()
+	{
+		return 1.0f;
 	}
 
 }

@@ -29,11 +29,6 @@ public struct Herd {
 
 	public struct DisplayStatus {
 		public Vector2 Position;
-		public float Food;
-		public float Water;
-		public float Health;
-		public float Social;
-		public float Comfort;
 	}
 	public DisplayStatus Status;
 

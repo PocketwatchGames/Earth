@@ -52,21 +52,39 @@ public class HerdInfoPanel : MonoBehaviour
 			var herd = state.Herds[World.HerdSelected];
 			PopulationText.text = "Population: " + herd.Population;
 
-			FoodText.color = state.Herds[World.HerdSelected].Status.Food > 0.5 ?
-				Color.Lerp(Color.yellow, Color.green, (state.Herds[World.HerdSelected].Status.Food - 0.5f) / 0.5f) :
-				Color.Lerp(Color.red, Color.yellow, (state.Herds[World.HerdSelected].Status.Food) / 0.5f);
+			float food = 0;
+			float water = 0;
+			float comfort = 0;
+			float social = 0;
 
-			WaterText.color = state.Herds[World.HerdSelected].Status.Water > 0.5 ?
-				Color.Lerp(Color.yellow, Color.green, (state.Herds[World.HerdSelected].Status.Water - 0.5f) / 0.5f) :
-				Color.Lerp(Color.red, Color.yellow, (state.Herds[World.HerdSelected].Status.Water) / 0.5f);
+			for (int j = 0; j < herd.UnitCount; j++)
+			{
+				food += herd.Units[j].Food / World.World.GetMaxFoodHeld();
+				water += herd.Units[j].Water / World.World.GetMaxWaterHeld();
+				comfort += herd.Units[j].Comfort / World.World.GetMaxComfortHeld();
+				social += herd.Units[j].Population;
+			}
+			food /= herd.UnitCount;
+			water /= herd.UnitCount;
+			comfort /= herd.UnitCount;
+			social = Mathf.Clamp01(social / World.World.GetMaxPopulationDensity() / herd.ActiveTileCount);
 
-			ComfortText.color = state.Herds[World.HerdSelected].Status.Comfort > 0.5 ?
-				Color.Lerp(Color.yellow, Color.green, (state.Herds[World.HerdSelected].Status.Comfort - 0.5f) / 0.5f) :
-				Color.Lerp(Color.red, Color.yellow, (state.Herds[World.HerdSelected].Status.Comfort) / 0.5f);
 
-			SocialText.color = state.Herds[World.HerdSelected].Status.Social > 0.5 ?
-				Color.Lerp(Color.yellow, Color.green, (state.Herds[World.HerdSelected].Status.Social - 0.5f) / 0.5f) :
-				Color.Lerp(Color.red, Color.yellow, (state.Herds[World.HerdSelected].Status.Social) / 0.5f);
+			FoodText.color = food > 0.5 ?
+				Color.Lerp(Color.yellow, Color.green, (food - 0.5f) / 0.5f) :
+				Color.Lerp(Color.red, Color.yellow, (food) / 0.5f);
+
+			WaterText.color = water > 0.5 ?
+				Color.Lerp(Color.yellow, Color.green, (water - 0.5f) / 0.5f) :
+				Color.Lerp(Color.red, Color.yellow, (water) / 0.5f);
+
+			ComfortText.color = comfort > 0.5 ?
+				Color.Lerp(Color.yellow, Color.green, (comfort - 0.5f) / 0.5f) :
+				Color.Lerp(Color.red, Color.yellow, (comfort) / 0.5f);
+
+			SocialText.color = social > 0.5 ?
+				Color.Lerp(Color.yellow, Color.green, (social - 0.5f) / 0.5f) :
+				Color.Lerp(Color.red, Color.yellow, (social) / 0.5f);
 
 			MutationProgress.value = herd.EvolutionProgress;
 			MutationSizeProgress.CurStateSlider.value = herd.MutationSize;
