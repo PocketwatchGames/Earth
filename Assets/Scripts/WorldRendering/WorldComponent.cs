@@ -54,6 +54,7 @@ public partial class WorldComponent : MonoBehaviour
 	public MeshFilter OceanMesh;
 	public GameObject ArrowPrefab;
 	public HerdIcon HerdIconPrefab;
+	public GameObject TerritoryMarker;
 	public List<Sprite> SpeciesSprites;
 
 	// events
@@ -67,6 +68,7 @@ public partial class WorldComponent : MonoBehaviour
 	private int _size = 100;
 	private GameObject[] _windArrows;
 	private HerdIcon[] _herdIcons;
+	private GameObject[] _territoryMarkers;
 
 	#endregion
 
@@ -85,9 +87,8 @@ public partial class WorldComponent : MonoBehaviour
 		{
 			for (int j = 0; j < _size; j++)
 			{
-				var a = GameObject.Instantiate<GameObject>(ArrowPrefab);
+				var a = GameObject.Instantiate<GameObject>(ArrowPrefab, this.transform);
 				a.transform.position = new Vector3(i, j, 0);
-				a.transform.parent = this.transform;
 				a.SetActive(false);
 				a.hideFlags = HideFlags.HideInHierarchy;
 				_windArrows[i+j*_size] = a;
@@ -97,12 +98,20 @@ public partial class WorldComponent : MonoBehaviour
 		_herdIcons = new HerdIcon[World.MaxHerds];
 		for (int i = 0; i < World.MaxHerds; i++)
 		{
-			var icon = HerdIcon.Instantiate<HerdIcon>(HerdIconPrefab);
-			icon.transform.parent = WorldIcons.transform;
+			var icon = HerdIcon.Instantiate<HerdIcon>(HerdIconPrefab, WorldIcons.transform);
 			icon.gameObject.hideFlags = HideFlags.HideInHierarchy;
 			icon.World = this;
 			icon.gameObject.SetActive(false);
 			_herdIcons[i] = icon;
+		}
+
+		_territoryMarkers = new GameObject[Herd.MaxActiveTiles];
+		for (int i = 0; i < Herd.MaxActiveTiles; i++)
+		{
+			var marker = GameObject.Instantiate<GameObject>(TerritoryMarker, WorldIcons.transform);
+			marker.gameObject.hideFlags = HideFlags.HideInHierarchy;
+			marker.gameObject.SetActive(false);
+			_territoryMarkers[i] = marker;
 		}
 
 		WorldStartedEvent?.Invoke();
@@ -137,6 +146,21 @@ public partial class WorldComponent : MonoBehaviour
 				_herdIcons[i].transform.position = new Vector3(herdPos.x, herdPos.y, -10);
 				_herdIcons[i].HerdIndex = i;
 			}
+		}
+
+		for (int i=0;i<Herd.MaxActiveTiles;i++)
+		{
+			bool visible = false;
+			if (HerdSelected >= 0)
+			{
+				var herd = World.States[World.CurRenderStateIndex].Herds[HerdSelected];
+				if (i < herd.ActiveTileCount)
+				{
+					visible = true;
+					_territoryMarkers[i].transform.position = new Vector3(herd.ActiveTiles[i].x, herd.ActiveTiles[i].y, -11);
+				}
+			}
+			_territoryMarkers[i].SetActive(visible);
 		}
 
 	}

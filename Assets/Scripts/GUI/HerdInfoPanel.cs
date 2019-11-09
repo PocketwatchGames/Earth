@@ -31,6 +31,7 @@ public class HerdInfoPanel : MonoBehaviour
 		for (int i = 0; i < Herd.MaxUnits; i++)
 		{
 			var u = GameObject.Instantiate<GameObject>(UnitIconPrefab, UnitDisplay.transform);
+			u.hideFlags = HideFlags.HideInHierarchy;
 			u.transform.SetAsLastSibling();
 			u.SetActive(false);
 			_unitIcons[i] = u;

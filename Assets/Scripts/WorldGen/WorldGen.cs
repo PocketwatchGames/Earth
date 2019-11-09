@@ -135,9 +135,11 @@ public partial class World {
 					}
 				};
 
-				state.Herds[h].ActiveTileCount = 1;
+				state.Herds[h].ActiveTileCount = 2;
 				state.Herds[h].ActiveTiles[0] = position;
 				state.Herds[h].DesiredTiles[0] = position;
+				state.Herds[h].ActiveTiles[1] = position + new Vector2Int(0,1);
+				state.Herds[h].DesiredTiles[1] = position + new Vector2Int(0, 1);
 
 				state.Herds[h].UnitCount = 8;
 				for (int i=0;i< state.Herds[h].UnitCount; i++)
