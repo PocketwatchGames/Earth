@@ -217,27 +217,36 @@ public partial class World {
 		{
 			while (true)
 			{
-				if (TimeTillTick <= 0)
+				try
 				{
-					TimeTillTick += TicksPerSecond;
-
-					lock (InputLock)
+					if (TimeTillTick <= 0)
 					{
-						int nextStateIndex = (CurStateIndex + 1) % StateCount;
-						lock (DrawLock)
+						TimeTillTick += TicksPerSecond;
+
+						lock (InputLock)
 						{
-							while (nextStateIndex == LastRenderStateIndex || nextStateIndex == CurRenderStateIndex)
+							int nextStateIndex = (CurStateIndex + 1) % StateCount;
+							lock (DrawLock)
 							{
-								nextStateIndex = (nextStateIndex + 1) % StateCount;
+								while (nextStateIndex == LastRenderStateIndex || nextStateIndex == CurRenderStateIndex)
+								{
+									nextStateIndex = (nextStateIndex + 1) % StateCount;
+								}
 							}
+
+							States[nextStateIndex] = (State)States[CurStateIndex].Clone();
+							Tick(States[CurStateIndex], States[nextStateIndex]);
+
+							// TODO: why can't i edit this in the tick call?  it's a class, so it should be pass by reference?
+							States[nextStateIndex].Ticks = States[CurStateIndex].Ticks + 1;
+							CurStateIndex = nextStateIndex;
 						}
-
-						States[nextStateIndex] = (State)States[CurStateIndex].Clone();
-						Tick(States[CurStateIndex], States[nextStateIndex]);
-
-						// TODO: why can't i edit this in the tick call?  it's a class, so it should be pass by reference?
-						States[nextStateIndex].Ticks = States[CurStateIndex].Ticks + 1;
-						CurStateIndex = nextStateIndex;
+					}
+				} catch (AggregateException e)
+				{
+					foreach (var i in e.InnerExceptions)
+					{
+						Debug.Log(i);
 					}
 				}
 			}

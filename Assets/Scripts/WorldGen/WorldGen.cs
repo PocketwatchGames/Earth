@@ -124,6 +124,13 @@ public partial class World {
 				Vector2Int position = new Vector2Int((int)((noise.GetWhiteNoiseInt(h, 2) * 0.5f + 0.5f) * Size), (int)((noise.GetWhiteNoiseInt(h, 3) * 0.5f + 0.5f) * Size));
 				state.Herds[h] = new Herd() {
 					SpeciesIndex = s,
+					DesiredMutationHealth = 0.5f,
+					DesiredMutationReproduction = 0.5f,
+					DesiredMutationSize = 0.5f,
+					MutationHealth = noise.GetWhiteNoiseInt(h, 4) * 0.5f + 0.5f,
+					MutationReproduction = noise.GetWhiteNoiseInt(h, 5) * 0.5f + 0.5f,
+					MutationSize = noise.GetWhiteNoiseInt(h, 6) * 0.5f + 0.5f,
+					EvolutionProgress = noise.GetWhiteNoiseInt(h, 7) * 0.5f + 0.5f,
 					ActiveTiles = new Vector2Int[Herd.MaxActiveTiles],
 					TilePopulation = new float[Herd.MaxActiveTiles],
 					DesiredTiles = new Vector2Int[Herd.MaxDesiredTiles],

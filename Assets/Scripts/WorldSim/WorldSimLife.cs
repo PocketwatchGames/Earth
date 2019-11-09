@@ -92,7 +92,7 @@ public partial class World
 
 
 			// Per-unit:
-			for (int j=0;j<nextState.Herds[i].UnitCount; j++)
+			for (int j = 0; j < nextState.Herds[i].UnitCount; j++)
 			{
 				nextState.Herds[i].Units[j].Age++;
 
@@ -118,15 +118,15 @@ public partial class World
 			}
 
 			// Rebalance unit populations
-			for (int j = 0; j < Herd.MaxUnits; j++)
+			for (int j = 0; j < nextState.Herds[i].UnitCount; j++)
 			{
 				// Death
 				//				if (nextState.Herds[i].Units[j].Water)
 
 				// Birth
-				if (nextState.Herds[i].Units[j].Maturity == Herd.UnitMaturity.Adult && 
-					nextState.Herds[i].Units[j].Social > 0 && 
-					nextState.Herds[i].Units[j].Water > 0 && 
+				if (nextState.Herds[i].Units[j].Maturity == Herd.UnitMaturity.Adult &&
+					nextState.Herds[i].Units[j].Social > 0 &&
+					nextState.Herds[i].Units[j].Water > 0 &&
 					nextState.Herds[i].Units[j].Food > 0)
 				{
 					int births = 0;
@@ -153,7 +153,8 @@ public partial class World
 					if (nextState.Herds[i].Units[j].Age >= adultAge)
 					{
 					}
-				} else if (nextState.Herds[i].Units[j].Maturity == Herd.UnitMaturity.Adult)
+				}
+				else if (nextState.Herds[i].Units[j].Maturity == Herd.UnitMaturity.Adult)
 				{
 					float elderlyAge = 100.0f;
 					if (nextState.Herds[i].Units[j].Age >= elderlyAge)
