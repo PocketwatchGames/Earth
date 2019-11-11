@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.EventSystems;
 
 public partial class WorldComponent : MonoBehaviour
 {
@@ -71,7 +72,7 @@ public partial class WorldComponent : MonoBehaviour
 	private GameObject[] _territoryMarkers;
 
 	#endregion
-
+	
 
 	// Start is called before the first frame update
 	void Start()
@@ -154,10 +155,10 @@ public partial class WorldComponent : MonoBehaviour
 			if (HerdSelected >= 0)
 			{
 				var herd = World.States[World.CurRenderStateIndex].Herds[HerdSelected];
-				if (i < herd.ActiveTileCount)
+				if (i < herd.DesiredTileCount)
 				{
 					visible = true;
-					_territoryMarkers[i].transform.position = new Vector3(herd.ActiveTiles[i].x, herd.ActiveTiles[i].y, -11);
+					_territoryMarkers[i].transform.position = new Vector3(herd.DesiredTiles[i].x, herd.DesiredTiles[i].y, -11);
 				}
 			}
 			_territoryMarkers[i].SetActive(visible);
@@ -232,8 +233,4 @@ public partial class WorldComponent : MonoBehaviour
 		});
 	}
 
-	public void OnWorldClick()
-	{
-		HerdSelected = -1;
-	}
 }

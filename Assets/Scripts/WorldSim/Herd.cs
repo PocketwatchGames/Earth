@@ -48,6 +48,7 @@ public struct Herd {
 	public int ActiveTileCount;
 	public Vector2Int[] ActiveTiles;
 	public float[] TilePopulation;
+	public int DesiredTileCount;
 	public Vector2Int[] DesiredTiles;
 
 	public int UnitCount;

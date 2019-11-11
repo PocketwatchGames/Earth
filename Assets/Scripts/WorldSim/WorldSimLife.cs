@@ -62,6 +62,14 @@ public partial class World
 			var species = state.Species[state.Herds[i].SpeciesIndex];
 
 			// Migrate tiles
+			nextState.Herds[i].ActiveTileCount = state.Herds[i].DesiredTileCount;
+			for (int j=0;j<Herd.MaxActiveTiles;j++)
+			{
+				if (j<state.Herds[i].DesiredTileCount)
+				{
+					nextState.Herds[i].ActiveTiles[j] = state.Herds[i].DesiredTiles[j];
+				}
+			}
 
 			// Generate tile-based shared herd resources
 			float water = 0;

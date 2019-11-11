@@ -114,7 +114,7 @@ public partial class World {
 			}
 		}
 
-		int numHerds = 20;
+		int numHerds = 1;
 		for (int h = 0; h < numHerds; h++)
 		{
 			int s = (int)(numSpecies * (noise.GetWhiteNoiseInt(h, 0) / 2 + 0.5f));
@@ -143,6 +143,7 @@ public partial class World {
 				};
 
 				state.Herds[h].ActiveTileCount = 2;
+				state.Herds[h].DesiredTileCount = 2;
 				state.Herds[h].ActiveTiles[0] = position;
 				state.Herds[h].DesiredTiles[0] = position;
 				state.Herds[h].ActiveTiles[1] = position + new Vector2Int(0,1);

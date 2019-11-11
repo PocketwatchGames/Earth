@@ -23,11 +23,19 @@ public class LifeView : MonoBehaviour
 	public void OnHerdSelected()
 	{
 		HerdInfo.gameObject.SetActive(World.HerdSelected >= 0);
+		if (World.HerdSelected >= 0)
+		{
+			GetComponent<ToolTerritory>().OnSelect();
+		} else
+		{
+			GetComponent<ToolTerritory>().OnDeselect();
+		}
 	}
 
 	public void OnEnable()
 	{
 		OnHerdSelected();
 	}
+
 
 }
