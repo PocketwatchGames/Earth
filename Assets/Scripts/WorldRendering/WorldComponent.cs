@@ -200,18 +200,11 @@ public partial class WorldComponent : MonoBehaviour
 			TemperatureDisplay = TemperatureDisplayType.Farenheit;
 		}
 	}
-	public void OnWindFilterChanged(bool value)
+	public void OnWindFilterChanged(UnityEngine.UI.Toggle toggle)
 	{
 		for (int i = 0; i < _size * _size; i++)
 		{
-			_windArrows[i].SetActive(value);
-		}
-	}
-	public void OnOceanCurrentFilterChanged(bool value)
-	{
-		for (int i = 0; i < _size * _size; i++)
-		{
-			_windArrows[i].SetActive(value);
+			_windArrows[i].SetActive(toggle.isOn);
 		}
 	}
 
