@@ -73,10 +73,6 @@ public partial class World
 		}));
 		simTasks.Add(Task.Run(() =>
 		{
-			TickBarometricPressure(state, nextState);
-		}));
-		simTasks.Add(Task.Run(() =>
-		{
 			TickWind(state, nextState);
 		}));
 		simTasks.Add(Task.Run(() =>

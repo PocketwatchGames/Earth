@@ -47,6 +47,10 @@ public class ToolElevation : GameTool
 							}
 							int index = World.World.GetIndex(x, y);
 							nextState.Elevation[index] += Direction * distT * DeltaPerSecond * Time.deltaTime;
+							nextState.OceanTemperatureShallow[index] = nextState.Temperature[index];
+							nextState.OceanTemperatureDeep[index] = World.Data.FreezingTemperature;
+							nextState.OceanSalinityDeep[index] = Mathf.Max(0, nextState.SeaLevel - nextState.Elevation[index]);
+							nextState.OceanSalinityShallow[index] = World.Data.DeepOceanDepth;
 						}
 					}
 				}

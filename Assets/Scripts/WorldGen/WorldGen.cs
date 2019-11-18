@@ -104,17 +104,25 @@ public partial class World {
 				state.CloudElevation[index] = state.Elevation[index] + 1000;
 				state.WaterTableDepth[index] = GetPerlinMinMax(noise, x, y, 1.0f, 200, Data.MinWaterTableDepth, Data.MaxWaterTableDepth);
 				state.SoilFertility[index] = GetPerlinNormalized(noise, x, y, 1.0f, 400);
-				state.Pressure[index] = GetPressureAtElevation(state, index, Math.Max(state.SeaLevel, e), 0);
-				if (e > 0)
+				state.Pressure[index] = GetPressureAtElevation(state, index, Math.Max(state.SeaLevel, e));
+				if (e >= 0)
 				{
 					state.SurfaceWater[index] = GetPerlinMinMax(noise, x, y, 1.0f, 100, 0, 10.0f);
 					state.GroundWater[index] = GetPerlinMinMax(noise, x, y, 1.0f, 300, 0, state.WaterTableDepth[index] * state.SoilFertility[index] * Data.MaxSoilPorousness);
 					state.Canopy[index] = GetPerlinNormalized(noise, x, y, 2.0f, 1000);
+				} else
+				{
+					state.OceanTemperatureShallow[index] = (state.Temperature[index] + Data.FreezingTemperature) / 2;
+					state.OceanTemperatureDeep[index] = (state.OceanTemperatureShallow[index] + Data.FreezingTemperature) / 2;
+					state.OceanSalinityShallow[index] = (1.0f - Math.Abs(latitude)) * Data.DeepOceanDepth;
+					float deepOceanVolume = state.SeaLevel - state.Elevation[index];
+					state.OceanSalinityDeep[index] = (Math.Abs(latitude)+1) * deepOceanVolume;
+					state.OceanDensityDeep[index] = GetOceanDensity(state.OceanTemperatureDeep[index], state.OceanSalinityDeep[index], deepOceanVolume);
 				}
 			}
 		}
 
-		int numHerds = 1;
+		int numHerds = 20;
 		for (int h = 0; h < numHerds; h++)
 		{
 			int s = (int)(numSpecies * (noise.GetWhiteNoiseInt(h, 0) / 2 + 0.5f));
@@ -134,8 +142,12 @@ public partial class World {
 					ActiveTiles = new Vector2Int[Herd.MaxActiveTiles],
 					TilePopulation = new float[Herd.MaxActiveTiles],
 					DesiredTiles = new Vector2Int[Herd.MaxDesiredTiles],
-					Units = new Herd.Unit[Herd.MaxUnits],
 					Population = p,
+					Food = 0.5f,
+					Water = 0.3f,
+					Social = 0.1f,
+					Disease = 0.05f,
+					Comfort = 0.8f,
 
 					Status = new Herd.DisplayStatus() {
 						Position = new Vector2(position.x+0.5f,position.y+0.5f)
@@ -149,19 +161,6 @@ public partial class World {
 				state.Herds[h].ActiveTiles[1] = position + new Vector2Int(0,1);
 				state.Herds[h].DesiredTiles[1] = position + new Vector2Int(0, 1);
 
-				state.Herds[h].UnitCount = 8;
-				for (int i=0;i< state.Herds[h].UnitCount; i++)
-				{
-					state.Herds[h].Units[i] = new Herd.Unit
-					{
-						Maturity = i == 0 ? Herd.UnitMaturity.Juvenile : ((i == 7) ? Herd.UnitMaturity.Elderly : Herd.UnitMaturity.Adult),
-						Food = 0.5f,
-						Water = 0.3f,
-						Social = 0.1f,
-						Disease = 0.05f,
-						Comfort = 0.8f,						
-					};
-				}
 			}
 		}
 

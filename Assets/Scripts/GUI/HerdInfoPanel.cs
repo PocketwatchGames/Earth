@@ -20,22 +20,22 @@ public class HerdInfoPanel : MonoBehaviour
 	public Button EvolveButton;
 	public GameObject UnitIconPrefab;
 	public GameObject UnitDisplay;
-	private GameObject[] _unitIcons;
+	//private GameObject[] _unitIcons;
 
     // Start is called before the first frame update
     void Start()
     {
 		World.HerdSelectedEvent += OnHerdSelected;
 
-		_unitIcons = new GameObject[Herd.MaxUnits];
-		for (int i = 0; i < Herd.MaxUnits; i++)
-		{
-			var u = GameObject.Instantiate<GameObject>(UnitIconPrefab, UnitDisplay.transform);
-			u.hideFlags = HideFlags.HideInHierarchy;
-			u.transform.SetAsLastSibling();
-			u.SetActive(false);
-			_unitIcons[i] = u;
-		}
+		//_unitIcons = new GameObject[Herd.MaxUnits];
+		//for (int i = 0; i < Herd.MaxUnits; i++)
+		//{
+		//	var u = GameObject.Instantiate<GameObject>(UnitIconPrefab, UnitDisplay.transform);
+		//	u.hideFlags = HideFlags.HideInHierarchy;
+		//	u.transform.SetAsLastSibling();
+		//	u.SetActive(false);
+		//	_unitIcons[i] = u;
+		//}
 	}
 
 	private void OnEnable()
@@ -57,16 +57,10 @@ public class HerdInfoPanel : MonoBehaviour
 			float comfort = 0;
 			float social = 0;
 
-			for (int j = 0; j < herd.UnitCount; j++)
-			{
-				food += herd.Units[j].Food / World.World.GetMaxFoodHeld();
-				water += herd.Units[j].Water / World.World.GetMaxWaterHeld();
-				comfort += herd.Units[j].Comfort / World.World.GetMaxComfortHeld();
-				social += herd.Units[j].Population;
-			}
-			food /= herd.UnitCount;
-			water /= herd.UnitCount;
-			comfort /= herd.UnitCount;
+			food += herd.Food / World.World.GetMaxFoodHeld();
+			water += herd.Water / World.World.GetMaxWaterHeld();
+			comfort += herd.Comfort / World.World.GetMaxComfortHeld();
+			social += herd.Population;
 			social = Mathf.Clamp01(social / World.World.GetMaxPopulationDensity() / herd.ActiveTileCount);
 
 
@@ -92,25 +86,25 @@ public class HerdInfoPanel : MonoBehaviour
 			MutationHealthProgress.CurStateSlider.value = herd.MutationHealth;
 			EvolveButton.interactable = herd.EvolutionProgress >= 1;
 
-			for (int i=0;i<Herd.MaxUnits;i++)
-			{
-				bool active = i < herd.UnitCount;
-				_unitIcons[i].SetActive(active);
-				if (active)
-				{
-					if (herd.Units[i].Maturity == Herd.UnitMaturity.Juvenile)
-					{
-						_unitIcons[i].transform.localScale = new Vector3(1, 0.5f, 1);
-					} else if (herd.Units[i].Maturity == Herd.UnitMaturity.Adult)
-					{
-						_unitIcons[i].transform.localScale = new Vector3(1, 1, 1);
-					} else
-					{
-						_unitIcons[i].transform.localScale = new Vector3(1, 0.8f, 1);
-					}
-				}
+			//for (int i=0;i<Herd.MaxUnits;i++)
+			//{
+			//	bool active = i < herd.UnitCount;
+			//	_unitIcons[i].SetActive(active);
+			//	if (active)
+			//	{
+			//		if (herd.Units[i].Maturity == Herd.UnitMaturity.Juvenile)
+			//		{
+			//			_unitIcons[i].transform.localScale = new Vector3(1, 0.5f, 1);
+			//		} else if (herd.Units[i].Maturity == Herd.UnitMaturity.Adult)
+			//		{
+			//			_unitIcons[i].transform.localScale = new Vector3(1, 1, 1);
+			//		} else
+			//		{
+			//			_unitIcons[i].transform.localScale = new Vector3(1, 0.8f, 1);
+			//		}
+			//	}
 
-			}
+			//}
 		}
 	}
 

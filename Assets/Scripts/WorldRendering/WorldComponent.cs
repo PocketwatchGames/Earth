@@ -29,6 +29,12 @@ public partial class WorldComponent : MonoBehaviour
 		Probes = 1 << 18,
 		WaterVapor = 1 << 19,
 		Plates = 1 << 20,
+		OceanCurrentShallow = 1 << 21,
+		OceanCurrentDeep = 1 << 22,
+		OceanTemperatureShallow = 1 << 23,
+		OceanTemperatureDeep = 1 << 24,
+		OceanSalinityShallow = 1 << 25,
+		OceanSalinityDeep = 1 << 26,
 	}
 	public enum TemperatureDisplayType {
 		Kelvin,
@@ -49,6 +55,7 @@ public partial class WorldComponent : MonoBehaviour
 	[Header("Internal")]
 	public Camera MainCamera;
 	public World World;
+	public WorldData Data;
 	public GameObject WorldIcons;
 	public MeshFilter LandMesh;
 	public MeshFilter CloudMesh;
@@ -78,7 +85,14 @@ public partial class WorldComponent : MonoBehaviour
 	void Start()
     {
 		World = new World();
-		World.Init(_size);
+
+		//ActiveFeatures = SimFeature.All;
+		//ActiveFeatures &= ~(SimFeature.Evaporation);
+		//		ActiveFeatures &= ~(SimFeature.TradeWinds);
+		Data.Init(World.SimFeature.All, _size);
+
+
+		World.Init(_size, Data);
 		World.Generate(SpeciesSprites);
 		CreateWorldMesh();
 		MainCamera.transform.position = new Vector3(World.Size / 2, World.Size / 2, MainCamera.transform.position.z);
@@ -187,6 +201,13 @@ public partial class WorldComponent : MonoBehaviour
 		}
 	}
 	public void OnWindFilterChanged(bool value)
+	{
+		for (int i = 0; i < _size * _size; i++)
+		{
+			_windArrows[i].SetActive(value);
+		}
+	}
+	public void OnOceanCurrentFilterChanged(bool value)
 	{
 		for (int i = 0; i < _size * _size; i++)
 		{

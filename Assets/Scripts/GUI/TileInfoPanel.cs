@@ -32,11 +32,23 @@ public class TileInfoPanel : MonoBehaviour
 			text += "\nRainfall: " + (state.Rainfall[index] * World.World.Data.TicksPerYear).ToString("0.00");
 			text += "\nEvaporation: " + (state.Evaporation[index] * World.World.Data.TicksPerYear).ToString("0.00");
 			text += "\nWaterTableDepth: " + (int)state.WaterTableDepth[index];
-			text += "\nGroundWater: " + state.GroundWater[index].ToString("0.00");
-			text += "\nSurfaceWater: " + state.SurfaceWater[index].ToString("0.00");
 			text += "\nSurfaceIce: " + state.SurfaceIce[index].ToString("0.00");
 			text += "\nSoilFertility: " + (int)(state.SoilFertility[index] * 100);
-			text += "\nCanopy: " + (int)(state.Canopy[index] * 100);
+
+			if (state.Elevation[index] <= state.SeaLevel)
+			{
+				text += "\nShallow Temp: " + (int)World.ConvertTemperature(state.OceanTemperatureShallow[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
+				text += "\nDeep Temp: " + (int)World.ConvertTemperature(state.OceanTemperatureDeep[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
+				text += "\nShallow Salinity: " + state.OceanSalinityShallow[index].ToString("0.00");
+				text += "\nDeep Salinity: " + state.OceanSalinityDeep[index].ToString("0.00");
+				text += "\nDensity: " + state.OceanDensityDeep[index].ToString("0.00");
+			}
+			else
+			{
+				text += "\nGroundWater: " + state.GroundWater[index].ToString("0.00");
+				text += "\nSurfaceWater: " + state.SurfaceWater[index].ToString("0.00");
+				text += "\nCanopy: " + (int)(state.Canopy[index] * 100);
+			}
 			//	spriteBatch.DrawString(font, "Wind: " + Wind[index], new Vector2(5, textY += 15), Color.White);
 			//for (int s = 0; s < World.MaxGroupsPerTile; s++)
 			//{

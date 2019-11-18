@@ -15,28 +15,37 @@ public struct WindInfo
 	public Vector3 tradeWind;
 }
 
-public class SimData
+public class WorldData : MonoBehaviour
 {
+	[Header("Planetary")]
 	public int TicksPerYear = 360;
-	public float TicksPerHour;
-	public float SecondsPerTick;
-
 	public float tileSize = 400000;
+	public float carbonDioxide = 0.001f;
+	public float FreezingTemperature = 273.15f;
+	public float MinTemperature = 223.15f;
+	public float MaxTemperature = 323.15f;
+	public float planetTiltAngle = -23.5f;
+	public float troposphereElevation = 10000;
+	public float stratosphereElevation = 50000;
+	public float MaxTropopauseElevation = 17000f;
+	public float MinTropopauseElevation = 9000f;
+	public float TropopauseElevationSeason = 1000f;
+	public float troposphereAtmosphereContent = 0.8f;
 
+	[Header("Ecology")]
 	public float canopyGrowthRate = 100.0f;
 	public float canopyDeathRate = 0.2f;
 	public float freshWaterMaxAvailability = 0.1f;
+
+	[Header("Animals")]
 	public float populationExpansionPercent = 0.2f;
 	public float minPopulationDensityForExpansion = 0.1f;
-	public float carbonDioxide = 0.001f;
 
+	[Header("Geology")]
 	public float MaxElevation = 10000.0f;
 	public float MinElevation = -10000.0f;
-	public float EvapRateWind = 1.0f;
-	public float EvapRateTemperature = 1.0f;
-	public float tradeWindSpeed = 12.0f; // average wind speeds around trade winds around 12 m/s
-	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
-	public float RainfallRate = 10.0f;
+
+	[Header("Water")]
 	public float FlowSpeed = 10.0f; // mississippi travels at around 3 km/h
 	public float FlowSpeedExponent = 0.25f; // arbitrary exponent to make flow speeds work at lower gradients
 	public float MaxWaterTableDepth = 1000.0f; // There is still a lot of water below a kilometer, but it's generally not worth simulating
@@ -44,60 +53,78 @@ public class SimData
 	public float MaxSoilPorousness = 0.1f;
 	public float GroundWaterReplenishmentSpeed = 10.0f;
 	public float GroundWaterFlowSpeed = 0.5f;
-	public float FreezingTemperature = 273.15f;
-	public float MinTemperature = 223.15f;
-	public float MaxTemperature = 323.15f;
-	public float planetTiltAngle = -23.5f;
-	public float evapMinTemperature = 253; // -20 celsius
-	public float evapMaxTemperature = 413; // 140 celsius
-	public float evapTemperatureRange;
+
+	[Header("Atmosphere")]
+	public float tradeWindSpeed = 12.0f; // average wind speeds around trade winds around 12 m/s
+	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
 	public float localSunHeat = 5; // sun can add about 10 degrees farenheit
-
-
 	public float heatLoss = 0.00015f; // how fast a cell loses heat an min elevation, no cloud cover
 	public float heatGainFromSun = 20.0f; // how fast a cell gains heat with no cloud cover, modified by sun height
 	public float heatReflectionWater = 0.0f; // How much heat is reflected back by the water
+	public float heatAbsorptionWater = 0.1f; // How much heat is reflected back by the water
 	public float heatReflectionIce = 0.5f; // How much heat is reflected back by the water
 	public float HeatReflectionLand = 0.1f;
 	public float heatLossPreventionCarbonDioxide = 200;
-	public float cloudContentFullAbsorption = 5.0f; // how much heat gain/loss is caused by cloud cover
-	public float cloudAbsorptionRate = 0.06f; // 6% absorbed by clouds
-	public float cloudReflectionRate = 0.20f; // 20% reflected back to space
-	public float troposphereElevation = 10000;
-	public float stratosphereElevation = 50000;
-	public float troposphereAtmosphereContent = 0.8f;
-	public float dewPointZero = 213.0f;
-	public float dewPointTemperatureRange = 100.0f;
-	public float dewPointRange = 0.06f;
-	public float rainPointTemperatureMultiplier = 0.00075f; // adjustment for temperature
 	public float temperatureLapseRate = -0.0065f;
-	public float EvaporativeCoolingRate = 1.0f;
-	public float temperatureLossFromWind = 20.0f;
-	public float humidityLossFromWind = 0.1f;
-	public float cloudMovementFromWind = 20.0f;
+	public float temperatureEqualizationFromWind = 0.5f;
 	public float windInertia = 0.0f;
-	public float cloudElevationDeltaSpeed = 10.0f;
-	public float windVerticalCloudSpeedMultiplier = 100000;
 	public float StaticPressure = 101325;
 	public float StdTemp = 288.15f;
 	public float StdTempLapseRate = -0.0065f;
 	public float GravitationalAcceleration = 9.80665f;
 	public float MolarMassEarthAir = 0.0289644f;
 	public float UniversalGasConstant = 8.3144598f;
-	public float PressureExponent;
-	public float verticalWindPressureAdjustment = 1;
-	public float temperatureGradientPressureAdjustment = 1;
+	public float verticalWindPressureAdjustment = 100;
+	public float temperatureGradientPressureAdjustment = 10;
 	public float upperAtmosphereCoolingRate = 0.0f;
-	public float MaxTropopauseElevation = 17000f;
-	public float MinTropopauseElevation = 9000f;
-	public float TropopauseElevationSeason = 1000f;
-	public float maxIce = 2.0f;
-	public float iceFreezeRate = 10.0f;
-	public float iceMeltRate = 10.0f;
 	public float windElevationFactor = 1.0f / 2000;
 	public float maxWindFrictionElevation = 1000;
 
+	[Header("Water Vapor")]
+	public float EvapRateWind = 1.0f;
+	public float EvapRateTemperature = 1.0f;
+	public float dewPointZero = 213.0f;
+	public float dewPointTemperatureRange = 100.0f;
+	public float dewPointRange = 0.06f;
+	public float RainfallRate = 10.0f;
+	public float cloudContentFullAbsorption = 5.0f; // how much heat gain/loss is caused by cloud cover
+	public float cloudAbsorptionRate = 0.06f; // 6% absorbed by clouds
+	public float cloudReflectionRate = 0.20f; // 20% reflected back to space
+	public float evapMinTemperature = 253; // -20 celsius
+	public float evapMaxTemperature = 413; // 140 celsius
+	public float evapTemperatureRange;
+	public float rainPointTemperatureMultiplier = 0.00075f; // adjustment for temperature
+	public float EvaporativeCoolingRate = 3.0f;
+	public float humidityLossFromWind = 0.1f;
+	public float cloudMovementFromWind = 20.0f;
+	public float cloudElevationDeltaSpeed = 10.0f;
+	public float windVerticalCloudSpeedMultiplier = 100000;
+
+
+	[Header("Ocean")]
+	public float maxIce = 2.0f;
+	public float iceFreezeRate = 10.0f;
+	public float iceMeltRate = 10.0f;
+	public float DeepOceanDepth = 500;
+	public float WindToOceanCurrentFactor = 0.1f;
+	public float oceanTemperatureMovement = 0.1f;
+	public float oceanSalinityMovement = 0.01f;
+	public float horizontalMixing = 0.01f;
+	public float heatExchangeAirSpeed = 0.1f;
+	public float upwellingSpeed = 10000.0f;
+	public float downwellingSpeed = 100.0f;
+	public float oceanSalinityIncrease = 0.1f;
+	public float temperatureMixingSpeed = 0.0001f;
+	public float salinityMixingSpeed = 0.001f;
+
+	[NonSerialized]
 	public WindInfo[] windInfo;
+	[NonSerialized]
+	public float TicksPerHour;
+	[NonSerialized]
+	public float SecondsPerTick;
+	[NonSerialized]
+	public float PressureExponent;
 
 
 	public void Init(World.SimFeature activeFeatures, int size)
@@ -122,7 +149,7 @@ public class SimData
 
 		evapTemperatureRange = evapMaxTemperature - evapMinTemperature;
 		heatGainFromSun /= TicksPerYear; // how fast a cell gains heat with no cloud cover, modified by sun height
-		temperatureLossFromWind *= SecondsPerTick / tileSize / TicksPerYear;
+		temperatureEqualizationFromWind *= SecondsPerTick / tileSize / TicksPerYear;
 		humidityLossFromWind *= SecondsPerTick / tileSize / TicksPerYear;
 		cloudMovementFromWind *= SecondsPerTick / tileSize / TicksPerYear;
 		cloudElevationDeltaSpeed /= TicksPerYear;
@@ -137,7 +164,7 @@ public class SimData
 			humidityLossFromWind = 0;
 		}
 		if (!activeFeatures.HasFlag(World.SimFeature.TemperatureMovesOnWind)) {
-			temperatureLossFromWind = 0;
+			temperatureEqualizationFromWind = 0;
 		}
 		if (!activeFeatures.HasFlag(World.SimFeature.Evaporation)) {
 			EvapRateTemperature = 0;
@@ -205,16 +232,13 @@ public class SimData
 			wind.z = cosPitch;
 			wind *= tradeWindSpeed;
 
-			float coriolisPower = (float)Math.Sqrt(Math.Abs(latitude)) * (float)Math.PI / 2; ;
-			coriolisPower *= (latitude > 0) ? 1 : -1;
 			float tropopauseElevation = (1.0f - Math.Abs(latitude)) * (MaxTropopauseElevation - MinTropopauseElevation) + MinTropopauseElevation + TropopauseElevationSeason * latitude;
-
 			windInfo[y] = new WindInfo()
 			{
 				latitude = latitude,
 				yaw = yaw,
 				tropopauseElevationMax = tropopauseElevation,
-				coriolisPower = coriolisPower,
+				coriolisPower = -Mathf.Sin(latitude*Mathf.PI/2),
 				tradeWind = wind
 			};
 		}
@@ -224,9 +248,8 @@ public class SimData
 
 public partial class World
 {
-	public SimData Data;
+	public WorldData Data;
 	public const int MaxSpecies = 4;
-	public SimFeature ActiveFeatures;
 
 	[Flags]
 	public enum SimFeature : uint

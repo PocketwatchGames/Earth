@@ -119,7 +119,10 @@ public partial class World
 		nextState.WaterTableDepth[newIndex] = state.WaterTableDepth[index];
 		nextState.GroundWater[newIndex] = state.GroundWater[index];
 		nextState.SurfaceWater[newIndex] = state.SurfaceWater[index];
-		nextState.WaterSalinity[newIndex] = state.WaterSalinity[index];
+		nextState.OceanSalinityShallow[newIndex] = state.OceanSalinityShallow[index];
+		nextState.OceanSalinityDeep[newIndex] = state.OceanSalinityDeep[index];
+		nextState.OceanTemperatureShallow[newIndex] = state.OceanTemperatureShallow[index];
+		nextState.OceanTemperatureDeep[newIndex] = state.OceanTemperatureDeep[index];
 		nextState.SurfaceIce[newIndex] = state.SurfaceIce[index];
 		nextState.SubmergedIce[newIndex] = state.SubmergedIce[index];
 		nextState.SoilFertility[newIndex] = state.SoilFertility[index];

@@ -14,48 +14,122 @@ public partial class World
 		for (int y = 0; y < Size; y++)
 		{
 			float latitude = Data.windInfo[y].latitude;
+			var windInfo = Data.windInfo[y];
 
 			for (int x = 0; x < Size; x++)
 			{
 				int index = GetIndex(x, y);
-				float pressure = state.Pressure[index];
 
-				// within 1 km of the ground, frictional forces slow wind down
-				var newWind = UpdateWind(state, x, y, latitude, pressure);
+				if (state.Elevation[index] <= state.SeaLevel)
+				{
 
-				nextState.Wind[index] = newWind;
+					float pressure = state.Pressure[index];
+					var normal = state.Normal[index];
+					float friction = (1.0f - normal.z) * 0.5f;
+
+					// within 1 km of the ground, frictional forces slow wind down
+					var newWind = UpdateWind(state, x, y, latitude, pressure, friction, windInfo.coriolisPower, windInfo.tradeWind.z);
+					nextState.Wind[index] = newWind;
+					if (state.Elevation[index] <= state.SeaLevel && state.SurfaceIce[index] == 0)
+					{
+						nextState.OceanCurrentShallow[index] = Quaternion.Euler(0, 0, windInfo.coriolisPower * 90) * new Vector3(newWind.x, newWind.y, 0) * Data.WindToOceanCurrentFactor;
+					}
+					else
+					{
+						nextState.OceanCurrentShallow[index] = Vector3.zero;
+					}
+
+
+
+
+
+					float density = state.OceanDensityDeep[index];
+					Vector2 densityDifferential = Vector2.zero;
+					for (int i = 0; i < 4; i++)
+					{
+						var neighbor = GetNeighbor(x, y, i);
+						int nIndex = GetIndex(neighbor.x, neighbor.y);
+						if (state.Elevation[nIndex] <= state.SeaLevel)
+						{
+							//var neighborWind = state.Wind[nIndex];
+							//nWind += neighborWind;
+
+							switch (i)
+							{
+								case 0:
+									densityDifferential.x += state.OceanDensityDeep[nIndex] - density;
+									break;
+								case 1:
+									densityDifferential.x -= state.OceanDensityDeep[nIndex] - density;
+									break;
+								case 2:
+									densityDifferential.y -= state.OceanDensityDeep[nIndex] - density;
+									break;
+								case 3:
+									densityDifferential.y += state.OceanDensityDeep[nIndex] - density;
+									break;
+							}
+						}
+					}
+					nextState.OceanCurrentDeep[index] = new Vector3(densityDifferential.x, densityDifferential.y, 0);
+
+
+				}
 			}
 		}
-		Task[] windTasks = new Task[]
-		{
-			Task.Run(() => { UpdateWindAtElevation(state, nextState.WindSurface, nextState.Wind, state.Elevation); }),
-			Task.Run(() => { UpdateWindAtElevation(state, nextState.WindCloud, nextState.Wind, state.CloudElevation); }),
-		};
-		Task.WaitAll(windTasks);
-	}
 
-	private void UpdateWindAtElevation(State state, Vector3[] windToSet, Vector3[] wind, float[] elevation)
-	{
 		for (int y = 0; y < Size; y++)
 		{
-			var windInfo = Data.windInfo[y];
-			float tropopauseElevation = windInfo.tropopauseElevationMax * (GetTimeOfYear(state.Ticks) * 2 - 1);
-
 			for (int x = 0; x < Size; x++)
 			{
 				int index = GetIndex(x, y);
-				var normal = state.Normal[index];
-				float elevationOrSeaLevel = Math.Max(state.SeaLevel, state.Elevation[index]);
-
-				// within 1 km of the ground, frictional forces slow wind down
-				float friction = (1.0f - normal.z * 0.75f);
-
-				windToSet[index] = GetWindAtElevation(windInfo.tradeWind, wind[index], Math.Max(state.SeaLevel, elevation[index]), Math.Max(state.SeaLevel, state.Elevation[index]), tropopauseElevation, windInfo.latitude, windInfo.yaw, windInfo.coriolisPower, friction);
+				if (state.Elevation[index] <= state.SeaLevel)
+				{
+					var vertCurrent = nextState.OceanCurrentShallow[index].magnitude;
+					for (int i = 0; i < 4; i++)
+					{
+						var neighbor = GetNeighbor(x, y, i);
+						int nIndex = GetIndex(neighbor.x, neighbor.y);
+						if (state.Elevation[nIndex] <= state.SeaLevel)
+						{
+							switch (i)
+							{
+								case 0:
+									if (nextState.OceanCurrentShallow[index].x > 0)
+									{
+										vertCurrent -= nextState.OceanCurrentShallow[index].x;
+									}
+									break;
+								case 1:
+									if (nextState.OceanCurrentShallow[index].x < 0)
+									{
+										vertCurrent += nextState.OceanCurrentShallow[index].x;
+									}
+									break;
+								case 2:
+									if (nextState.OceanCurrentShallow[index].y < 0)
+									{
+										vertCurrent += nextState.OceanCurrentShallow[index].y;
+									}
+									break;
+								case 3:
+									if (nextState.OceanCurrentShallow[index].y > 0)
+									{
+										vertCurrent -= nextState.OceanCurrentShallow[index].y;
+									}
+									break;
+							}
+						}
+					}
+					nextState.OceanCurrentShallow[index].z = vertCurrent;
+				}
 			}
 		}
+
 	}
 
-	private Vector3 UpdateWind(State state, int x, int y, float latitude, float pressure)
+
+	private Vector3 UpdateWind(State state, int x, int y, float latitude, float pressure, float friction, float coriolisPower, float verticalWindSpeed)
 	{
 		Vector2 pressureDifferential = Vector2.zero;
 		Vector3 nWind = Vector3.zero;
@@ -82,54 +156,11 @@ public partial class World
 					break;
 			}
 		}
-		Vector3 newWind = new Vector3(pressureDifferential.x, pressureDifferential.y, (pressureDifferential.x + pressureDifferential.y) / 4) * Data.pressureDifferentialWindSpeed;
-		return newWind * (1.0f - Data.windInertia) + nWind / 4 * Data.windInertia;
+		var pressureGradient = new Vector3(pressureDifferential.x, pressureDifferential.y, (pressureDifferential.x + pressureDifferential.y) / 4) * Data.pressureDifferentialWindSpeed;
+		var newWind = Quaternion.Euler(0, 0, coriolisPower * 90) * pressureGradient;
+		newWind.z = verticalWindSpeed;
+		return newWind;
 
-	}
-
-	Vector3 GetWindAtElevation(Vector3 tradeWind, Vector3 pressureWind, float windElevation, float landElevation, float tropopauseElevation, float latitude, float yaw, float coriolisPower, float friction)
-	{
-		float altitude = windElevation - landElevation;
-		float hadleyCellHeight = Math.Min(1.0f, altitude / (tropopauseElevation - landElevation));
-
-		if (latitude < 0.3333f && latitude > -0.3333f)
-		{
-			tradeWind.y *= (float)-Math.Sin(yaw + Math.PI * hadleyCellHeight);
-		}
-		else if (latitude < 0.667f && latitude > -0.667f)
-		{
-			tradeWind.y *= (float)Math.Sin(yaw + Math.PI * hadleyCellHeight);
-		}
-		else
-		{
-			tradeWind.y *= (float)Math.Sin(yaw + Math.PI * hadleyCellHeight);
-		}
-		if (tradeWind.z > 0)
-		{
-			tradeWind.z *= 1.0f - hadleyCellHeight;
-		}
-		else
-		{
-			tradeWind.z *= hadleyCellHeight;
-		}
-		Vector3 wind = tradeWind;
-
-		// within 1 km of the ground, frictional forces slow wind down			
-		float frictionElevation = Math.Max(0.0f, (1.0f - altitude / Data.maxWindFrictionElevation));
-		friction *= frictionElevation * frictionElevation;
-
-		if (coriolisPower > 0 && friction < 1)
-		{
-//				Matrix4x4.Rotate(Quaternion.EulerRotation())
-			wind += Quaternion.Euler(0,0,coriolisPower * (1.0f - friction)) * pressureWind;
-		}
-
-		// Wind speeds are much higher at high altitudes
-		float windElevationNormalized = Math.Min(1.0f, windElevation * Data.windElevationFactor);
-		wind *= 1.0f + windElevationNormalized * windElevationNormalized * (1.0f - friction);
-
-		// TODO: Should I be simulating pressure differentials at the tropopause to distribute heat at the upper atmosphere?
-		return wind;
 	}
 
 }
