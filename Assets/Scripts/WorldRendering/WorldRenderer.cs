@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity;
 using UnityEngine;
+using Sim;
 
 public partial class WorldComponent {
 	Vector3[] landVerts;
@@ -250,7 +251,7 @@ public partial class WorldComponent {
 				}
 				else if (showLayers.HasFlag(Layers.RelativeHumidity))
 				{
-					oceanColor = color = Color.Lerp(Color.black, Color.blue, Math.Min(1.0f, World.GetRelativeHumidity(World.GetLocalTemperature(Math.Max(0, World.GetSunVector(state.Ticks, World.GetLatitude(y)).z), state.CloudCover[index], state.Temperature[index]), state.Humidity[index], state.CloudElevation[index], Math.Max(elevation, state.SeaLevel)) / World.Data.dewPointRange));
+					oceanColor = color = Color.Lerp(Color.black, Color.blue, Math.Min(1.0f, Atmosphere.GetRelativeHumidity(World, Atmosphere.GetLocalTemperature(World, Math.Max(0, Atmosphere.GetSunVector(World, state.Ticks, World.GetLatitude(y)).z), state.CloudCover[index], state.Temperature[index]), state.Humidity[index], state.CloudElevation[index], Math.Max(elevation, state.SeaLevel)) / World.Data.dewPointRange));
 				}
 				else if (showLayers.HasFlag(Layers.Rainfall))
 				{

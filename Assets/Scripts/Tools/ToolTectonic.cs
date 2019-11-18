@@ -59,7 +59,7 @@ public class ToolTectonic : GameTool
 					{
 						move = new Vector2Int(0, Math.Sign(diff.y));
 					}
-					World.World.MovePlate(World.World.States[World.World.CurStateIndex], nextState, StartPlate, move);
+					Sim.Geology.MovePlate(World.World, World.World.States[World.World.CurStateIndex], nextState, StartPlate, move);
 
 					Start = p;
 

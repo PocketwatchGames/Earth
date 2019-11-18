@@ -303,4 +303,92 @@ public partial class World {
 		States[nextStateIndex] = (State)States[CurStateIndex].Clone();
 		return nextStateIndex;
 	}
+
+
+	public int WrapX(int x)
+	{
+		if (x < 0)
+		{
+			x += Size;
+		}
+		else if (x >= Size)
+		{
+			x -= Size;
+		}
+		return x;
+	}
+	public int WrapY(int y)
+	{
+		return Mathf.Clamp(y, 0, Size - 1);
+	}
+	public Vector2Int GetNeighbor(int x, int y, int neighborIndex)
+	{
+		switch (neighborIndex)
+		{
+			case 0:
+				x--;
+				if (x < 0)
+				{
+					x += Size;
+				}
+				break;
+			case 1:
+				x++;
+				if (x >= Size)
+				{
+					x -= Size;
+				}
+				break;
+			case 2:
+				y++;
+				if (y >= Size)
+				{
+					y = Size - 1;
+					//						x = (x + Size / 2) % Size;
+				}
+				break;
+			case 3:
+				y--;
+				if (y < 0)
+				{
+					y = 0;
+					//						x = (x + Size / 2) % Size;
+				}
+				break;
+		}
+		return new Vector2Int(x, y);
+	}
+
+	private void Tick(State state, State nextState)
+	{
+		nextState.SpeciesStats = new SpeciesStat[MaxSpecies];
+
+		List<Task> simTasks = new List<Task>();
+		simTasks.Add(Task.Run(() =>
+		{
+			Sim.Geology.Tick(this, state, nextState);
+		}));
+		simTasks.Add(Task.Run(() =>
+		{
+			Sim.Wind.Tick(this, state, nextState);
+		}));
+		simTasks.Add(Task.Run(() =>
+		{
+			Sim.Atmosphere.Tick(this, state, nextState);
+		}));
+		simTasks.Add(Task.Run(() =>
+		{
+			Sim.Animals.Tick(this, state, nextState);
+		}));
+		//simTasks.Add(Task.Run(() =>
+		//{
+		//	for (int i = 0; i < ProbeCount; i++)
+		//	{
+		//		Probes[i].Update(this, state);
+		//	}
+		//}));
+		Task.WaitAll(simTasks.ToArray());
+	}
+
+
 }

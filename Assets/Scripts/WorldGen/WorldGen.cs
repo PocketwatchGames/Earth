@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity;
 using UnityEngine;
+using Sim;
 
 public partial class World {
 
@@ -104,7 +105,7 @@ public partial class World {
 				state.CloudElevation[index] = state.Elevation[index] + 1000;
 				state.WaterTableDepth[index] = GetPerlinMinMax(noise, x, y, 1.0f, 200, Data.MinWaterTableDepth, Data.MaxWaterTableDepth);
 				state.SoilFertility[index] = GetPerlinNormalized(noise, x, y, 1.0f, 400);
-				state.Pressure[index] = GetPressureAtElevation(state, index, Math.Max(state.SeaLevel, e));
+				state.Pressure[index] = Atmosphere.GetPressureAtElevation(this, state, index, Math.Max(state.SeaLevel, e));
 				if (e >= 0)
 				{
 					state.SurfaceWater[index] = GetPerlinMinMax(noise, x, y, 1.0f, 100, 0, 10.0f);
@@ -117,7 +118,7 @@ public partial class World {
 					state.OceanSalinityShallow[index] = (1.0f - Math.Abs(latitude)) * Data.DeepOceanDepth;
 					float deepOceanVolume = state.SeaLevel - state.Elevation[index];
 					state.OceanSalinityDeep[index] = (Math.Abs(latitude)+1) * deepOceanVolume;
-					state.OceanDensityDeep[index] = GetOceanDensity(state.OceanTemperatureDeep[index], state.OceanSalinityDeep[index], deepOceanVolume);
+					state.OceanDensityDeep[index] = Atmosphere.GetOceanDensity(this, state.OceanTemperatureDeep[index], state.OceanSalinityDeep[index], deepOceanVolume);
 				}
 			}
 		}

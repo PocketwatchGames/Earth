@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Sim;
 
 public class HerdInfoPanel : MonoBehaviour
 {
@@ -57,11 +58,11 @@ public class HerdInfoPanel : MonoBehaviour
 			float comfort = 0;
 			float social = 0;
 
-			food += herd.Food / World.World.GetMaxFoodHeld();
-			water += herd.Water / World.World.GetMaxWaterHeld();
-			comfort += herd.Comfort / World.World.GetMaxComfortHeld();
+			food += herd.Food / Animals.GetMaxFoodHeld();
+			water += herd.Water / Animals.GetMaxWaterHeld();
+			comfort += herd.Comfort / Animals.GetMaxComfortHeld();
 			social += herd.Population;
-			social = Mathf.Clamp01(social / World.World.GetMaxPopulationDensity() / herd.ActiveTileCount);
+			social = Mathf.Clamp01(social / Animals.GetMaxPopulationDensity() / herd.ActiveTileCount);
 
 
 			FoodText.color = food > 0.5 ?

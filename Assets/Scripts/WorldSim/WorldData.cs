@@ -79,6 +79,7 @@ public class WorldData : MonoBehaviour
 	public float upperAtmosphereCoolingRate = 0.0f;
 	public float windElevationFactor = 1.0f / 2000;
 	public float maxWindFrictionElevation = 1000;
+	public float temperatureToPressure = 1000;
 
 	[Header("Water Vapor")]
 	public float EvapRateWind = 1.0f;
@@ -116,6 +117,8 @@ public class WorldData : MonoBehaviour
 	public float oceanSalinityIncrease = 0.1f;
 	public float temperatureMixingSpeed = 0.0001f;
 	public float salinityMixingSpeed = 0.001f;
+	public float OceanSalinityDensity = 1.0f;
+	public float OceanTemperatureDensity = 10.0f;
 
 	[NonSerialized]
 	public WindInfo[] windInfo;
