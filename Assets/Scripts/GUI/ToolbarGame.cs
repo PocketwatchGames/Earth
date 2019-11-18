@@ -7,7 +7,9 @@ public class ToolbarGame : Toolbar
 	override public void Start()
 	{
 		base.Start();
-		OnClick(0);
+		int startIndex = 0;
+		base.OnClick(startIndex);
+		Buttons[startIndex].GetComponent<GameTool>()?.OnSelect();
 	}
 	override public void OnClick(int index)
 	{
