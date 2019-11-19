@@ -105,7 +105,7 @@ public partial class World {
 				state.CloudElevation[index] = state.Elevation[index] + 1000;
 				state.WaterTableDepth[index] = GetPerlinMinMax(noise, x, y, 1.0f, 200, Data.MinWaterTableDepth, Data.MaxWaterTableDepth);
 				state.SoilFertility[index] = GetPerlinNormalized(noise, x, y, 1.0f, 400);
-				state.Pressure[index] = Atmosphere.GetPressureAtElevation(this, state, index, Math.Max(state.SeaLevel, e));
+				state.Pressure[index] = Data.StaticPressure;
 				if (e >= 0)
 				{
 					state.SurfaceWater[index] = GetPerlinMinMax(noise, x, y, 1.0f, 100, 0, 10.0f);

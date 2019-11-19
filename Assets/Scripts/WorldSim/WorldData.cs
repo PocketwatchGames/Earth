@@ -60,10 +60,12 @@ public class WorldData : MonoBehaviour
 	public float localSunHeat = 5; // sun can add about 10 degrees farenheit
 	public float heatLoss = 0.00015f; // how fast a cell loses heat an min elevation, no cloud cover
 	public float heatGainFromSun = 20.0f; // how fast a cell gains heat with no cloud cover, modified by sun height
-	public float heatReflectionWater = 0.0f; // How much heat is reflected back by the water
 	public float heatAbsorptionWater = 0.1f; // How much heat is reflected back by the water
-	public float heatReflectionIce = 0.5f; // How much heat is reflected back by the water
-	public float HeatReflectionLand = 0.1f;
+	public float AlbedoWater = 0.06f; // How much heat is reflected back by the water
+	public float AlbedoIce = 0.5f; // How much heat is reflected back by the water
+	public float AlbedoLand = 0.4f;
+	public float AlbedoReductionSoilQuality = 0.15f;
+	public float AlbedoFoliage = 0.1f;
 	public float heatLossPreventionCarbonDioxide = 200;
 	public float temperatureLapseRate = -0.0065f;
 	public float temperatureEqualizationFromWind = 0.5f;
@@ -80,6 +82,10 @@ public class WorldData : MonoBehaviour
 	public float windElevationFactor = 1.0f / 2000;
 	public float maxWindFrictionElevation = 1000;
 	public float temperatureToPressure = 1000;
+	public float temperatureDeltaToPressure = 1000;
+	public float pressureEqualizationSpeed = 0.001f;
+	public float temperatureDispersalSpeed = 0.01f;
+	public float humidityDispersalSpeed = 0.01f;
 
 	[Header("Water Vapor")]
 	public float EvapRateWind = 1.0f;

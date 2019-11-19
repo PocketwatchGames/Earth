@@ -251,7 +251,13 @@ public partial class WorldComponent {
 				}
 				else if (showLayers.HasFlag(Layers.RelativeHumidity))
 				{
-					oceanColor = color = Color.Lerp(Color.black, Color.blue, Math.Min(1.0f, Atmosphere.GetRelativeHumidity(World, Atmosphere.GetLocalTemperature(World, Math.Max(0, Atmosphere.GetSunVector(World, state.Ticks, World.GetLatitude(y)).z), state.CloudCover[index], state.Temperature[index]), state.Humidity[index], state.CloudElevation[index], Math.Max(elevation, state.SeaLevel)) / World.Data.dewPointRange));
+					float timeOfYear = World.GetTimeOfYear(state.Ticks);
+					float declinationOfSun = Atmosphere.GetDeclinationOfSun(Data.planetTiltAngle, timeOfYear);
+					float lengthOfDay = Atmosphere.GetLengthOfDay(World.GetLatitude(y), timeOfYear, declinationOfSun);
+					var sunVector = Atmosphere.GetSunVector(World, state.Ticks, World.GetLatitude(y)).z;
+					float localTemperature = Atmosphere.GetLocalTemperature(World, Math.Max(0, sunVector), state.CloudCover[index], state.Temperature[index], lengthOfDay);
+					float relativeHumidity = Atmosphere.GetRelativeHumidity(World, localTemperature, state.Humidity[index], state.CloudElevation[index], Math.Max(elevation, state.SeaLevel));
+					oceanColor = color = Color.Lerp(Color.black, Color.blue, Math.Min(1.0f, relativeHumidity / World.Data.dewPointRange));
 				}
 				else if (showLayers.HasFlag(Layers.Rainfall))
 				{
