@@ -65,7 +65,7 @@ public class Probe {
 	public Vector2Int Position;
 	public int CurSampleIndex;
 	public int TotalSamples;
-	public float[] Temperature = new float[SampleCount];
+	public float[] AirTemperature = new float[SampleCount];
 	public float[] Pressure = new float[SampleCount];
 	public float[] Humidity = new float[SampleCount];
 	public float[] CloudCover = new float[SampleCount];
@@ -78,7 +78,7 @@ public class Probe {
 	public void Update(World world, World.State state)
 	{
 		int index = world.GetIndex(Position.x, Position.y);
-		Temperature[CurSampleIndex] = state.Temperature[index];
+		AirTemperature[CurSampleIndex] = state.AirTemperature[index];
 		Pressure[CurSampleIndex] = state.Pressure[index];
 		Humidity[CurSampleIndex] = state.Humidity[index];
 		CloudCover[CurSampleIndex] = state.CloudCover[index];

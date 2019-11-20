@@ -79,7 +79,9 @@ public partial class World {
 
 		public int[] Plate;
 		public float[] Elevation;
-		public float[] Temperature;
+		public float[] AirEnergy;
+		public float[] AirTemperature;
+		public float[] LandEnergy;
 		public float[] Humidity;
 		public float[] Rainfall;
 		public float[] Evaporation;
@@ -91,8 +93,8 @@ public partial class World {
 		public float[] OceanSalinityDeep;
 		public float[] OceanSalinityShallow;
 		public float[] OceanDensityDeep;
-		public float[] OceanTemperatureDeep;
-		public float[] OceanTemperatureShallow;
+		public float[] OceanEnergyDeep;
+		public float[] OceanEnergyShallow;
 		public Vector3[] OceanCurrentShallow;
 		public Vector3[] OceanCurrentDeep;
 		public float[] SurfaceIce;
@@ -121,7 +123,9 @@ public partial class World {
 			o.Herds = (Herd[])Herds.Clone();
 			o.Plate = (int[])Plate.Clone();
 			o.Elevation = (float[])Elevation.Clone();
-			o.Temperature = (float[])Temperature.Clone();
+			o.LandEnergy = (float[])LandEnergy.Clone();
+			o.AirEnergy = (float[])AirEnergy.Clone();
+			o.AirTemperature = (float[])AirTemperature.Clone();
 			o.Humidity = (float[])Humidity.Clone();
 			o.Rainfall = (float[])Rainfall.Clone();
 			o.Evaporation = (float[])Evaporation.Clone();
@@ -133,8 +137,8 @@ public partial class World {
 			o.OceanSalinityDeep = (float[])OceanSalinityDeep.Clone();
 			o.OceanSalinityShallow = (float[])OceanSalinityShallow.Clone();
 			o.OceanDensityDeep = (float[])OceanDensityDeep.Clone();
-			o.OceanTemperatureDeep = (float[])OceanTemperatureDeep.Clone();
-			o.OceanTemperatureShallow = (float[])OceanTemperatureShallow.Clone();
+			o.OceanEnergyDeep = (float[])OceanEnergyDeep.Clone();
+			o.OceanEnergyShallow = (float[])OceanEnergyShallow.Clone();
 			o.SurfaceIce = (float[])SurfaceIce.Clone();
 			o.SubmergedIce = (float[])SubmergedIce.Clone();
 			o.SoilFertility = (float[])SoilFertility.Clone();
@@ -179,7 +183,9 @@ public partial class World {
 			States[i].Plate = new int[s];
 			States[i].Elevation = new float[s];
 			States[i].CloudElevation = new float[s];
-			States[i].Temperature = new float[s];
+			States[i].LandEnergy = new float[s];
+			States[i].AirEnergy = new float[s];
+			States[i].AirTemperature = new float[s];
 			States[i].Humidity = new float[s];
 			States[i].CloudCover = new float[s];
 			States[i].WaterTableDepth = new float[s];
@@ -190,8 +196,8 @@ public partial class World {
 			States[i].OceanSalinityDeep = new float[s];
 			States[i].OceanSalinityShallow = new float[s];
 			States[i].OceanDensityDeep = new float[s];
-			States[i].OceanTemperatureDeep = new float[s];
-			States[i].OceanTemperatureShallow = new float[s];
+			States[i].OceanEnergyDeep = new float[s];
+			States[i].OceanEnergyShallow = new float[s];
 			States[i].SurfaceIce = new float[s];
 			States[i].SubmergedIce = new float[s];
 			States[i].SoilFertility = new float[s];
@@ -302,6 +308,11 @@ public partial class World {
 		}
 		States[nextStateIndex] = (State)States[CurStateIndex].Clone();
 		return nextStateIndex;
+	}
+
+	public bool IsOcean(float elevation, float seaLevel)
+	{
+		return elevation < seaLevel;
 	}
 
 

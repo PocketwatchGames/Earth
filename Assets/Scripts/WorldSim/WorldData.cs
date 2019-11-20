@@ -57,15 +57,6 @@ public class WorldData : MonoBehaviour
 	[Header("Atmosphere")]
 	public float tradeWindSpeed = 12.0f; // average wind speeds around trade winds around 12 m/s
 	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
-	public float localSunHeat = 5; // sun can add about 10 degrees farenheit
-	public float heatLoss = 0.00015f; // how fast a cell loses heat an min elevation, no cloud cover
-	public float heatGainFromSun = 20.0f; // how fast a cell gains heat with no cloud cover, modified by sun height
-	public float heatAbsorptionWater = 0.1f; // How much heat is reflected back by the water
-	public float AlbedoWater = 0.06f; // How much heat is reflected back by the water
-	public float AlbedoIce = 0.5f; // How much heat is reflected back by the water
-	public float AlbedoLand = 0.4f;
-	public float AlbedoReductionSoilQuality = 0.15f;
-	public float AlbedoFoliage = 0.1f;
 	public float heatLossPreventionCarbonDioxide = 200;
 	public float temperatureLapseRate = -0.0065f;
 	public float temperatureEqualizationFromWind = 0.5f;
@@ -87,6 +78,25 @@ public class WorldData : MonoBehaviour
 	public float temperatureDispersalSpeed = 0.01f;
 	public float humidityDispersalSpeed = 0.01f;
 
+	// atmospheric heat balance https://energyeducation.ca/encyclopedia/Earth%27s_heat_balance
+	// https://en.wikipedia.org/wiki/Earth%27s_energy_budget
+	public float localSunHeat = 5; // sun can add about 5 degrees celsius
+	public float SolarRadiation = 118; // extraterrestrial solar radiation // https://en.wikipedia.org/wiki/Sunlight (1367 w/m^2) *seconds per day (86400)
+	public float AtmosphericHeatAbsorption = 0.23f;
+	public float AtmosphericHeatReflection = 0.23f;
+	public float EvaporativeHeatLoss = 0.065f; // global average = 78 watts -- TODO: get this in line with average evaportaion (2.5M per year)
+	public float OceanHeatRadiation = 0.00001021f; // global average = 66 watts
+	public float OceanAirConduction = 1.3824f; // global avg = 16 watts per degree delta between air and ocean
+	public float AlbedoWater = 0.06f; // How much heat is reflected back by the water
+	public float AlbedoIce = 0.5f; // How much heat is reflected back by the water
+	public float AlbedoLand = 0.4f;
+	public float AlbedoReductionSoilQuality = 0.15f;
+	public float AlbedoFoliage = 0.1f;
+	public float AtmosphericHeatLossToSpace = 0.000001024f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
+	public float LandRadiation = 0.5f;
+	public float SpecificHeatSeaWater = 3.85f; // specific heat is joules to raise one degree
+	public float SpecificHeatAtmosphere = 1.158f; // specific heat is joules to raise one degree
+
 	[Header("Water Vapor")]
 	public float EvapRateWind = 1.0f;
 	public float EvapRateTemperature = 1.0f;
@@ -101,23 +111,21 @@ public class WorldData : MonoBehaviour
 	public float evapMaxTemperature = 413; // 140 celsius
 	public float evapTemperatureRange;
 	public float rainPointTemperatureMultiplier = 0.00075f; // adjustment for temperature
-	public float EvaporativeCoolingRate = 3.0f;
 	public float humidityLossFromWind = 0.1f;
 	public float cloudMovementFromWind = 20.0f;
 	public float cloudElevationDeltaSpeed = 10.0f;
 	public float windVerticalCloudSpeedMultiplier = 100000;
 
-
 	[Header("Ocean")]
 	public float maxIce = 2.0f;
 	public float iceFreezeRate = 10.0f;
 	public float iceMeltRate = 10.0f;
+	public float iceMeltRadiationRate = 0.001f;
 	public float DeepOceanDepth = 500;
 	public float WindToOceanCurrentFactor = 0.1f;
 	public float oceanTemperatureMovement = 0.1f;
 	public float oceanSalinityMovement = 0.01f;
 	public float horizontalMixing = 0.01f;
-	public float heatExchangeAirSpeed = 0.1f;
 	public float upwellingSpeed = 10000.0f;
 	public float downwellingSpeed = 100.0f;
 	public float oceanSalinityIncrease = 0.1f;
@@ -157,7 +165,6 @@ public class WorldData : MonoBehaviour
 		planetTiltAngle = Mathf.Deg2Rad * planetTiltAngle;
 
 		evapTemperatureRange = evapMaxTemperature - evapMinTemperature;
-		heatGainFromSun /= TicksPerYear; // how fast a cell gains heat with no cloud cover, modified by sun height
 		temperatureEqualizationFromWind *= SecondsPerTick / tileSize / TicksPerYear;
 		humidityLossFromWind *= SecondsPerTick / tileSize / TicksPerYear;
 		cloudMovementFromWind *= SecondsPerTick / tileSize / TicksPerYear;

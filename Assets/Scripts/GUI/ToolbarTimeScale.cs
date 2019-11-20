@@ -6,7 +6,7 @@ public class ToolbarTimeScale : Toolbar
 {
 	public WorldComponent World;
 
-	private float[] _timeScales = new float[] { 0, 5, 20, 200 };
+	private float[] _timeScales = new float[] { 0, 5, 20, 200, -1 };
 
 	override public void Start()
 	{
@@ -26,6 +26,10 @@ public class ToolbarTimeScale : Toolbar
 	public override void OnClick(int index)
 	{
 		base.OnClick(index);
-		World.World.TimeScale = _timeScales[index];
+		World.World.TimeScale = Mathf.Max(0,_timeScales[index]);
+		if (_timeScales[index] < 0)
+		{
+			World.World.TimeTillTick = 0;
+		}
 	}
 }

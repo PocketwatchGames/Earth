@@ -19,18 +19,18 @@ namespace Sim {
 					// Foliage
 					float freshWaterAvailability = 0;
 					float canopy = state.Canopy[index];
-					float temperature = state.Temperature[index];
+					float airHeat = state.AirTemperature[index];
 
 					float newCanopy = canopy;
 					if (canopy > 0)
 					{
-						if (state.Elevation[index] <= state.SeaLevel)
+						if (world.IsOcean(state.Elevation[index], state.SeaLevel))
 						{
 							newCanopy = 0;
 						}
 						else
 						{
-							float t = state.Temperature[index];
+							float t = state.AirTemperature[index];
 							float sf = state.SoilFertility[index];
 							float groundWaterSaturation = GetGroundWaterSaturation(state.GroundWater[index], state.WaterTableDepth[index], sf * world.Data.MaxSoilPorousness);
 							float surfaceWater = state.SurfaceWater[index];
@@ -45,7 +45,7 @@ namespace Sim {
 							//{
 							//	var n = GetNeighbor(x, y, i);
 							//	int neighborIndex = GetIndex(n.x, n.y);
-							//	if (state.Elevation[neighborIndex] > state.SeaLevel)
+							//	if (world.IsOcean(state.Elevation[neighborIndex], state.SeaLevel))
 							//	{
 							//		nextState.Canopy[neighborIndex] = Math.Min(1.0f, nextState.Canopy[neighborIndex] + expansion);
 							//	}
@@ -91,7 +91,7 @@ namespace Sim {
 						}
 						int tileIndex = world.GetIndex(tile.x, tile.y);
 						water += state.SurfaceWater[tileIndex];
-						comfort += Mathf.Clamp01((species.RestingTemperature + species.TemperatureRange - state.Temperature[tileIndex]) / species.TemperatureRange);
+						comfort += Mathf.Clamp01((species.RestingTemperature + species.TemperatureRange - state.AirTemperature[tileIndex]) / species.TemperatureRange);
 						food += state.Canopy[tileIndex];
 						radiation += state.Radiation[tileIndex];
 					}
@@ -181,7 +181,7 @@ namespace Sim {
 			//		int tileIndex = GetIndex((int)state.Herds[i].Position.x, (int)state.Herds[i].Position.y);
 			//		float newPopulation = population;
 
-			//		if (state.Elevation[tileIndex] <= state.SeaLevel)
+			//		if (world.IsOcean(state.Elevation[tileIndex], state.SeaLevel))
 			//		{
 			//			newPopulation = 0;
 			//		}

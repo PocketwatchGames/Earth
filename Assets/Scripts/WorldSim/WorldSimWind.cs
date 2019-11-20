@@ -20,7 +20,7 @@ namespace Sim {
 				{
 					int index = world.GetIndex(x, y);
 
-					if (state.Elevation[index] <= state.SeaLevel)
+					if (world.IsOcean(state.Elevation[index], state.SeaLevel))
 					{
 
 						float pressure = state.Pressure[index];
@@ -30,7 +30,7 @@ namespace Sim {
 						// within 1 km of the ground, frictional forces slow wind down
 						var newWind = UpdateWind(world, state, x, y, latitude, pressure, friction, windInfo.coriolisPower, windInfo.tradeWind.z);
 						nextState.Wind[index] = newWind;
-						if (state.Elevation[index] <= state.SeaLevel && state.SurfaceIce[index] == 0)
+						if (state.SurfaceIce[index] == 0)
 						{
 							nextState.OceanCurrentShallow[index] = Quaternion.Euler(0, 0, windInfo.coriolisPower * 90) * new Vector3(newWind.x, newWind.y, 0) * world.Data.WindToOceanCurrentFactor;
 						}
@@ -49,7 +49,7 @@ namespace Sim {
 						{
 							var neighbor = world.GetNeighbor(x, y, i);
 							int nIndex = world.GetIndex(neighbor.x, neighbor.y);
-							if (state.Elevation[nIndex] <= state.SeaLevel)
+							if (world.IsOcean(state.Elevation[nIndex], state.SeaLevel))
 							{
 								//var neighborWind = state.Wind[nIndex];
 								//nWind += neighborWind;
@@ -83,14 +83,14 @@ namespace Sim {
 				for (int x = 0; x < world.Size; x++)
 				{
 					int index = world.GetIndex(x, y);
-					if (state.Elevation[index] <= state.SeaLevel)
+					if (world.IsOcean(state.Elevation[index], state.SeaLevel))
 					{
 						var vertCurrent = nextState.OceanCurrentShallow[index].magnitude;
 						for (int i = 0; i < 4; i++)
 						{
 							var neighbor = world.GetNeighbor(x, y, i);
 							int nIndex = world.GetIndex(neighbor.x, neighbor.y);
-							if (state.Elevation[nIndex] <= state.SeaLevel)
+							if (world.IsOcean(state.Elevation[nIndex], state.SeaLevel))
 							{
 								switch (i)
 								{

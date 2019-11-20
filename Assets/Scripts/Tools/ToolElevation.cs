@@ -29,7 +29,7 @@ public class ToolElevation : GameTool
 
 		if (Input.GetMouseButton(0))
 		{
-			World.World.ApplyInput((nextState) =>
+			World.World.ApplyInput((System.Action<World.State>)((nextState) =>
 			{
 				for (int i = -Mathf.CeilToInt(BrushSize); i <= Mathf.CeilToInt(BrushSize); i++)
 				{
@@ -47,14 +47,14 @@ public class ToolElevation : GameTool
 							}
 							int index = World.World.GetIndex(x, y);
 							nextState.Elevation[index] += Direction * distT * DeltaPerSecond * Time.deltaTime;
-							nextState.OceanTemperatureShallow[index] = nextState.Temperature[index];
-							nextState.OceanTemperatureDeep[index] = World.Data.FreezingTemperature;
+							nextState.OceanEnergyShallow[index] = nextState.AirTemperature[index];
+							nextState.OceanEnergyDeep[index] = World.Data.FreezingTemperature;
 							nextState.OceanSalinityDeep[index] = Mathf.Max(0, nextState.SeaLevel - nextState.Elevation[index]);
 							nextState.OceanSalinityShallow[index] = World.Data.DeepOceanDepth;
 						}
 					}
 				}
-			});
+			}));
 		}
 	}
 

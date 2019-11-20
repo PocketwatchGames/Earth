@@ -163,7 +163,7 @@ public partial class WorldComponent {
 				float elevation = state.Elevation[index];
 				float ice = state.SurfaceIce[index];
 				float normalizedElevation = (elevation - World.Data.MinElevation) / (World.Data.MaxElevation - World.Data.MinElevation);
-				bool drawOcean = elevation <= state.SeaLevel && showLayers.HasFlag(Layers.Water);
+				bool drawOcean = elevation < state.SeaLevel && showLayers.HasFlag(Layers.Water);
 
 				landVerts[index] = new Vector3(x, y, -elevation * ElevationScale);
 				oceanVerts[index] = new Vector3(x, y, -state.SeaLevel * ElevationScale);
@@ -188,7 +188,7 @@ public partial class WorldComponent {
 
 				if (showLayers.HasFlag(Layers.TemperatureSubtle))
 				{
-					color = Lerp(new List<CVP>() { new CVP(new Color(0.4f, 0.4f, 1.0f), -500 + World.Data.FreezingTemperature), new CVP(color, World.Data.FreezingTemperature), new CVP(Color.red, 500 + World.Data.FreezingTemperature) }, state.Temperature[index]);
+					color = Lerp(new List<CVP>() { new CVP(new Color(0.4f, 0.4f, 1.0f), -500 + World.Data.FreezingTemperature), new CVP(color, World.Data.FreezingTemperature), new CVP(Color.red, 500 + World.Data.FreezingTemperature) }, state.AirTemperature[index]);
 				}
 
 				//		if (showLayers.HasFlag(Layers.Water))
@@ -236,7 +236,7 @@ public partial class WorldComponent {
 											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
 											new CVP(Color.red, 50+World.Data.FreezingTemperature),
 											new CVP(Color.white, 75 + World.Data.FreezingTemperature) },
-						state.Temperature[index]);
+						state.AirTemperature[index]);
 				}
 				else if (showLayers.HasFlag(Layers.Pressure))
 				{
@@ -255,7 +255,7 @@ public partial class WorldComponent {
 					float declinationOfSun = Atmosphere.GetDeclinationOfSun(Data.planetTiltAngle, timeOfYear);
 					float lengthOfDay = Atmosphere.GetLengthOfDay(World.GetLatitude(y), timeOfYear, declinationOfSun);
 					var sunVector = Atmosphere.GetSunVector(World, state.Ticks, World.GetLatitude(y)).z;
-					float localTemperature = Atmosphere.GetLocalTemperature(World, Math.Max(0, sunVector), state.CloudCover[index], state.Temperature[index], lengthOfDay);
+					float localTemperature = Atmosphere.GetLocalTemperature(World, Math.Max(0, sunVector), state.CloudCover[index], state.AirTemperature[index], lengthOfDay);
 					float relativeHumidity = Atmosphere.GetRelativeHumidity(World, localTemperature, state.Humidity[index], state.CloudElevation[index], Math.Max(elevation, state.SeaLevel));
 					oceanColor = color = Color.Lerp(Color.black, Color.blue, Math.Min(1.0f, relativeHumidity / World.Data.dewPointRange));
 				}
@@ -300,7 +300,7 @@ public partial class WorldComponent {
 											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
 											new CVP(Color.red, 50+World.Data.FreezingTemperature),
 											new CVP(Color.white, 75 + World.Data.FreezingTemperature) },
-						state.OceanTemperatureShallow[index]);
+						Atmosphere.GetWaterTemperature(World, state.OceanEnergyShallow[index], World.Data.DeepOceanDepth));
 				}
 				else if (showLayers.HasFlag(Layers.OceanTemperatureDeep))
 				{
@@ -311,7 +311,7 @@ public partial class WorldComponent {
 											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
 											new CVP(Color.red, 50+World.Data.FreezingTemperature),
 											new CVP(Color.white, 75 + World.Data.FreezingTemperature) },
-						state.OceanTemperatureDeep[index]);
+						Atmosphere.GetWaterTemperature(World, state.OceanEnergyDeep[index], Math.Max(0, state.SeaLevel - elevation)));
 				}
 				else if (showLayers.HasFlag(Layers.OceanSalinityShallow))
 				{

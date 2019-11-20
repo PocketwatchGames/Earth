@@ -72,13 +72,6 @@ MonoBehaviour:
   GroundWaterFlowSpeed: 0.5
   tradeWindSpeed: 12
   pressureDifferentialWindSpeed: 70
-  localSunHeat: 5
-  heatLoss: 0.00015
-  heatGainFromSun: 20
-  heatReflectionWater: 0
-  heatAbsorptionWater: 0.1
-  heatReflectionIce: 0.5
-  HeatReflectionLand: 0.1
   heatLossPreventionCarbonDioxide: 200
   temperatureLapseRate: -0.0065
   temperatureEqualizationFromWind: 0.5
@@ -94,6 +87,27 @@ MonoBehaviour:
   upperAtmosphereCoolingRate: 0
   windElevationFactor: 0.0005
   maxWindFrictionElevation: 1000
+  temperatureToPressure: 1000
+  temperatureDeltaToPressure: 1000
+  pressureEqualizationSpeed: 0.001
+  temperatureDispersalSpeed: 0.01
+  humidityDispersalSpeed: 0.01
+  localSunHeat: 5
+  SolarRadiation: 118
+  AtmosphericHeatAbsorption: 0.23
+  AtmosphericHeatReflection: 0.23
+  EvaporativeHeatLoss: 0.065
+  OceanHeatRadiation: 0.00001021
+  OceanAirConduction: 1.3824
+  AlbedoWater: 0.06
+  AlbedoIce: 0.5
+  AlbedoLand: 0.4
+  AlbedoReductionSoilQuality: 0.15
+  AlbedoFoliage: 0.1
+  AtmosphericHeatLossToSpace: 0.000001024
+  LandRadiation: 0.5
+  SpecificHeatSeaWater: 3.85
+  SpecificHeatAtmosphere: 1.158
   EvapRateWind: 1
   EvapRateTemperature: 1
   dewPointZero: 213
@@ -107,7 +121,6 @@ MonoBehaviour:
   evapMaxTemperature: 413
   evapTemperatureRange: 0
   rainPointTemperatureMultiplier: 0.00075
-  EvaporativeCoolingRate: 3
   humidityLossFromWind: 0.1
   cloudMovementFromWind: 20
   cloudElevationDeltaSpeed: 10
@@ -115,14 +128,16 @@ MonoBehaviour:
   maxIce: 2
   iceFreezeRate: 10
   iceMeltRate: 10
+  iceMeltRadiationRate: 0.001
   DeepOceanDepth: 500
   WindToOceanCurrentFactor: 0.1
   oceanTemperatureMovement: 0.1
   oceanSalinityMovement: 0.01
   horizontalMixing: 0.01
-  heatExchangeAirSpeed: 0.1
   upwellingSpeed: 10000
   downwellingSpeed: 100
   oceanSalinityIncrease: 0.1
   temperatureMixingSpeed: 0.0001
   salinityMixingSpeed: 0.001
+  OceanSalinityDensity: 1
+  OceanTemperatureDensity: 10

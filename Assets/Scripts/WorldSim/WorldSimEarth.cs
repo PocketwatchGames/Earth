@@ -60,7 +60,7 @@ namespace Sim {
 						{
 							float startElevation = state.Elevation[index];
 							float endElevation = state.Elevation[newIndex];
-							if (startElevation > state.SeaLevel && endElevation > state.SeaLevel)
+							if (!world.IsOcean(startElevation, state.SeaLevel) && !world.IsOcean(endElevation, state.SeaLevel))
 							{
 								// continental collision
 								nextState.Elevation[newIndex] += 50;
@@ -70,7 +70,7 @@ namespace Sim {
 							else
 							{
 								// subduction
-								if (startElevation > state.SeaLevel)
+								if (!world.IsOcean(startElevation, state.SeaLevel))
 								{
 									// We are moving OVER the adjacent tile
 									MoveTile(world, state, nextState, index, newIndex);
@@ -103,7 +103,7 @@ namespace Sim {
 					nextState.FlowDirection[index] = newFlowDirection;
 					nextState.Normal[index] = newNormal;
 
-					if (nextState.SurfaceWater[index] > 0 && nextState.Elevation[index] <= nextState.SeaLevel)
+					if (nextState.SurfaceWater[index] > 0 && world.IsOcean(nextState.Elevation[index], state.SeaLevel))
 					{
 						nextState.SurfaceWater[index] = 0;
 					}
@@ -122,8 +122,8 @@ namespace Sim {
 			nextState.SurfaceWater[newIndex] = state.SurfaceWater[index];
 			nextState.OceanSalinityShallow[newIndex] = state.OceanSalinityShallow[index];
 			nextState.OceanSalinityDeep[newIndex] = state.OceanSalinityDeep[index];
-			nextState.OceanTemperatureShallow[newIndex] = state.OceanTemperatureShallow[index];
-			nextState.OceanTemperatureDeep[newIndex] = state.OceanTemperatureDeep[index];
+			nextState.OceanEnergyShallow[newIndex] = state.OceanEnergyShallow[index];
+			nextState.OceanEnergyDeep[newIndex] = state.OceanEnergyDeep[index];
 			nextState.SurfaceIce[newIndex] = state.SurfaceIce[index];
 			nextState.SubmergedIce[newIndex] = state.SubmergedIce[index];
 			nextState.SoilFertility[newIndex] = state.SoilFertility[index];
@@ -133,7 +133,7 @@ namespace Sim {
 
 		static private void UpdateFlowDirectionAndNormal(World world, World.State state, World.State nextState, int x, int y, int index, float elevation, out Vector2 flowDirection, out Vector3 normal)
 		{
-			if (elevation <= state.SeaLevel)
+			if (world.IsOcean(elevation, state.SeaLevel))
 			{
 				flowDirection = Vector2.zero;
 				normal = new Vector3(0, 0, 1);

@@ -22,10 +22,11 @@ public class TileInfoPanel : MonoBehaviour
 		string text = "";
 		if (TileInfoPoint.x >= 0 && TileInfoPoint.x < World.World.Size && TileInfoPoint.y >= 0 && TileInfoPoint.y < World.World.Size)
 		{
+			float elevation = state.Elevation[index];
 			text += "Index: " + index;
 			text += "\nPlate: " + state.Plate[index];
-			text += "\nElevation: " + (int)state.Elevation[index];
-			text += "\nTemperature: " + (int)World.ConvertTemperature(state.Temperature[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
+			text += "\nElevation: " + (int)elevation;
+			text += "\nTemperature: " + (int)World.ConvertTemperature(state.AirTemperature[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 			text += "\nPressure: " + (state.Pressure[index] / World.World.Data.StaticPressure).ToString("0.00");
 			text += "\nHumidity: " + state.Humidity[index].ToString("0.00");
 			text += "\nCloudCover: " + state.CloudCover[index].ToString("0.00");
@@ -35,10 +36,10 @@ public class TileInfoPanel : MonoBehaviour
 			text += "\nSurfaceIce: " + state.SurfaceIce[index].ToString("0.00");
 			text += "\nSoilFertility: " + (int)(state.SoilFertility[index] * 100);
 
-			if (state.Elevation[index] <= state.SeaLevel)
+			if (World.World.IsOcean(elevation, state.SeaLevel))
 			{
-				text += "\nShallow Temp: " + (int)World.ConvertTemperature(state.OceanTemperatureShallow[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
-				text += "\nDeep Temp: " + (int)World.ConvertTemperature(state.OceanTemperatureDeep[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
+				text += "\nShallow Temp: " + (int)World.ConvertTemperature(Sim.Atmosphere.GetWaterTemperature(World.World, state.OceanEnergyShallow[index], World.Data.DeepOceanDepth), World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
+				text += "\nDeep Temp: " + (int)World.ConvertTemperature(Sim.Atmosphere.GetWaterTemperature(World.World, state.OceanEnergyDeep[index], state.SeaLevel - elevation), World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 				text += "\nShallow Salinity: " + state.OceanSalinityShallow[index].ToString("0.00");
 				text += "\nDeep Salinity: " + state.OceanSalinityDeep[index].ToString("0.00");
 				text += "\nDensity: " + state.OceanDensityDeep[index].ToString("0.00");
@@ -48,6 +49,7 @@ public class TileInfoPanel : MonoBehaviour
 				text += "\nGroundWater: " + state.GroundWater[index].ToString("0.00");
 				text += "\nSurfaceWater: " + state.SurfaceWater[index].ToString("0.00");
 				text += "\nCanopy: " + (int)(state.Canopy[index] * 100);
+				text += "\nPotential Energy: " + (int)(state.LandEnergy[index]);
 			}
 			//	spriteBatch.DrawString(font, "Wind: " + Wind[index], new Vector2(5, textY += 15), Color.White);
 			//for (int s = 0; s < World.MaxGroupsPerTile; s++)
