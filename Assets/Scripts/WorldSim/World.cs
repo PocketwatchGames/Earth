@@ -293,7 +293,7 @@ public partial class World {
 
 	public float GetLatitude(int y)
 	{
-		return ((float)y / Size) * 2 - 1.0f;
+		return -(((float)y / Size) * 2 - 1.0f);
 	}
 
 	public int AdvanceState()

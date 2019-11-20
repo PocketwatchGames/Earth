@@ -59,7 +59,7 @@ public class WorldData : MonoBehaviour
 	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
 	public float heatLossPreventionCarbonDioxide = 200;
 	public float temperatureLapseRate = -0.0065f;
-	public float temperatureEqualizationFromWind = 0.5f;
+	public float energyWindMovement = 0.0001f;
 	public float windInertia = 0.0f;
 	public float StaticPressure = 101325;
 	public float StdTemp = 288.15f;
@@ -75,7 +75,7 @@ public class WorldData : MonoBehaviour
 	public float temperatureToPressure = 1000;
 	public float temperatureDeltaToPressure = 1000;
 	public float pressureEqualizationSpeed = 0.001f;
-	public float temperatureDispersalSpeed = 0.01f;
+	public float airEnergyDispersalSpeed = 0.01f;
 	public float humidityDispersalSpeed = 0.01f;
 
 	// atmospheric heat balance https://energyeducation.ca/encyclopedia/Earth%27s_heat_balance
@@ -165,7 +165,6 @@ public class WorldData : MonoBehaviour
 		planetTiltAngle = Mathf.Deg2Rad * planetTiltAngle;
 
 		evapTemperatureRange = evapMaxTemperature - evapMinTemperature;
-		temperatureEqualizationFromWind *= SecondsPerTick / tileSize / TicksPerYear;
 		humidityLossFromWind *= SecondsPerTick / tileSize / TicksPerYear;
 		cloudMovementFromWind *= SecondsPerTick / tileSize / TicksPerYear;
 		cloudElevationDeltaSpeed /= TicksPerYear;
@@ -180,7 +179,7 @@ public class WorldData : MonoBehaviour
 			humidityLossFromWind = 0;
 		}
 		if (!activeFeatures.HasFlag(World.SimFeature.TemperatureMovesOnWind)) {
-			temperatureEqualizationFromWind = 0;
+			energyWindMovement = 0;
 		}
 		if (!activeFeatures.HasFlag(World.SimFeature.Evaporation)) {
 			EvapRateTemperature = 0;
