@@ -115,7 +115,7 @@ public partial class World {
 				} else
 				{
 					state.OceanEnergyShallow[index] = Atmosphere.GetWaterEnergy(this, state.AirTemperature[index], Data.DeepOceanDepth);
-					state.OceanEnergyDeep[index] = Atmosphere.GetWaterEnergy(this, (state.AirTemperature[index] + Data.FreezingTemperature) / 2, Math.Max(0, -e));
+					state.OceanEnergyDeep[index] = Atmosphere.GetWaterEnergy(this, Data.FreezingTemperature + 3, Math.Max(0, -e));
 					state.OceanSalinityShallow[index] = (1.0f - Math.Abs(latitude)) * Data.DeepOceanDepth;
 					float deepOceanVolume = state.SeaLevel - state.Elevation[index];
 					state.OceanSalinityDeep[index] = (Math.Abs(latitude)+1) * deepOceanVolume;

@@ -131,13 +131,13 @@ MonoBehaviour:
   iceMeltRadiationRate: 0.001
   DeepOceanDepth: 500
   WindToOceanCurrentFactor: 0.1
-  oceanTemperatureMovement: 0.1
+  oceanTemperatureMovement: 10
   oceanSalinityMovement: 0.01
-  horizontalMixing: 0.01
+  horizontalMixing: 0
   upwellingSpeed: 10000
   downwellingSpeed: 100
   oceanSalinityIncrease: 0.1
   temperatureMixingSpeed: 0.0001
   salinityMixingSpeed: 0.001
   OceanSalinityDensity: 1
-  OceanTemperatureDensity: 10
+  OceanTemperatureDensity: 0.1

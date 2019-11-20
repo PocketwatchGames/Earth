@@ -85,38 +85,26 @@ namespace Sim {
 					int index = world.GetIndex(x, y);
 					if (world.IsOcean(state.Elevation[index], state.SeaLevel))
 					{
-						var vertCurrent = nextState.OceanCurrentShallow[index].magnitude;
+						float vertCurrent = 0;
 						for (int i = 0; i < 4; i++)
 						{
 							var neighbor = world.GetNeighbor(x, y, i);
 							int nIndex = world.GetIndex(neighbor.x, neighbor.y);
-							if (world.IsOcean(state.Elevation[nIndex], state.SeaLevel))
+							if (!world.IsOcean(state.Elevation[nIndex], state.SeaLevel))
 							{
 								switch (i)
 								{
 									case 0:
-										if (nextState.OceanCurrentShallow[index].x > 0)
-										{
-											vertCurrent -= nextState.OceanCurrentShallow[index].x;
-										}
+										vertCurrent += nextState.OceanCurrentShallow[index].x;
 										break;
 									case 1:
-										if (nextState.OceanCurrentShallow[index].x < 0)
-										{
-											vertCurrent += nextState.OceanCurrentShallow[index].x;
-										}
+										vertCurrent -= nextState.OceanCurrentShallow[index].x;
 										break;
 									case 2:
-										if (nextState.OceanCurrentShallow[index].y < 0)
-										{
-											vertCurrent += nextState.OceanCurrentShallow[index].y;
-										}
+										vertCurrent -= nextState.OceanCurrentShallow[index].y;
 										break;
 									case 3:
-										if (nextState.OceanCurrentShallow[index].y > 0)
-										{
-											vertCurrent -= nextState.OceanCurrentShallow[index].y;
-										}
+										vertCurrent += nextState.OceanCurrentShallow[index].y;
 										break;
 								}
 							}

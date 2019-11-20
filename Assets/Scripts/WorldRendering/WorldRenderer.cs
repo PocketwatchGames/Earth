@@ -424,7 +424,7 @@ public partial class WorldComponent {
 	private void UpdateWindArrow(World.State state, int x, int y, int index, Vector3 wind, float maxSpeed)
 	{
 		float elevationOrSeaLevel = Math.Max(state.SeaLevel, state.Elevation[index]);
-		float maxWindSpeedVertical = 2;
+		float maxWindSpeedVertical = maxSpeed / 10;
 		Color windColor;
 		if (wind.z < 0)
 		{
@@ -440,5 +440,6 @@ public partial class WorldComponent {
 		_windArrows[index].transform.position = new Vector3(x, y, -(elevationOrSeaLevel + 1000) * ElevationScale);
 		_windArrows[index].transform.localScale = Vector3.one * Mathf.Clamp01(windXYSpeed / maxSpeed);
 		_windArrows[index].transform.rotation = Quaternion.Euler(0, 0, Mathf.Rad2Deg * windAngle);
+		_windArrows[index].GetComponentInChildren<MeshRenderer>().material.color = windColor;
 	}
 }

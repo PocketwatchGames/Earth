@@ -8946,6 +8946,26 @@ PrefabInstance:
       propertyPath: HeatReflectionLand
       value: 0.28
       objectReference: {fileID: 0}
+    - target: {fileID: 6078235804126165679, guid: e80f16b7b156b0942b53d750c587a39c,
+        type: 3}
+      propertyPath: horizontalMixing
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 6078235804126165679, guid: e80f16b7b156b0942b53d750c587a39c,
+        type: 3}
+      propertyPath: temperatureMixingSpeed
+      value: 0.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 6078235804126165679, guid: e80f16b7b156b0942b53d750c587a39c,
+        type: 3}
+      propertyPath: upwellingSpeed
+      value: 0.00001
+      objectReference: {fileID: 0}
+    - target: {fileID: 6078235804126165679, guid: e80f16b7b156b0942b53d750c587a39c,
+        type: 3}
+      propertyPath: downwellingSpeed
+      value: 0.00001
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e80f16b7b156b0942b53d750c587a39c, type: 3}
 --- !u!4 &2097833156 stripped

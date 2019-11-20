@@ -120,10 +120,10 @@ public class WorldData : MonoBehaviour
 	public float maxIce = 2.0f;
 	public float iceFreezeRate = 10.0f;
 	public float iceMeltRate = 10.0f;
-	public float iceMeltRadiationRate = 0.001f;
+	public float iceMeltRadiationRate = 0.0001f;
 	public float DeepOceanDepth = 500;
 	public float WindToOceanCurrentFactor = 0.1f;
-	public float oceanTemperatureMovement = 0.1f;
+	public float oceanEnergyMovement = 0.001f;
 	public float oceanSalinityMovement = 0.01f;
 	public float horizontalMixing = 0.01f;
 	public float upwellingSpeed = 10000.0f;

@@ -53,6 +53,7 @@ namespace Sim {
 					var currentDeep = state.OceanCurrentDeep[index];
 					var currentShallow = state.OceanCurrentShallow[index];
 					float oceanTemperatureShallow = GetWaterTemperature(world, oceanEnergyShallow, world.Data.DeepOceanDepth);
+					float oceanTemperatureDeep = GetWaterTemperature(world, oceanEnergyDeep, Math.Max(0, state.SeaLevel - elevation));
 
 
 					float newEvaporation;
@@ -128,9 +129,9 @@ namespace Sim {
 						if (!world.IsOcean(elevation, state.SeaLevel))
 						{
 							frozen = Math.Min(frozen, surfaceWater);
-							surfaceWater -= frozen;
+							newSurfaceWater -= frozen;
 						}
-						surfaceIce += frozen;
+						newSurfaceIce += frozen;
 					}
 					else if (surfaceIce > 0)
 					{
@@ -198,7 +199,7 @@ namespace Sim {
 					}
 					newTemperature = GetAirTemperature(world, newAirEnergy, elevation);
 					
-					//MoveOceanOnCurrent(world, state, x, y, elevation, surfaceIce, oceanEnergyShallow, oceanEnergyDeep, oceanSalinityShallow, oceanSalinityDeep, oceanTemperatureShallow, oceanDensity, currentShallow, currentDeep, ref newOceanEnergyShallow, ref newOceanEnergyDeep, ref newOceanSalinityShallow, ref newOceanSalinityDeep, ref newAirEnergy);
+					MoveOceanOnCurrent(world, state, x, y, elevation, surfaceIce, oceanEnergyShallow, oceanEnergyDeep, oceanSalinityShallow, oceanSalinityDeep, oceanTemperatureShallow, oceanTemperatureDeep, oceanDensity, currentShallow, currentDeep, ref newOceanEnergyShallow, ref newOceanEnergyDeep, ref newOceanSalinityShallow, ref newOceanSalinityDeep, ref newAirEnergy);
 					//MoveAtmosphereOnWind(world, state, x, y, temperature, humidity, wind, ref newHumidity, ref newTemperature);
 					FlowWater(world, state, x, y, gradient, soilFertility, ref newSurfaceWater, ref newGroundWater);
 					SeepWaterIntoGround(world, elevation, state.SeaLevel, soilFertility, waterTableDepth, ref newGroundWater, ref newSurfaceWater);
@@ -579,6 +580,7 @@ namespace Sim {
 			float oceanSalinityShallow,
 			float oceanSalinityDeep,
 			float oceanTemperatureShallow,
+			float oceanTemperatureDeep,
 			float oceanDensity,
 			Vector3 currentShallow,
 			Vector3 currentDeep,
@@ -616,152 +618,168 @@ namespace Sim {
 					newOceanSalinityDeep -= salinityExchange * depth / (depth + world.Data.DeepOceanDepth);
 					newOceanSalinityShallow += salinityExchange * world.Data.DeepOceanDepth / (depth + world.Data.DeepOceanDepth);
 
-					float heatExchange = (oceanEnergyDeep - oceanEnergyShallow) * world.Data.temperatureMixingSpeed / (depth + world.Data.DeepOceanDepth);
-					newOceanEnergyShallow += heatExchange * depth;
-					newOceanEnergyDeep -= heatExchange * world.Data.DeepOceanDepth;
+					float deepWaterMixingDepth = Math.Min(world.Data.DeepOceanDepth, depth);
+					float heatExchange = (oceanTemperatureDeep - oceanTemperatureShallow) * deepWaterMixingDepth * world.Data.SpecificHeatSeaWater * world.Data.temperatureMixingSpeed;
+					newOceanEnergyShallow += heatExchange;
+					newOceanEnergyDeep -= heatExchange;
 				}
 
 				if (currentShallow.z < 0)
 				{
-					float downwelling = -currentShallow.z * world.Data.downwellingSpeed;
-					newOceanEnergyDeep += (oceanEnergyShallow - oceanEnergyDeep) * Math.Min(0.5f, downwelling / depth);
-					float salinityExchange = Math.Min(0.5f, downwelling * oceanSalinityShallow / world.Data.DeepOceanDepth);
+					float downwelling = Math.Min(0.5f, -currentShallow.z * world.Data.downwellingSpeed);
+					float energyExchange = oceanEnergyShallow * downwelling;
+					newOceanEnergyShallow -= energyExchange;
+					newOceanEnergyDeep += energyExchange;
+					float salinityExchange = oceanSalinityShallow * downwelling;
 					newOceanSalinityDeep += salinityExchange;
 					newOceanSalinityShallow -= salinityExchange;
 				}
 				else if (currentShallow.z > 0)
 				{
-					float upwelling = currentShallow.z * world.Data.upwellingSpeed;
-					newOceanEnergyShallow += (oceanEnergyDeep - oceanEnergyShallow) * Math.Min(0.5f, upwelling / world.Data.DeepOceanDepth);
-					float salinityExchange = Math.Min(0.5f, upwelling * oceanSalinityDeep / depth);
+					float upwelling = Math.Min(0.5f, currentShallow.z * world.Data.upwellingSpeed);
+					float mixingDepth = Math.Min(depth, world.Data.DeepOceanDepth) / depth;
+					float energyExchange = oceanEnergyDeep * mixingDepth * upwelling;
+					newOceanEnergyShallow += energyExchange;
+					newOceanEnergyDeep -= energyExchange;
+					float salinityExchange = oceanSalinityDeep * mixingDepth * upwelling;
 					newOceanSalinityDeep -= salinityExchange;
 					newOceanSalinityShallow += salinityExchange;
 				}
 			}
 
-			for (int i = 0; i < 4; i++)
-			{
-				var neighbor = world.GetNeighbor(x, y, i);
-				int nIndex = world.GetIndex(neighbor.x, neighbor.y);
-				float neighborDepth = state.SeaLevel - state.Elevation[nIndex];
-				if (neighborDepth > 0)
-				{
-					var neighborCurrentDeep = state.OceanCurrentDeep[nIndex];
-					var neighborCurrentShallow = state.OceanCurrentShallow[nIndex];
+			//for (int i = 0; i < 4; i++)
+			//{
+			//	var neighbor = world.GetNeighbor(x, y, i);
+			//	int nIndex = world.GetIndex(neighbor.x, neighbor.y);
+			//	float neighborDepth = state.SeaLevel - state.Elevation[nIndex];
+			//	if (neighborDepth > 0)
+			//	{
+			//		var neighborCurrentDeep = state.OceanCurrentDeep[nIndex];
+			//		var neighborCurrentShallow = state.OceanCurrentShallow[nIndex];
 
-					float nTemperatureShallow = state.OceanEnergyShallow[nIndex];
-					float nTemperatureDeep = state.OceanEnergyDeep[nIndex];
-					float nSalinityShallow = state.OceanSalinityShallow[nIndex];
-					float nSalinityDeep = state.OceanSalinityDeep[nIndex];
+			//		float nEnergyShallow = state.OceanEnergyShallow[nIndex];
+			//		float nEnergyDeep = state.OceanEnergyDeep[nIndex];
+			//		float nTemperatureShallow = GetWaterTemperature(world, nEnergyShallow, world.Data.DeepOceanDepth);
+			//		float nTemperatureDeep = GetWaterTemperature(world, nEnergyDeep, neighborDepth);
+			//		float nSalinityShallow = state.OceanSalinityShallow[nIndex];
+			//		float nSalinityDeep = state.OceanSalinityDeep[nIndex];
 
-					newOceanEnergyShallow += (nTemperatureShallow - oceanEnergyShallow) * world.Data.horizontalMixing;
-					newOceanEnergyDeep += (nTemperatureDeep - oceanEnergyDeep) * world.Data.horizontalMixing;
-					float nSalinityDeepPercentage = nSalinityDeep / neighborDepth;
-					newOceanSalinityDeep += (nSalinityDeepPercentage - salinityDeepPercentage) * world.Data.horizontalMixing * Math.Min(neighborDepth, depth);
+			//		float mixingDepth = Math.Min(neighborDepth, depth);
+			//		newOceanEnergyShallow += world.Data.SpecificHeatSeaWater * world.Data.DeepOceanDepth * (nTemperatureShallow - oceanTemperatureShallow) * world.Data.horizontalMixing;
+			//		newOceanEnergyDeep += world.Data.SpecificHeatSeaWater * mixingDepth * (nTemperatureDeep - oceanTemperatureDeep) * world.Data.horizontalMixing;
+			//		float nSalinityDeepPercentage = nSalinityDeep / neighborDepth;
+			//		newOceanSalinityDeep += (nSalinityDeepPercentage - salinityDeepPercentage) * world.Data.horizontalMixing * Math.Min(neighborDepth, depth);
 
-					newOceanSalinityShallow += (nSalinityShallow - oceanSalinityShallow) * world.Data.horizontalMixing;
+			//		newOceanSalinityShallow += (nSalinityShallow - oceanSalinityShallow) * world.Data.horizontalMixing;
 
-					switch (i)
-					{
-						case 0:
-							if (neighborCurrentShallow.x > 0)
-							{
-								float absX = Math.Abs(neighborCurrentShallow.x);
-								newOceanEnergyShallow += (nTemperatureShallow - oceanEnergyShallow) * Math.Min(0.25f, absX * world.Data.oceanTemperatureMovement);
-								newOceanSalinityShallow += nSalinityShallow * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
-							}
-							if (currentShallow.x < 0)
-							{
-								float absX = Math.Abs(currentShallow.x);
-								newOceanSalinityShallow -= oceanSalinityShallow * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
-							}
-							if (neighborCurrentDeep.x > 0)
-							{
-								float absX = Math.Abs(neighborCurrentDeep.x);
-								newOceanEnergyDeep += (nTemperatureDeep - oceanEnergyDeep) * Math.Min(0.25f, absX * world.Data.oceanTemperatureMovement);
-								newOceanSalinityDeep += nSalinityDeep * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
-							}
-							if (currentDeep.x < 0)
-							{
-								float absX = Math.Abs(currentDeep.x);
-								newOceanSalinityDeep -= oceanSalinityDeep * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
-							}
-							break;
-						case 1:
-							if (neighborCurrentShallow.x < 0)
-							{
-								float absX = Math.Abs(neighborCurrentShallow.x);
-								newOceanEnergyShallow += (nTemperatureShallow - oceanEnergyShallow) * Math.Min(0.25f, absX * world.Data.oceanTemperatureMovement);
-								newOceanSalinityShallow += nSalinityShallow * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
-							}
-							if (currentShallow.x > 0)
-							{
-								float absX = Math.Abs(currentShallow.x);
-								newOceanSalinityShallow -= oceanSalinityShallow * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
-							}
-							if (neighborCurrentDeep.x < 0)
-							{
-								float absX = Math.Abs(neighborCurrentDeep.x);
-								newOceanEnergyDeep += (nTemperatureDeep - oceanEnergyDeep) * Math.Min(0.25f, absX * world.Data.oceanTemperatureMovement);
-								newOceanSalinityDeep += nSalinityDeep * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
-							}
-							if (currentDeep.x > 0)
-							{
-								float absX = Math.Abs(currentDeep.x);
-								newOceanSalinityDeep -= oceanSalinityDeep * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
-							}
-							break;
-						case 2:
-							if (neighborCurrentShallow.y < 0)
-							{
-								float absY = Math.Abs(neighborCurrentShallow.y);
-								newOceanEnergyShallow += (nTemperatureShallow - oceanEnergyShallow) * Math.Min(0.25f, absY * world.Data.oceanTemperatureMovement);
-								newOceanSalinityShallow += nSalinityShallow * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
-							}
-							if (currentShallow.y > 0)
-							{
-								float absY = Math.Abs(currentShallow.y);
-								newOceanSalinityShallow -= oceanSalinityShallow * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
-							}
-							if (neighborCurrentDeep.y < 0)
-							{
-								float absY = Math.Abs(neighborCurrentDeep.y);
-								newOceanEnergyDeep += (nTemperatureDeep - oceanEnergyDeep) * Math.Min(0.25f, absY * world.Data.oceanTemperatureMovement);
-								newOceanSalinityDeep += nSalinityDeep * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
-							}
-							if (currentDeep.y > 0)
-							{
-								float absY = Math.Abs(currentDeep.y);
-								newOceanSalinityDeep -= oceanSalinityDeep * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
-							}
-							break;
-						case 3:
-							if (neighborCurrentShallow.y > 0)
-							{
-								float absY = Math.Abs(neighborCurrentShallow.y);
-								newOceanEnergyShallow += (nTemperatureShallow - oceanEnergyShallow) * Math.Min(0.25f, absY * world.Data.oceanTemperatureMovement);
-								newOceanSalinityShallow += nSalinityShallow * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
-							}
-							if (currentShallow.y < 0)
-							{
-								float absY = Math.Abs(currentShallow.y);
-								newOceanSalinityShallow -= oceanSalinityShallow * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
-							}
-							if (neighborCurrentDeep.y > 0)
-							{
-								float absY = Math.Abs(neighborCurrentDeep.y);
-								newOceanEnergyDeep += (nTemperatureDeep - oceanEnergyDeep) * Math.Min(0.25f, absY * world.Data.oceanTemperatureMovement);
-								newOceanSalinityDeep += nSalinityDeep * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
-							}
-							if (currentDeep.y < 0)
-							{
-								float absY = Math.Abs(currentDeep.y);
-								newOceanSalinityDeep -= oceanSalinityDeep * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
-							}
-							break;
-					}
-				}
-			}
+			//		switch (i)
+			//		{
+			//			case 0:
+			//				if (neighborCurrentShallow.x > 0)
+			//				{
+			//					float absX = Math.Abs(neighborCurrentShallow.x);
+			//					newOceanEnergyShallow += nEnergyShallow * Math.Min(0.25f, absX * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityShallow += nSalinityShallow * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
+			//				}
+			//				if (currentShallow.x < 0)
+			//				{
+			//					float absX = Math.Abs(currentShallow.x);
+			//					newOceanEnergyShallow -= oceanEnergyShallow * Math.Min(0.25f, absX * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityShallow -= oceanSalinityShallow * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
+			//				}
+			//				if (neighborCurrentDeep.x > 0)
+			//				{
+			//					float absX = Math.Abs(neighborCurrentDeep.x);
+			//					newOceanEnergyDeep += nEnergyDeep * Math.Min(0.25f, absX * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityDeep += nSalinityDeep * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
+			//				}
+			//				if (currentDeep.x < 0)
+			//				{
+			//					float absX = Math.Abs(currentDeep.x);
+			//					newOceanSalinityDeep -= oceanSalinityDeep * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
+			//				}
+			//				break;
+			//			case 1:
+			//				if (neighborCurrentShallow.x < 0)
+			//				{
+			//					float absX = Math.Abs(neighborCurrentShallow.x);
+			//					newOceanEnergyShallow += nEnergyShallow * Math.Min(0.25f, absX * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityShallow += nSalinityShallow * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
+			//				}
+			//				if (currentShallow.x > 0)
+			//				{
+			//					float absX = Math.Abs(currentShallow.x);
+			//					newOceanEnergyShallow -= oceanEnergyShallow * Math.Min(0.25f, absX * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityShallow -= oceanSalinityShallow * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
+			//				}
+			//				if (neighborCurrentDeep.x < 0)
+			//				{
+			//					float absX = Math.Abs(neighborCurrentDeep.x);
+			//					newOceanEnergyDeep += nEnergyDeep * Math.Min(0.25f, absX * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityDeep += nSalinityDeep * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
+			//				}
+			//				if (currentDeep.x > 0)
+			//				{
+			//					float absX = Math.Abs(currentDeep.x);
+			//					newOceanEnergyDeep -= oceanEnergyDeep * Math.Min(0.25f, absX * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityDeep -= oceanSalinityDeep * Math.Min(0.25f, absX * world.Data.oceanSalinityMovement);
+			//				}
+			//				break;
+			//			case 2:
+			//				if (neighborCurrentShallow.y < 0)
+			//				{
+			//					float absY = Math.Abs(neighborCurrentShallow.y);
+			//					newOceanEnergyShallow += nEnergyShallow * Math.Min(0.25f, absY * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityShallow += nSalinityShallow * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
+			//				}
+			//				if (currentShallow.y > 0)
+			//				{
+			//					float absY = Math.Abs(currentShallow.y);
+			//					newOceanEnergyShallow -= oceanEnergyShallow * Math.Min(0.25f, absY * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityShallow -= oceanSalinityShallow * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
+			//				}
+			//				if (neighborCurrentDeep.y < 0)
+			//				{
+			//					float absY = Math.Abs(neighborCurrentDeep.y);
+			//					newOceanEnergyDeep += nEnergyDeep * Math.Min(0.25f, absY * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityDeep += nSalinityDeep * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
+			//				}
+			//				if (currentDeep.y > 0)
+			//				{
+			//					float absY = Math.Abs(currentDeep.y);
+			//					newOceanEnergyDeep -= oceanEnergyDeep * Math.Min(0.25f, absY * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityDeep -= oceanSalinityDeep * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
+			//				}
+			//				break;
+			//			case 3:
+			//				if (neighborCurrentShallow.y > 0)
+			//				{
+			//					float absY = Math.Abs(neighborCurrentShallow.y);
+			//					newOceanEnergyShallow += nEnergyShallow * Math.Min(0.25f, absY * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityShallow += nSalinityShallow * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
+			//				}
+			//				if (currentShallow.y < 0)
+			//				{
+			//					float absY = Math.Abs(currentShallow.y);
+			//					newOceanEnergyShallow -= oceanEnergyShallow * Math.Min(0.25f, absY * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityShallow -= oceanSalinityShallow * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
+			//				}
+			//				if (neighborCurrentDeep.y > 0)
+			//				{
+			//					float absY = Math.Abs(neighborCurrentDeep.y);
+			//					newOceanEnergyDeep += nEnergyDeep * Math.Min(0.25f, absY * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityDeep += nSalinityDeep * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
+			//				}
+			//				if (currentDeep.y < 0)
+			//				{
+			//					float absY = Math.Abs(currentDeep.y);
+			//					newOceanEnergyDeep -= oceanEnergyDeep * Math.Min(0.25f, absY * world.Data.oceanEnergyMovement);
+			//					newOceanSalinityDeep -= oceanSalinityDeep * Math.Min(0.25f, absY * world.Data.oceanSalinityMovement);
+			//				}
+			//				break;
+			//		}
+			//	}
+			//}
 			newOceanSalinityDeep = Math.Max(0, newOceanSalinityDeep);
 			newOceanSalinityShallow = Math.Max(0, newOceanSalinityShallow);
 		}
