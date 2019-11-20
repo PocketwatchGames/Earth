@@ -23,7 +23,7 @@ namespace Sim {
 					if (world.IsOcean(state.Elevation[index], state.SeaLevel))
 					{
 
-						float pressure = state.Pressure[index];
+						float pressure = state.LowerAirPressure[index];
 						var normal = state.Normal[index];
 						float friction = (1.0f - normal.z) * 0.5f;
 
@@ -131,16 +131,16 @@ namespace Sim {
 				switch (i)
 				{
 					case 0:
-						pressureDifferential.x += state.Pressure[nIndex] - pressure;
+						pressureDifferential.x += state.LowerAirPressure[nIndex] - pressure;
 						break;
 					case 1:
-						pressureDifferential.x -= state.Pressure[nIndex] - pressure;
+						pressureDifferential.x -= state.LowerAirPressure[nIndex] - pressure;
 						break;
 					case 2:
-						pressureDifferential.y -= state.Pressure[nIndex] - pressure;
+						pressureDifferential.y -= state.LowerAirPressure[nIndex] - pressure;
 						break;
 					case 3:
-						pressureDifferential.y += state.Pressure[nIndex] - pressure;
+						pressureDifferential.y += state.LowerAirPressure[nIndex] - pressure;
 						break;
 				}
 			}

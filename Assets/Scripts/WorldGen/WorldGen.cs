@@ -99,14 +99,14 @@ public partial class World {
 					GetPerlinMinMax(noise, x, y, 2.0f, 30, Data.MinElevation, Data.MaxElevation) * 0.1f;
 				state.Elevation[index] = e;
 				float latitude = GetLatitude(y);
-				state.AirTemperature[index] = (1.0f - Mathf.Clamp(e - state.SeaLevel, 0, Data.MaxElevation) / (Data.MaxElevation - state.SeaLevel)) * (1.0f - latitude * latitude) * (Data.MaxTemperature - Data.MinTemperature) + Data.MinTemperature;
-				state.AirEnergy[index] = Atmosphere.GetAirEnergy(this, state.AirTemperature[index], Math.Max(0, e));
+				state.LowerAirTemperature[index] = (1.0f - Mathf.Clamp(e - state.SeaLevel, 0, Data.MaxElevation) / (Data.MaxElevation - state.SeaLevel)) * (1.0f - latitude * latitude) * (Data.MaxTemperature - Data.MinTemperature) + Data.MinTemperature;
+				state.LowerAirEnergy[index] = Atmosphere.GetAirEnergy(this, state.LowerAirTemperature[index], Math.Max(0, e));
 				state.CloudCover[index] = GetPerlinMinMax(noise, x, y, 3.0f, 2000, 0, 2);
 				state.Humidity[index] = GetPerlinMinMax(noise, x, y, 3.0f, 3000, 0, 2);
 				state.CloudElevation[index] = state.Elevation[index] + 1000;
 				state.WaterTableDepth[index] = GetPerlinMinMax(noise, x, y, 1.0f, 200, Data.MinWaterTableDepth, Data.MaxWaterTableDepth);
 				state.SoilFertility[index] = GetPerlinNormalized(noise, x, y, 1.0f, 400);
-				state.Pressure[index] = Data.StaticPressure;
+				state.LowerAirPressure[index] = Data.StaticPressure;
 				if (e >= 0)
 				{
 					state.SurfaceWater[index] = GetPerlinMinMax(noise, x, y, 1.0f, 100, 0, 10.0f);
@@ -114,7 +114,7 @@ public partial class World {
 					state.Canopy[index] = GetPerlinNormalized(noise, x, y, 2.0f, 1000);
 				} else
 				{
-					state.OceanEnergyShallow[index] = Atmosphere.GetWaterEnergy(this, state.AirTemperature[index], Data.DeepOceanDepth);
+					state.OceanEnergyShallow[index] = Atmosphere.GetWaterEnergy(this, state.LowerAirTemperature[index], Data.DeepOceanDepth);
 					state.OceanEnergyDeep[index] = Atmosphere.GetWaterEnergy(this, Data.FreezingTemperature + 3, Math.Max(0, -e));
 					state.OceanSalinityShallow[index] = (1.0f - Math.Abs(latitude)) * Data.DeepOceanDepth;
 					float deepOceanVolume = state.SeaLevel - state.Elevation[index];

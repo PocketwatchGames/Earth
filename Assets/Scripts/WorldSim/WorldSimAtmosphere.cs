@@ -30,9 +30,9 @@ namespace Sim {
 					float elevationOrSeaLevel = Math.Max(state.SeaLevel, elevation);
 					float cloudCover = state.CloudCover[index];
 					float landEnergy = state.LandEnergy[index];
-					float airTemperature = state.AirTemperature[index];
-					float airEnergy = state.AirEnergy[index];
-					float pressure = state.Pressure[index];
+					float airTemperature = state.LowerAirTemperature[index];
+					float airEnergy = state.LowerAirEnergy[index];
+					float pressure = state.LowerAirPressure[index];
 					var gradient = state.FlowDirection[index];
 					var terrainNormal = state.Normal[index];
 					float surfaceWater = state.SurfaceWater[index];
@@ -217,7 +217,7 @@ namespace Sim {
 					{
 						break;
 					}
-					nextState.AirEnergy[index] = newAirEnergy;
+					nextState.LowerAirEnergy[index] = newAirEnergy;
 					nextState.LandEnergy[index] = newLandEnergy;
 					nextState.Evaporation[index] = newEvaporation;
 					nextState.SurfaceWater[index] = newSurfaceWater;
@@ -228,13 +228,13 @@ namespace Sim {
 					nextState.CloudCover[index] = newCloudCover;
 					nextState.CloudElevation[index] = newCloudElevation;
 					nextState.Radiation[index] = newRadiation;
-					nextState.Pressure[index] = newPressure;
+					nextState.LowerAirPressure[index] = newPressure;
 					nextState.OceanEnergyShallow[index] = newOceanEnergyShallow;
 					nextState.OceanEnergyDeep[index] = newOceanEnergyDeep;
 					nextState.OceanSalinityDeep[index] = newOceanSalinityDeep;
 					nextState.OceanSalinityShallow[index] = newOceanSalinityShallow;
 					nextState.OceanDensityDeep[index] = GetOceanDensity(world, newOceanEnergyDeep, newOceanSalinityDeep, state.SeaLevel - elevation);
-					nextState.AirTemperature[index] = newTemperature;
+					nextState.LowerAirTemperature[index] = newTemperature;
 
 				}
 			}
@@ -531,7 +531,7 @@ namespace Sim {
 			{
 				var neighbor = world.GetNeighbor(x, y, i);
 				int nIndex = world.GetIndex(neighbor.x, neighbor.y);
-				float nAirEnergy = state.AirEnergy[nIndex];
+				float nAirEnergy = state.LowerAirEnergy[nIndex];
 				float nHumidity = state.Humidity[nIndex];
 				var nWind = state.Wind[nIndex];
 				float nElevationOrSeaLevel = Math.Max(0, state.Elevation[nIndex]);

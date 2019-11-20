@@ -78,8 +78,8 @@ public class Probe {
 	public void Update(World world, World.State state)
 	{
 		int index = world.GetIndex(Position.x, Position.y);
-		AirTemperature[CurSampleIndex] = state.AirTemperature[index];
-		Pressure[CurSampleIndex] = state.Pressure[index];
+		AirTemperature[CurSampleIndex] = state.LowerAirTemperature[index];
+		Pressure[CurSampleIndex] = state.LowerAirPressure[index];
 		Humidity[CurSampleIndex] = state.Humidity[index];
 		CloudCover[CurSampleIndex] = state.CloudCover[index];
 		Rainfall[CurSampleIndex] = state.Rainfall[index];

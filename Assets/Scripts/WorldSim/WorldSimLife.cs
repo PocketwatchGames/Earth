@@ -19,7 +19,7 @@ namespace Sim {
 					// Foliage
 					float freshWaterAvailability = 0;
 					float canopy = state.Canopy[index];
-					float airHeat = state.AirTemperature[index];
+					float airHeat = state.LowerAirTemperature[index];
 
 					float newCanopy = canopy;
 					if (canopy > 0)
@@ -30,7 +30,7 @@ namespace Sim {
 						}
 						else
 						{
-							float t = state.AirTemperature[index];
+							float t = state.LowerAirTemperature[index];
 							float sf = state.SoilFertility[index];
 							float groundWaterSaturation = GetGroundWaterSaturation(state.GroundWater[index], state.WaterTableDepth[index], sf * world.Data.MaxSoilPorousness);
 							float surfaceWater = state.SurfaceWater[index];
@@ -91,7 +91,7 @@ namespace Sim {
 						}
 						int tileIndex = world.GetIndex(tile.x, tile.y);
 						water += state.SurfaceWater[tileIndex];
-						comfort += Mathf.Clamp01((species.RestingTemperature + species.TemperatureRange - state.AirTemperature[tileIndex]) / species.TemperatureRange);
+						comfort += Mathf.Clamp01((species.RestingTemperature + species.TemperatureRange - state.LowerAirTemperature[tileIndex]) / species.TemperatureRange);
 						food += state.Canopy[tileIndex];
 						radiation += state.Radiation[tileIndex];
 					}

@@ -79,8 +79,12 @@ public partial class World {
 
 		public int[] Plate;
 		public float[] Elevation;
-		public float[] AirEnergy;
-		public float[] AirTemperature;
+		public float[] LowerAirEnergy;
+		public float[] LowerAirTemperature;
+		public float[] LowerAirPressure;
+		public float[] UpperAirEnergy;
+		public float[] UpperAirTemperature;
+		public float[] UpperAirPressure;
 		public float[] LandEnergy;
 		public float[] Humidity;
 		public float[] Rainfall;
@@ -101,7 +105,6 @@ public partial class World {
 		public float[] SubmergedIce;
 		public float[] SoilFertility;
 		public float[] Canopy;
-		public float[] Pressure;
 		public float[] Radiation;
 		public int[] AnimalsPerTile;
 		public Vector3[] Wind;
@@ -124,8 +127,8 @@ public partial class World {
 			o.Plate = (int[])Plate.Clone();
 			o.Elevation = (float[])Elevation.Clone();
 			o.LandEnergy = (float[])LandEnergy.Clone();
-			o.AirEnergy = (float[])AirEnergy.Clone();
-			o.AirTemperature = (float[])AirTemperature.Clone();
+			o.LowerAirEnergy = (float[])LowerAirEnergy.Clone();
+			o.LowerAirTemperature = (float[])LowerAirTemperature.Clone();
 			o.Humidity = (float[])Humidity.Clone();
 			o.Rainfall = (float[])Rainfall.Clone();
 			o.Evaporation = (float[])Evaporation.Clone();
@@ -143,7 +146,7 @@ public partial class World {
 			o.SubmergedIce = (float[])SubmergedIce.Clone();
 			o.SoilFertility = (float[])SoilFertility.Clone();
 			o.Canopy = (float[])Canopy.Clone();
-			o.Pressure = (float[])Pressure.Clone();
+			o.LowerAirPressure = (float[])LowerAirPressure.Clone();
 			o.Radiation = (float[])Radiation.Clone();
 			o.AnimalsPerTile = (int[])AnimalsPerTile.Clone();
 			o.Wind = (Vector3[])Wind.Clone();
@@ -184,8 +187,8 @@ public partial class World {
 			States[i].Elevation = new float[s];
 			States[i].CloudElevation = new float[s];
 			States[i].LandEnergy = new float[s];
-			States[i].AirEnergy = new float[s];
-			States[i].AirTemperature = new float[s];
+			States[i].LowerAirEnergy = new float[s];
+			States[i].LowerAirTemperature = new float[s];
 			States[i].Humidity = new float[s];
 			States[i].CloudCover = new float[s];
 			States[i].WaterTableDepth = new float[s];
@@ -205,7 +208,7 @@ public partial class World {
 			States[i].Wind = new Vector3[s];
 			States[i].OceanCurrentShallow = new Vector3[s];
 			States[i].OceanCurrentDeep = new Vector3[s];
-			States[i].Pressure = new float[s];
+			States[i].LowerAirPressure = new float[s];
 			States[i].Radiation = new float[s];
 			States[i].FlowDirection = new Vector2[s];
 			States[i].Normal = new Vector3[s];
