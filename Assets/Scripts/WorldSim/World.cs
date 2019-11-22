@@ -72,6 +72,7 @@ public partial class World {
 		public float AtmosphereN;
 		public float GlobalTemperature;
 		public float SeaLevel;
+		public float StratosphereMass;
 
 		public SpeciesType[] Species;
 		public SpeciesStat[] SpeciesStats;
@@ -122,6 +123,7 @@ public partial class World {
 			o.AtmosphereN = AtmosphereN;
 			o.GlobalTemperature = GlobalTemperature;
 			o.SeaLevel = SeaLevel;
+			o.StratosphereMass = StratosphereMass;
 
 			o.Species = (SpeciesType[])Species.Clone();
 			o.SpeciesStats = (SpeciesStat[])SpeciesStats.Clone();
@@ -239,7 +241,9 @@ public partial class World {
 		{
 			Probes[i] = new Probe();
 		}
+	}
 
+	public void Start() { 
 
 		_simTask = Task.Run(() =>
 		{

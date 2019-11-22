@@ -67,58 +67,61 @@ public partial class WorldComponent {
 		new Color(0,0.5f,1),
 	};
 
+	public const float MinElevation = -11000;
+	public const float MaxElevation = 10000;
+
 	void CreateWorldMesh()
 	{
-		landVerts = new Vector3[_size * _size];
-		landCols = new Color[_size * _size];
-		landTris = new int[(_size - 1) * (_size - 1) * 6];
+		landVerts = new Vector3[World.Size * World.Size];
+		landCols = new Color[World.Size * World.Size];
+		landTris = new int[(World.Size - 1) * (World.Size - 1) * 6];
 
-		cloudVerts = new Vector3[_size * _size];
-		cloudCols = new Color[_size * _size];
-		cloudTris = new int[(_size - 1) * (_size - 1) * 6];
+		cloudVerts = new Vector3[World.Size * World.Size];
+		cloudCols = new Color[World.Size * World.Size];
+		cloudTris = new int[(World.Size - 1) * (World.Size - 1) * 6];
 
-		oceanVerts = new Vector3[_size * _size];
-		oceanCols = new Color[_size * _size];
-		oceanTris = new int[(_size - 1) * (_size - 1) * 6];
+		oceanVerts = new Vector3[World.Size * World.Size];
+		oceanCols = new Color[World.Size * World.Size];
+		oceanTris = new int[(World.Size - 1) * (World.Size - 1) * 6];
 
 
-		for (int i = 0; i < _size; i++)
+		for (int i = 0; i < World.Size; i++)
 		{
-			for (int j = 0; j < _size; j++)
+			for (int j = 0; j < World.Size; j++)
 			{
-				landVerts[i * _size + j] = new Vector3(j, i, 0);
-				landCols[i * _size + j] = Color.black;
-				cloudVerts[i * _size + j] = new Vector3(j, i, 0);
-				cloudCols[i * _size + j] = new Color(0, 0, 0, 0);
-				oceanVerts[i * _size + j] = new Vector3(j, i, 0);
-				oceanCols[i * _size + j] = new Color(0, 0, 0, 0);
+				landVerts[i * World.Size + j] = new Vector3(j, i, 0);
+				landCols[i * World.Size + j] = Color.black;
+				cloudVerts[i * World.Size + j] = new Vector3(j, i, 0);
+				cloudCols[i * World.Size + j] = new Color(0, 0, 0, 0);
+				oceanVerts[i * World.Size + j] = new Vector3(j, i, 0);
+				oceanCols[i * World.Size + j] = new Color(0, 0, 0, 0);
 			}
 		}
 		int index = 0;
-		for (int i = 0; i < _size - 1; i++)
+		for (int i = 0; i < World.Size - 1; i++)
 		{
-			for (int j = 0; j < _size - 1; j++)
+			for (int j = 0; j < World.Size - 1; j++)
 			{
-				landTris[index + 0] = i * _size + j;
-				landTris[index + 1] = (i + 1) * _size + j;
-				landTris[index + 2] = (i + 1) * _size + (j + 1);
-				landTris[index + 3] = i * _size + j;
-				landTris[index + 4] = (i + 1) * _size + (j + 1);
-				landTris[index + 5] = i * _size + (j + 1);
+				landTris[index + 0] = i * World.Size + j;
+				landTris[index + 1] = (i + 1) * World.Size + j;
+				landTris[index + 2] = (i + 1) * World.Size + (j + 1);
+				landTris[index + 3] = i * World.Size + j;
+				landTris[index + 4] = (i + 1) * World.Size + (j + 1);
+				landTris[index + 5] = i * World.Size + (j + 1);
 
-				cloudTris[index + 0] = i * _size + j;
-				cloudTris[index + 1] = (i + 1) * _size + j;
-				cloudTris[index + 2] = (i + 1) * _size + (j + 1);
-				cloudTris[index + 3] = i * _size + j;
-				cloudTris[index + 4] = (i + 1) * _size + (j + 1);
-				cloudTris[index + 5] = i * _size + (j + 1);
+				cloudTris[index + 0] = i * World.Size + j;
+				cloudTris[index + 1] = (i + 1) * World.Size + j;
+				cloudTris[index + 2] = (i + 1) * World.Size + (j + 1);
+				cloudTris[index + 3] = i * World.Size + j;
+				cloudTris[index + 4] = (i + 1) * World.Size + (j + 1);
+				cloudTris[index + 5] = i * World.Size + (j + 1);
 
-				oceanTris[index + 0] = i * _size + j;
-				oceanTris[index + 1] = (i + 1) * _size + j;
-				oceanTris[index + 2] = (i + 1) * _size + (j + 1);
-				oceanTris[index + 3] = i * _size + j;
-				oceanTris[index + 4] = (i + 1) * _size + (j + 1);
-				oceanTris[index + 5] = i * _size + (j + 1);
+				oceanTris[index + 0] = i * World.Size + j;
+				oceanTris[index + 1] = (i + 1) * World.Size + j;
+				oceanTris[index + 2] = (i + 1) * World.Size + (j + 1);
+				oceanTris[index + 3] = i * World.Size + j;
+				oceanTris[index + 4] = (i + 1) * World.Size + (j + 1);
+				oceanTris[index + 5] = i * World.Size + (j + 1);
 
 				index += 6;
 			}
@@ -152,9 +155,9 @@ public partial class WorldComponent {
 		ref var lastState = ref World.States[World.LastRenderStateIndex];
 		stateLerpT = Math.Max(1.0f, dt * 10);
 
-		for (int y = 0; y < _size; y++)
+		for (int y = 0; y < World.Size; y++)
 		{
-			for (int x = 0; x < _size; x++)
+			for (int x = 0; x < World.Size; x++)
 			{
 				int index = World.GetIndex(x, y);
 
@@ -162,7 +165,7 @@ public partial class WorldComponent {
 				Color color = Color.white;
 				float elevation = state.Elevation[index];
 				float ice = state.SurfaceIce[index];
-				float normalizedElevation = (elevation - World.Data.MinElevation) / (World.Data.MaxElevation - World.Data.MinElevation);
+				float normalizedElevation = (elevation - MinElevation) / (MaxElevation - MinElevation);
 				bool drawOcean = elevation < state.SeaLevel && showLayers.HasFlag(Layers.Water);
 
 				landVerts[index] = new Vector3(x, y, -elevation * ElevationScale);
@@ -211,7 +214,7 @@ public partial class WorldComponent {
 				if (showLayers.HasFlag(Layers.ElevationSubtle))
 				{
 					oceanColor = Lerp(new List<CVP> {
-									new CVP(Color.black, World.Data.MinElevation),
+									new CVP(Color.black, MinElevation),
 									new CVP(Color.blue, state.SeaLevel - 500),
 									new CVP(new Color(0.1f,0.2f,1.0f), state.SeaLevel), },
 						elevation);
@@ -269,7 +272,7 @@ public partial class WorldComponent {
 				else if (showLayers.HasFlag(Layers.RelativeHumidity))
 				{
 					float timeOfYear = World.GetTimeOfYear(state.Ticks);
-					float declinationOfSun = Atmosphere.GetDeclinationOfSun(Data.planetTiltAngle, timeOfYear);
+					float declinationOfSun = Atmosphere.GetDeclinationOfSun(World.Data.planetTiltAngle, timeOfYear);
 					float lengthOfDay = Atmosphere.GetLengthOfDay(World.GetLatitude(y), timeOfYear, declinationOfSun);
 					var sunVector = Atmosphere.GetSunVector(World, state.Ticks, World.GetLatitude(y)).z;
 					float localTemperature = Atmosphere.GetLocalTemperature(World, Math.Max(0, sunVector), state.CloudCover[index], state.LowerAirTemperature[index], lengthOfDay);
@@ -293,17 +296,17 @@ public partial class WorldComponent {
 				{
 					oceanColor = color = Lerp(
 						new List<CVP> {
-											new CVP(Color.black, World.Data.MinElevation),
-											new CVP(new Color(0, 0, 0.5f), (state.SeaLevel - World.Data.MinElevation)/2+World.Data.MinElevation),
+											new CVP(Color.black, MinElevation),
+											new CVP(new Color(0, 0, 0.5f), (state.SeaLevel - MinElevation)/2+MinElevation),
 											new CVP(new Color(0.4f, 0.4f, 1.0f), state.SeaLevel),
 											new CVP(Color.yellow, state.SeaLevel+1),
-											new CVP(new Color(0.5f, 0.5f, 0.5f), (World.Data.MaxElevation-state.SeaLevel)/4+state.SeaLevel),
-											new CVP(Color.white, World.Data.MaxElevation) },
+											new CVP(new Color(0.5f, 0.5f, 0.5f), (MaxElevation-state.SeaLevel)/4+state.SeaLevel),
+											new CVP(Color.white, MaxElevation) },
 						elevation);
 				}
 				else if (showLayers.HasFlag(Layers.Plates))
 				{
-					float elevationT = elevation / World.Data.MaxElevation;
+					float elevationT = elevation / MaxElevation;
 					color = Color.Lerp(Color.black, Color.white, Math.Sign(elevation) * (float)Math.Sqrt(Math.Abs(elevationT)) / 2 + 0.5f);
 					oceanColor = color = Color.Lerp(color, PlateColors[state.Plate[index] % MaxPlateColors], 0.25f);
 				}
@@ -338,7 +341,7 @@ public partial class WorldComponent {
 											new CVP(Color.blue, 1),
 											new CVP(Color.green, 1.5f),
 											new CVP(Color.white, 2) },
-						elevation < state.SeaLevel ? state.OceanSalinityShallow[index] / Data.DeepOceanDepth : 0);
+						elevation < state.SeaLevel ? state.OceanSalinityShallow[index] / World.Data.DeepOceanDepth : 0);
 				} 
 				else if (showLayers.HasFlag(Layers.OceanSalinityDeep))
 				{

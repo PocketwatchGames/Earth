@@ -14,72 +14,26 @@ public struct WindInfo
 	public float coriolisPower;
 }
 
-public class WorldData : MonoBehaviour
+[Serializable]
+public class WorldData
 {
-	[Header("Planetary")]
-	public int TicksPerYear = 360;
-	public float tileSize = 400000;
-	public float carbonDioxide = 0.001f;
-	public float FreezingTemperature = 273.15f;
-	public float MinTemperature = 223.15f;
-	public float MaxTemperature = 323.15f;
-	public float planetTiltAngle = -23.5f;
-	public float troposphereElevation = 10000;
-	public float BoundaryZoneElevation = 1000;
-	public float stratosphereElevation = 50000;
-	public float MaxTropopauseElevation = 17000f;
-	public float MinTropopauseElevation = 9000f;
-	public float TropopauseElevationSeason = 1000f;
-	public float troposphereAtmosphereContent = 0.8f;
-
-	[Header("Ecology")]
-	public float canopyGrowthRate = 100.0f;
-	public float canopyDeathRate = 0.2f;
-	public float freshWaterMaxAvailability = 0.1f;
-
-	[Header("Animals")]
-	public float populationExpansionPercent = 0.2f;
-	public float minPopulationDensityForExpansion = 0.1f;
-
-	[Header("Geology")]
-	public float MaxElevation = 10000.0f;
-	public float MinElevation = -10000.0f;
-
-	[Header("Water")]
-	public float FlowSpeed = 10.0f; // mississippi travels at around 3 km/h
-	public float FlowSpeedExponent = 0.25f; // arbitrary exponent to make flow speeds work at lower gradients
-	public float MaxWaterTableDepth = 1000.0f; // There is still a lot of water below a kilometer, but it's generally not worth simulating
-	public float MinWaterTableDepth = 0.0f;
-	public float MaxSoilPorousness = 0.1f;
-	public float GroundWaterReplenishmentSpeed = 10.0f;
-	public float GroundWaterFlowSpeed = 0.5f;
-
 	[Header("Atmosphere")]
 	//public float tradeWindSpeed = 12.0f; // average wind speeds around trade winds around 12 m/s
 										 //	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
 	public float pressureToHorizontalWindSpeed = 0.01f;
 	public float pressureToVerticalWindSpeed = 0.01f;
 	public float heatLossPreventionCarbonDioxide = 200;
-	public float temperatureLapseRate = -0.0065f;
-	public float MassEarthAir = 1.29f;
-	public float MassSeaWater = 1024f;
 	public float LowerAirDensity = 1.2f;
 	public float UpperAirDensity = 0.4f;
 	public float massWindMovement = 0.0001f;
 	public float MaxTerrainNormalForFriction = 0.25f;
 	public float WindLandFrictionMinimum = 0.2f;
-	public float StaticPressure = 101325;
-	public float StdTemp = 288.15f;
-	public float GravitationalAcceleration = 9.80665f;
-	public float MolarMassEarthAir = 0.0289644f;
-	public float UniversalGasConstant = 8.3144598f;
 	public float airDispersalSpeed = 0.01f;
 	public float humidityDispersalSpeed = 0.01f;
 
 	// atmospheric heat balance https://energyeducation.ca/encyclopedia/Earth%27s_heat_balance
 	// https://en.wikipedia.org/wiki/Earth%27s_energy_budget
 	public float localSunHeat = 5; // sun can add about 5 degrees celsius
-	public float SolarRadiation = 118; // extraterrestrial solar radiation // https://en.wikipedia.org/wiki/Sunlight (1367 w/m^2) *seconds per day (86400)
 	public float AtmosphericHeatAbsorption = 0.23f; // total absorbed by atmosphere about 23%
 	public float AtmosphericHeatReflection = 0.23f;
 	public float EvaporativeHeatLoss = 0.065f; // global average = 78 watts -- TODO: get this in line with average evaportaion (2.5M per year)
@@ -92,15 +46,10 @@ public class WorldData : MonoBehaviour
 	public float AlbedoFoliage = 0.1f;
 	public float AtmosphericHeatLossToSpace = 0.000001024f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
 	public float LandRadiation = 0.5f;
-	public float SpecificHeatSeaWater = 3.85f; // specific heat is joules to raise one degree
-	public float SpecificHeatAtmosphere = 1.158f; // specific heat is joules to raise one degree
-	public float StratosphereMass = 2583;
-	public float TroposphereMass = 7749;
 
 	[Header("Water Vapor")]
 	public float EvapRateWind = 1.0f;
 	public float EvapRateTemperature = 1.0f;
-	public float dewPointZero = 213.0f;
 	public float dewPointTemperatureRange = 100.0f;
 	public float dewPointRange = 0.06f;
 	public float RainfallRate = 10.0f;
@@ -132,6 +81,52 @@ public class WorldData : MonoBehaviour
 	public float OceanDensityPerSalinity = 1.0f;
 	public float OceanDensityPerTemperature = 10.0f;
 
+	[Header("Ecology")]
+	public float canopyGrowthRate = 100.0f;
+	public float canopyDeathRate = 0.2f;
+	public float freshWaterMaxAvailability = 0.1f;
+
+	[Header("Animals")]
+	public float populationExpansionPercent = 0.2f;
+	public float minPopulationDensityForExpansion = 0.1f;
+
+	[Header("Water")]
+	public float FlowSpeed = 10.0f; // mississippi travels at around 3 km/h
+	public float FlowSpeedExponent = 0.25f; // arbitrary exponent to make flow speeds work at lower gradients
+	public float MaxWaterTableDepth = 1000.0f; // There is still a lot of water below a kilometer, but it's generally not worth simulating
+	public float MinWaterTableDepth = 0.0f;
+	public float MaxSoilPorousness = 0.1f;
+	public float GroundWaterReplenishmentSpeed = 10.0f;
+	public float GroundWaterFlowSpeed = 0.5f;
+
+	[Header("Planetary")]
+	public int TicksPerYear = 360;
+	public float tileSize = 400000;
+	public float carbonDioxide = 0.001f;
+	public float MinTemperature = 223.15f;
+	public float MaxTemperature = 323.15f;
+	public float planetTiltAngle = -23.5f;
+	public float troposphereElevation = 10000;
+	public float BoundaryZoneElevation = 1000;
+	public float stratosphereElevation = 50000;
+	public float MaxTropopauseElevation = 17000f;
+	public float MinTropopauseElevation = 9000f;
+	public float TropopauseElevationSeason = 1000f;
+	public float troposphereAtmosphereContent = 0.8f;
+	public float temperatureLapseRate = -0.0065f;
+	public float GravitationalAcceleration = 9.80665f;
+	public float StaticPressure = 101325;
+	public float StdTemp = 288.15f;
+	public float MolarMassEarthAir = 0.0289644f;
+	public float UniversalGasConstant = 8.3144598f;
+	public float dewPointZero = 213.0f;
+	public float MassEarthAir = 1.29f;
+	public float MassSeaWater = 1024f;
+	public float SpecificHeatSeaWater = 3.85f; // specific heat is joules to raise one degree
+	public float SpecificHeatAtmosphere = 1.158f; // specific heat is joules to raise one degree
+	public float FreezingTemperature = 273.15f;
+	public float SolarRadiation = 118; // extraterrestrial solar radiation // https://en.wikipedia.org/wiki/Sunlight (1367 w/m^2) *seconds per day (86400)
+
 	[NonSerialized]
 	public WindInfo[] windInfo;
 	[NonSerialized]
@@ -142,7 +137,7 @@ public class WorldData : MonoBehaviour
 	public float PressureExponent;
 
 
-	public void Init(World.SimFeature activeFeatures, int size)
+	public void Init(int size)
 	{
 		TicksPerHour = TicksPerYear * (365 * 24);
 		int secondsPerYear = 365 * 24 * 60 * 60;
@@ -170,44 +165,6 @@ public class WorldData : MonoBehaviour
 		iceFreezeRate /= TicksPerYear;
 		iceMeltRate /= TicksPerYear;
 
-		if (!activeFeatures.HasFlag(World.SimFeature.HumidityMovesOnWind))
-		{
-			humidityLossFromWind = 0;
-		}
-		if (!activeFeatures.HasFlag(World.SimFeature.TemperatureMovesOnWind)) {
-		}
-		if (!activeFeatures.HasFlag(World.SimFeature.Evaporation)) {
-			EvapRateTemperature = 0;
-			EvapRateWind = 0;
-		}
-		if (!activeFeatures.HasFlag(World.SimFeature.EvaporationFromTemperature)) {
-			EvapRateTemperature = 0;
-		}
-		if (!activeFeatures.HasFlag(World.SimFeature.EvaporationFromWind)) {
-			EvapRateWind = 0;
-		}
-		if (!activeFeatures.HasFlag(World.SimFeature.HumidityToCloud)) {
-		}
-		if (!activeFeatures.HasFlag(World.SimFeature.HumidityToCloudFromWind)) {
-
-		}
-		if (!activeFeatures.HasFlag(World.SimFeature.HumidityToCloudFromAbsorption)) {
-		}
-		if (!activeFeatures.HasFlag(World.SimFeature.Rainfall)) {
-			RainfallRate = 0;
-		}
-		if (!activeFeatures.HasFlag(World.SimFeature.CloudShadesLand)) { }
-		if (!activeFeatures.HasFlag(World.SimFeature.Ice)) {
-			iceFreezeRate = 0;
-		}
-		if (!activeFeatures.HasFlag(World.SimFeature.GroundWaterAbsorption)) {
-			GroundWaterReplenishmentSpeed = 0;
-		}
-		if (!activeFeatures.HasFlag(World.SimFeature.GroundWaterFlow)) {
-			GroundWaterFlowSpeed = 0;
-		}
-		if (!activeFeatures.HasFlag(World.SimFeature.WindCoriolisForce )) {
-		}
 
 		for (int y = 0; y < size; y++)
 		{

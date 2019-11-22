@@ -21,8 +21,11 @@ public partial class World {
 	{
 		return noise.GetPerlin((float)x / Size * frequency + hash, (float)y / Size * frequency);
 	}
-	public void Generate(List<Sprite> speciesSprites)
+	public void Generate(List<Sprite> speciesSprites, WorldData data, WorldGenData worldGenData)
 	{
+		Data = data;
+		Init(worldGenData.Size, Data);
+
 		ref var state = ref States[0];
 		FastNoise noise = new FastNoise(67687);
 		noise.SetFrequency(10);
@@ -93,19 +96,19 @@ public partial class World {
 			{
 				int index = GetIndex(x, y);
 				var e =
-					GetPerlinMinMax(noise, x, y, 0.25f, 0, Data.MinElevation, Data.MaxElevation) * 0.4f +
-					GetPerlinMinMax(noise, x, y, 0.5f, 10, Data.MinElevation, Data.MaxElevation) * 0.3f +
-					GetPerlinMinMax(noise, x, y, 1.0f, 20, Data.MinElevation, Data.MaxElevation) * 0.2f +
-					GetPerlinMinMax(noise, x, y, 2.0f, 30, Data.MinElevation, Data.MaxElevation) * 0.1f;
+					GetPerlinMinMax(noise, x, y, 0.25f, 0, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.4f +
+					GetPerlinMinMax(noise, x, y, 0.5f, 10, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.3f +
+					GetPerlinMinMax(noise, x, y, 1.0f, 20, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.2f +
+					GetPerlinMinMax(noise, x, y, 2.0f, 30, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.1f;
 				state.Elevation[index] = e;
 				float latitude = GetLatitude(y);
 
 				float elevationOrSeaLevel = Math.Max(0, e);
 				float troposphereColumnHeight = Data.troposphereElevation - elevationOrSeaLevel;
-				float troposphereMass = Data.TroposphereMass * troposphereColumnHeight / Data.troposphereElevation;
+				float troposphereMass = worldGenData.TroposphereMass * troposphereColumnHeight / Data.troposphereElevation;
 				float upperAirColumnHeight = troposphereColumnHeight - Data.BoundaryZoneElevation;
 
-				state.LowerAirTemperature[index] = (1.0f - Mathf.Clamp(e - state.SeaLevel, 0, Data.MaxElevation) / (Data.MaxElevation - state.SeaLevel)) * (1.0f - latitude * latitude) * (Data.MaxTemperature - Data.MinTemperature) + Data.MinTemperature;
+				state.LowerAirTemperature[index] = (1.0f - Mathf.Clamp(e - state.SeaLevel, 0, worldGenData.MaxElevation) / (worldGenData.MaxElevation - state.SeaLevel)) * (1.0f - latitude * latitude) * (Data.MaxTemperature - Data.MinTemperature) + Data.MinTemperature;
 				state.UpperAirTemperature[index] = state.LowerAirTemperature[index] + Data.temperatureLapseRate * (Data.troposphereElevation - elevationOrSeaLevel);
 
 				float lowerDensity = Data.LowerAirDensity - (Data.LowerAirDensity - Data.UpperAirDensity) * (elevationOrSeaLevel / Data.troposphereElevation);

@@ -45,6 +45,11 @@ public partial class WorldComponent : MonoBehaviour
 		Farenheit
 	}
 
+	[Header("Data")]
+	public WorldGenData WorldGenData;
+	public WorldData Data;
+
+	[Header("Display")]
 	public Layers ShowLayers;
 	public float ElevationScale = 0.002f;
 	public float MinZoom;
@@ -55,10 +60,10 @@ public partial class WorldComponent : MonoBehaviour
 	public float CameraZoomSpeed = 2;
 	public TemperatureDisplayType TemperatureDisplay;
 
+
 	[Header("Internal")]
 	public Camera MainCamera;
 	public World World;
-	public WorldData Data;
 	public GameObject WorldIcons;
 	public MeshFilter LandMesh;
 	public MeshFilter CloudMesh;
@@ -76,7 +81,6 @@ public partial class WorldComponent : MonoBehaviour
 
 	#region private vars
 
-	private int _size = 100;
 	private GameObject[] _windArrows;
 	private HerdIcon[] _herdIcons;
 	private GameObject[] _territoryMarkers;
@@ -92,24 +96,22 @@ public partial class WorldComponent : MonoBehaviour
 		//ActiveFeatures = SimFeature.All;
 		//ActiveFeatures &= ~(SimFeature.Evaporation);
 		//		ActiveFeatures &= ~(SimFeature.TradeWinds);
-		Data.Init(World.SimFeature.All, _size);
 
-
-		World.Init(_size, Data);
-		World.Generate(SpeciesSprites);
+		Data.Init(WorldGenData.Size);
+		World.Generate(SpeciesSprites, Data, WorldGenData);
 		CreateWorldMesh();
 		MainCamera.transform.position = new Vector3(World.Size / 2, World.Size / 2, MainCamera.transform.position.z);
 
-		_windArrows = new GameObject[_size*_size];
-		for (int i = 0; i < _size; i++)
+		_windArrows = new GameObject[World.Size* World.Size];
+		for (int i = 0; i < World.Size; i++)
 		{
-			for (int j = 0; j < _size; j++)
+			for (int j = 0; j < World.Size; j++)
 			{
 				var a = GameObject.Instantiate<GameObject>(ArrowPrefab, this.transform);
 				a.transform.position = new Vector3(i, j, 0);
 				a.SetActive(false);
 				a.hideFlags = HideFlags.HideInHierarchy;
-				_windArrows[i+j*_size] = a;
+				_windArrows[i+j* World.Size] = a;
 			}
 		}
 
@@ -134,6 +136,8 @@ public partial class WorldComponent : MonoBehaviour
 
 		WorldStartedEvent?.Invoke();
 		HerdSelected = -1;
+
+		World.Start();
 	}
 
 
@@ -205,7 +209,7 @@ public partial class WorldComponent : MonoBehaviour
 	}
 	public void OnWindFilterChanged(UnityEngine.UI.Toggle toggle)
 	{
-		for (int i = 0; i < _size * _size; i++)
+		for (int i = 0; i < World.Size * World.Size; i++)
 		{
 			_windArrows[i].SetActive(toggle.isOn);
 		}

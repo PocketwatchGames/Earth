@@ -79,7 +79,7 @@ namespace Sim {
 					float newOceanSalinityDeep = oceanSalinityDeep;
 					float newOceanSalinityShallow = oceanSalinityShallow;
 					float windSpeed = lowerWind.magnitude;
-					float massOfAtmosphericColumn = world.Data.StratosphereMass + upperAirMass + lowerAirMass;
+					float massOfAtmosphericColumn = state.StratosphereMass + upperAirMass + lowerAirMass;
 
 					float evapRate = GetEvaporationRate(world, surfaceIce, lowerAirTemperature, humidity, lowerWind.magnitude, cloudElevation, elevationOrSeaLevel);
 					float cloudOpacity = Math.Min(1.0f, cloudCover / world.Data.cloudContentFullAbsorption);
@@ -93,7 +93,7 @@ namespace Sim {
 					// Absorbed by atmosphere
 					{
 						// stratosphere accounts for about a quarter of atmospheric mass
-						float absorbedByStratosphere = incomingRadiation * world.Data.AtmosphericHeatAbsorption * (world.Data.StratosphereMass / massOfAtmosphericColumn);
+						float absorbedByStratosphere = incomingRadiation * world.Data.AtmosphericHeatAbsorption * (state.StratosphereMass / massOfAtmosphericColumn);
 						incomingRadiation -= absorbedByStratosphere;
 
 						// absorb some rads directly in the atmosphere
