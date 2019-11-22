@@ -46,16 +46,16 @@ public class TileInfoPanel : MonoBehaviour
 			textUpperAtmosphere += "\nTemperature: " + (int)World.ConvertTemperature(state.UpperAirTemperature[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 			textUpperAtmosphere += "\nPressure: " + (state.UpperAirPressure[index]).ToString("0.00");
 			textUpperAtmosphere += "\nWind: " + (state.UpperWind[index]).ToString();
+			textUpperAtmosphere += "\nCloudCover: " + state.CloudCover[index].ToString("0.00");
+			textUpperAtmosphere += "\nRainfall: " + (state.Rainfall[index] * World.World.Data.TicksPerYear).ToString("0.00");
 
 			textLowerAtmosphere += "LOWER ATMOS";
 			textLowerAtmosphere += "\nTemperature: " + (int)World.ConvertTemperature(state.LowerAirTemperature[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 			textLowerAtmosphere += "\nPressure: " + (state.LowerAirPressure[index]).ToString("0.00");
 			textLowerAtmosphere += "\nWind: " + (state.LowerWind[index]).ToString();
+			textLowerAtmosphere += "\nHumidity: " + state.Humidity[index].ToString("0.00");
+			textLowerAtmosphere += "\nEvaporation: " + (state.Evaporation[index] * World.World.Data.TicksPerYear).ToString("0.00");
 
-			//textPrecipitation += "\nCloudCover: " + state.CloudCover[index].ToString("0.00");
-			//textPrecipitation += "\nRainfall: " + (state.Rainfall[index] * World.World.Data.TicksPerYear).ToString("0.00");
-			//textPrecipitation += "\nHumidity: " + state.Humidity[index].ToString("0.00");
-			//textPrecipitation += "\nEvaporation: " + (state.Evaporation[index] * World.World.Data.TicksPerYear).ToString("0.00");
 
 			if (World.World.IsOcean(elevation, state.SeaLevel))
 			{

@@ -14599,15 +14599,15 @@ MonoBehaviour:
     StratosphereMass: 2583
     TroposphereMass: 7749
   Data:
-    pressureToHorizontalWindSpeed: 0.01
-    pressureToVerticalWindSpeed: 0.01
+    pressureToHorizontalWindSpeed: 5
+    pressureToVerticalWindSpeed: 10
     heatLossPreventionCarbonDioxide: 200
     LowerAirDensity: 1.2
     UpperAirDensity: 0.4
-    massWindMovement: 0.0001
+    massWindMovement: 0.00001
     MaxTerrainNormalForFriction: 0.25
     WindLandFrictionMinimum: 0.2
-    airDispersalSpeed: 0.01
+    airDispersalSpeed: 0.05
     humidityDispersalSpeed: 0.01
     localSunHeat: 5
     AtmosphericHeatAbsorption: 0.23

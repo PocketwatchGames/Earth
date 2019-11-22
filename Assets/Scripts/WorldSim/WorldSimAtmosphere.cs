@@ -272,7 +272,7 @@ namespace Sim {
 					nextState.SurfaceWater[index] = newSurfaceWater;
 					nextState.SurfaceIce[index] = newSurfaceIce;
 					nextState.GroundWater[index] = newGroundWater;
-			//		nextState.Humidity[index] = newHumidity;
+					nextState.Humidity[index] = newHumidity;
 					nextState.CloudCover[index] = newCloudCover;
 					nextState.CloudElevation[index] = newCloudElevation;
 					nextState.Radiation[index] = newRadiation;

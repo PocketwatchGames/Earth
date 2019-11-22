@@ -20,12 +20,12 @@ public class WorldData
 	[Header("Atmosphere")]
 	//public float tradeWindSpeed = 12.0f; // average wind speeds around trade winds around 12 m/s
 										 //	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
-	public float pressureToHorizontalWindSpeed = 0.01f;
-	public float pressureToVerticalWindSpeed = 0.01f;
+	public float pressureToHorizontalWindSpeed = 5f;
+	public float pressureToVerticalWindSpeed = 10;
 	public float heatLossPreventionCarbonDioxide = 200;
 	public float LowerAirDensity = 1.2f;
 	public float UpperAirDensity = 0.4f;
-	public float massWindMovement = 0.0001f;
+	public float massWindMovement = 0.00001f;
 	public float MaxTerrainNormalForFriction = 0.25f;
 	public float WindLandFrictionMinimum = 0.2f;
 	public float airDispersalSpeed = 0.01f;
