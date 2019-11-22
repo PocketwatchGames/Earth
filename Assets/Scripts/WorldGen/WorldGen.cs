@@ -163,7 +163,7 @@ public partial class World {
 					state.Canopy[index] = GetPerlinNormalized(noise, x, y, 2.0f, 1000);
 				} else
 				{
-					state.OceanEnergyShallow[index] = Atmosphere.GetWaterEnergy(this, state.LowerAirTemperature[index], Data.DeepOceanDepth);
+					state.OceanEnergyShallow[index] = Atmosphere.GetWaterEnergy(this, Math.Max(Data.FreezingTemperature, state.LowerAirTemperature[index]), Data.DeepOceanDepth);
 					state.OceanEnergyDeep[index] = Atmosphere.GetWaterEnergy(this, Data.FreezingTemperature + 3, Math.Max(0, -e));
 					state.OceanSalinityShallow[index] = (1.0f - Math.Abs(latitude)) * Data.DeepOceanDepth;
 					float deepOceanVolume = state.SeaLevel - state.Elevation[index];

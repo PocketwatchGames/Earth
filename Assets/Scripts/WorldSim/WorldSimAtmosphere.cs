@@ -148,7 +148,7 @@ namespace Sim {
 							{
 								newOceanSalinityDeep += frozen;
 								newOceanSalinityShallow -= frozen;
-								newOceanEnergyDeep = world.Data.FreezingTemperature;
+								//newOceanEnergyDeep = GetWaterEnergy(world, world.Data.FreezingTemperature, state.SeaLevel - elevation);
 							}
 							newSurfaceIce += frozen;
 						}
@@ -196,18 +196,23 @@ namespace Sim {
 						// absorb the remainder and radiate heat
 						if (world.IsOcean(elevation, state.SeaLevel))
 						{
-							// absorb
-							newOceanEnergyShallow += incomingRadiation;
+							if (surfaceIce < 1.0f)
+							{
+								// absorb
+								newOceanEnergyShallow += incomingRadiation;
 
-							// radiate heat
-							float oceanRadiation = oceanEnergyShallow * world.Data.OceanHeatRadiation;
-							newLowerAirEnergy += oceanRadiation;
-							newOceanEnergyShallow -= oceanRadiation;
+								float inverseIce = 1.0f - surfaceIce;
 
-							// heat transfer (both ways) based on temperature differential
-							float oceanConduction = (oceanTemperatureShallow - lowerAirTemperature) * world.Data.OceanAirConduction;
-							newLowerAirEnergy += oceanConduction;
-							newOceanEnergyShallow -= oceanConduction;
+								// radiate heat
+								float oceanRadiation = oceanEnergyShallow * world.Data.OceanHeatRadiation * inverseIce;
+								newLowerAirEnergy += oceanRadiation;
+								newOceanEnergyShallow -= oceanRadiation;
+
+								// heat transfer (both ways) based on temperature differential
+								float oceanConduction = (oceanTemperatureShallow - lowerAirTemperature) * world.Data.OceanAirConduction * inverseIce;
+								newLowerAirEnergy += oceanConduction;
+								newOceanEnergyShallow -= oceanConduction;
+							}
 						}
 						else
 						{
@@ -264,7 +269,7 @@ namespace Sim {
 					nextState.SurfaceWater[index] = newSurfaceWater;
 					nextState.SurfaceIce[index] = newSurfaceIce;
 					nextState.GroundWater[index] = newGroundWater;
-				//	nextState.Humidity[index] = newHumidity;
+			//		nextState.Humidity[index] = newHumidity;
 					nextState.Rainfall[index] = rainfall;
 					nextState.CloudCover[index] = newCloudCover;
 					nextState.CloudElevation[index] = newCloudElevation;
@@ -279,7 +284,7 @@ namespace Sim {
 					nextState.LowerAirTemperature[index] = newLowerAirTemperature;
 					nextState.UpperAirTemperature[index] = newUpperAirTemperature;
 					nextState.LowerAirPressure[index] = GetAirPressure(world, newLowerAirMass, newLowerAirTemperature, elevationOrSeaLevel, world.Data.BoundaryZoneElevation);
-					nextState.UpperAirPressure[index] = GetAirPressure(world, newUpperAirMass, newUpperAirTemperature, (world.Data.troposphereElevation + (elevationOrSeaLevel + world.Data.BoundaryZoneElevation)) / 2, world.Data.troposphereElevation - (elevation + world.Data.BoundaryZoneElevation));
+					nextState.UpperAirPressure[index] = GetAirPressure(world, newUpperAirMass, newUpperAirTemperature, (world.Data.troposphereElevation + (elevationOrSeaLevel + world.Data.BoundaryZoneElevation)) / 2, world.Data.troposphereElevation - (elevationOrSeaLevel + world.Data.BoundaryZoneElevation));
 
 				}
 			}

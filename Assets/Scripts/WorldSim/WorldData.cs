@@ -55,7 +55,7 @@ public class WorldData : MonoBehaviour
 	public float GroundWaterFlowSpeed = 0.5f;
 
 	[Header("Atmosphere")]
-	public float tradeWindSpeed = 12.0f; // average wind speeds around trade winds around 12 m/s
+	//public float tradeWindSpeed = 12.0f; // average wind speeds around trade winds around 12 m/s
 										 //	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
 	public float pressureToHorizontalWindSpeed = 0.01f;
 	public float pressureToVerticalWindSpeed = 0.01f;
@@ -66,7 +66,8 @@ public class WorldData : MonoBehaviour
 	public float LowerAirDensity = 1.2f;
 	public float UpperAirDensity = 0.4f;
 	public float massWindMovement = 0.0001f;
-	public float windInertia = 0.0f;
+	public float MaxTerrainNormalForFriction = 0.25f;
+	public float WindLandFrictionMinimum = 0.2f;
 	public float StaticPressure = 101325;
 	public float StdTemp = 288.15f;
 	public float GravitationalAcceleration = 9.80665f;
@@ -205,9 +206,6 @@ public class WorldData : MonoBehaviour
 		if (!activeFeatures.HasFlag(World.SimFeature.GroundWaterFlow)) {
 			GroundWaterFlowSpeed = 0;
 		}
-		if (!activeFeatures.HasFlag(World.SimFeature.TradeWinds)) {
-			tradeWindSpeed = 0;
-		}
 		if (!activeFeatures.HasFlag(World.SimFeature.WindCoriolisForce )) {
 		}
 
@@ -219,24 +217,6 @@ public class WorldData : MonoBehaviour
 			float absSinPitch = (float)(Math.Abs(Math.Sin(pitch)));
 			float cosYaw = (float)Math.Cos(yaw);
 			float cosPitch = (float)Math.Cos(pitch);
-			Vector3 wind = Vector3.zero;
-			if (latitude < 0.3333 && latitude > -0.3333)
-			{
-				wind.x = absSinPitch * -cosYaw;
-				wind.y = absSinPitch;
-			}
-			else if (latitude < 0.667 && latitude > -0.667)
-			{
-				wind.x = absSinPitch * -cosYaw;
-				wind.y = absSinPitch;
-			}
-			else
-			{
-				wind.x = absSinPitch * cosYaw;
-				wind.y = absSinPitch;
-			}
-			wind.z = cosPitch;
-			wind *= tradeWindSpeed;
 
 			float tropopauseElevation = (1.0f - Math.Abs(latitude)) * (MaxTropopauseElevation - MinTropopauseElevation) + MinTropopauseElevation + TropopauseElevationSeason * latitude;
 			windInfo[y] = new WindInfo()
