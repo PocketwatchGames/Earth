@@ -37,7 +37,9 @@ public partial class WorldComponent : MonoBehaviour
 		OceanSalinityDeep = 1 << 26,
 		UpperAirTemperature = 1 << 27,
 		UpperAirPressure = 1 << 28,
-		UpperAirWind = 1 << 29
+		UpperAirWind = 1 << 29,
+		HeatAbsorbed = 1 << 30,
+		Evaporation = 1 << 31,
 	}
 	public enum TemperatureDisplayType {
 		Kelvin,

@@ -61,7 +61,7 @@ namespace Sim {
 					float oceanTemperatureDeep = GetWaterTemperature(world, oceanEnergyDeep, Math.Max(0, state.SeaLevel - elevation));
 
 
-					float newEvaporation = 0;
+					float evaporation = 0;
 					float newGroundWater = groundWater;
 					float newHumidity = humidity;
 					float newLowerAirEnergy = lowerAirEnergy;
@@ -86,6 +86,7 @@ namespace Sim {
 					float groundWaterSaturation = Animals.GetGroundWaterSaturation(state.GroundWater[index], state.WaterTableDepth[index], soilFertility * world.Data.MaxSoilPorousness);
 					float incomingRadiation = world.Data.SolarRadiation * sunAngle * lengthOfDay / 2;
 					float outgoingRadiation = 0;
+					float heatAbsorbed = 0;
 
 					// reflect some rads off atmosphere and clouds
 					incomingRadiation -= incomingRadiation * (world.Data.AtmosphericHeatReflection + world.Data.cloudReflectionRate * cloudOpacity);
@@ -100,10 +101,12 @@ namespace Sim {
 						float absorbedByUpperAtmosphereIncoming = incomingRadiation * world.Data.AtmosphericHeatAbsorption * (upperAirMass / massOfAtmosphericColumn);
 						newLowerAirEnergy += absorbedByUpperAtmosphereIncoming;
 						incomingRadiation -= absorbedByUpperAtmosphereIncoming;
+						heatAbsorbed += absorbedByUpperAtmosphereIncoming;
 
 						float absorbedByLowerAtmosphereIncoming = incomingRadiation * world.Data.AtmosphericHeatAbsorption * (lowerAirMass / massOfAtmosphericColumn);
 						newLowerAirEnergy += absorbedByLowerAtmosphereIncoming;
 						incomingRadiation -= absorbedByLowerAtmosphereIncoming;
+						heatAbsorbed += absorbedByLowerAtmosphereIncoming;
 					}
 
 					// reflection off surface
@@ -170,7 +173,9 @@ namespace Sim {
 
 
 						// absorb all incoming radiation
-						incomingRadiation *= Math.Max(0, 1.0f - surfaceIce);
+						float heatAbsorbedByIce = incomingRadiation * Math.Max(0, 1.0f - surfaceIce);
+						incomingRadiation -= heatAbsorbedByIce;
+						heatAbsorbed += heatAbsorbedByIce;
 
 						// reduce ice
 						newSurfaceIce -= iceMelted;
@@ -198,6 +203,7 @@ namespace Sim {
 							{
 								// absorb
 								newOceanEnergyShallow += incomingRadiation;
+								heatAbsorbed += incomingRadiation;
 
 								float inverseIce = 1.0f - surfaceIce;
 
@@ -215,6 +221,7 @@ namespace Sim {
 						else
 						{
 							newLowerAirEnergy += incomingRadiation;
+							heatAbsorbed += incomingRadiation;
 
 							//// absorb
 							//newLandEnergy += incomingRadiation;
@@ -245,7 +252,7 @@ namespace Sim {
 					MoveOceanOnCurrent(world, state, x, y, elevation, surfaceIce, oceanEnergyShallow, oceanEnergyDeep, oceanSalinityShallow, oceanSalinityDeep, oceanTemperatureShallow, oceanTemperatureDeep, oceanDensity, currentShallow, currentDeep, ref newOceanEnergyShallow, ref newOceanEnergyDeep, ref newOceanSalinityShallow, ref newOceanSalinityDeep, ref newLowerAirEnergy);
 					FlowWater(world, state, x, y, gradient, soilFertility, ref newSurfaceWater, ref newGroundWater);
 					SeepWaterIntoGround(world, elevation, state.SeaLevel, soilFertility, waterTableDepth, ref newGroundWater, ref newSurfaceWater);
-					//EvaporateWater(world, evapRate, elevation, state.SeaLevel, groundWater, waterTableDepth, ref newHumidity, ref newLowerAirEnergy, ref newOceanEnergyShallow, ref newGroundWater, ref newSurfaceWater, out newEvaporation);
+					//EvaporateWater(world, evapRate, elevation, state.SeaLevel, groundWater, waterTableDepth, ref newHumidity, ref newLowerAirEnergy, ref newOceanEnergyShallow, ref newGroundWater, ref newSurfaceWater, out evaporation);
 					//			MoveHumidityToClouds(elevation, humidity, tempWithSunAtGround, cloudElevation, windAtSurface, ref newHumidity, ref newCloudCover);
 					if (cloudCover > 0)
 					{
@@ -262,12 +269,10 @@ namespace Sim {
 					nextState.UpperAirEnergy[index] = newUpperAirEnergy;
 					nextState.LowerAirMass[index] = newLowerAirMass;
 					nextState.UpperAirMass[index] = newUpperAirMass;
-					nextState.Evaporation[index] = newEvaporation;
 					nextState.SurfaceWater[index] = newSurfaceWater;
 					nextState.SurfaceIce[index] = newSurfaceIce;
 					nextState.GroundWater[index] = newGroundWater;
 			//		nextState.Humidity[index] = newHumidity;
-					nextState.Rainfall[index] = rainfall;
 					nextState.CloudCover[index] = newCloudCover;
 					nextState.CloudElevation[index] = newCloudElevation;
 					nextState.Radiation[index] = newRadiation;
@@ -282,6 +287,10 @@ namespace Sim {
 					nextState.UpperAirTemperature[index] = newUpperAirTemperature;
 					nextState.LowerAirPressure[index] = GetAirPressure(world, newLowerAirMass, newLowerAirTemperature, elevationOrSeaLevel, world.Data.BoundaryZoneElevation);
 					nextState.UpperAirPressure[index] = GetAirPressure(world, newUpperAirMass, newUpperAirTemperature, (world.Data.troposphereElevation + (elevationOrSeaLevel + world.Data.BoundaryZoneElevation)) / 2, world.Data.troposphereElevation - (elevationOrSeaLevel + world.Data.BoundaryZoneElevation));
+
+					nextState.Evaporation[index] = evaporation;
+					nextState.Rainfall[index] = rainfall;
+					nextState.HeatAbsorbed[index] = heatAbsorbed;
 
 				}
 			}

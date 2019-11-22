@@ -89,8 +89,6 @@ public partial class World {
 		public float[] UpperAirPressure;
 		public float[] UpperAirMass;
 		public float[] Humidity;
-		public float[] Rainfall;
-		public float[] Evaporation;
 		public float[] CloudCover;
 		public float[] CloudElevation;
 		public float[] WaterTableDepth;
@@ -113,6 +111,11 @@ public partial class World {
 		public Vector3[] UpperWind;
 		public Vector2[] FlowDirection;
 		public Vector3[] Normal;
+
+		// for display
+		public float[] Rainfall;
+		public float[] Evaporation;
+		public float[] HeatAbsorbed;
 
 		public object Clone()
 		{
@@ -139,8 +142,6 @@ public partial class World {
 			o.LowerAirPressure = (float[])LowerAirPressure.Clone();
 			o.LowerAirMass = (float[])LowerAirMass.Clone();
 			o.Humidity = (float[])Humidity.Clone();
-			o.Rainfall = (float[])Rainfall.Clone();
-			o.Evaporation = (float[])Evaporation.Clone();
 			o.CloudCover = (float[])CloudCover.Clone();
 			o.CloudElevation = (float[])CloudElevation.Clone();
 			o.WaterTableDepth = (float[])WaterTableDepth.Clone();
@@ -163,6 +164,11 @@ public partial class World {
 			o.OceanCurrentDeep = (Vector3[])OceanCurrentDeep.Clone();
 			o.FlowDirection = (Vector2[])FlowDirection.Clone();
 			o.Normal = (Vector3[])Normal.Clone();
+
+			o.Rainfall = (float[])Rainfall.Clone();
+			o.Evaporation = (float[])Evaporation.Clone();
+			o.HeatAbsorbed = (float[])HeatAbsorbed.Clone();
+
 			return o;
 		}
 	}
@@ -210,6 +216,7 @@ public partial class World {
 			States[i].SurfaceWater = new float[s];
 			States[i].Rainfall = new float[s];
 			States[i].Evaporation = new float[s];
+			States[i].HeatAbsorbed = new float[s];
 			States[i].OceanSalinityDeep = new float[s];
 			States[i].OceanSalinityShallow = new float[s];
 			States[i].OceanDensityDeep = new float[s];

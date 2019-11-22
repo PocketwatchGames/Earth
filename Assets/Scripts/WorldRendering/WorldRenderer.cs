@@ -252,6 +252,36 @@ public partial class WorldComponent {
 											new CVP(Color.magenta, 75 + World.Data.FreezingTemperature) },
 						state.UpperAirTemperature[index]);
 				}
+				else if (showLayers.HasFlag(Layers.Evaporation))
+				{
+					oceanColor = color = Lerp(new List<CVP> {
+											new CVP(Color.black, 0),
+											new CVP(Color.blue, 0.01f),
+											new CVP(Color.yellow, 0.02f),
+											new CVP(Color.red, 0.03f),
+											new CVP(Color.white, 0.05f) },
+						state.Evaporation[index]);
+				}
+				else if (showLayers.HasFlag(Layers.Rainfall))
+				{
+					oceanColor = color = Lerp(new List<CVP> {
+											new CVP(Color.black, 0),
+											new CVP(Color.blue, 0.01f),
+											new CVP(Color.yellow, 0.02f),
+											new CVP(Color.red, 0.03f),
+											new CVP(Color.white, 0.05f) },
+						state.Rainfall[index]);
+				}
+				else if (showLayers.HasFlag(Layers.HeatAbsorbed))
+				{
+					oceanColor = color = Lerp(new List<CVP> {
+											new CVP(Color.black, 0),
+											new CVP(Color.blue, 50),
+											new CVP(Color.yellow, 100),
+											new CVP(Color.red, 150),
+											new CVP(Color.white, 200) },
+						state.HeatAbsorbed[index]);
+				}
 				else if (showLayers.HasFlag(Layers.LowerAirPressure))
 				{
 					float minPressure = 120;
