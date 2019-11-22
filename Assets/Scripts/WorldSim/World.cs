@@ -87,7 +87,6 @@ public partial class World {
 		public float[] UpperAirTemperature;
 		public float[] UpperAirPressure;
 		public float[] UpperAirMass;
-		public float[] LandEnergy;
 		public float[] Humidity;
 		public float[] Rainfall;
 		public float[] Evaporation;
@@ -129,7 +128,6 @@ public partial class World {
 			o.Herds = (Herd[])Herds.Clone();
 			o.Plate = (int[])Plate.Clone();
 			o.Elevation = (float[])Elevation.Clone();
-			o.LandEnergy = (float[])LandEnergy.Clone();
 			o.UpperAirTemperature = (float[])UpperAirTemperature.Clone();
 			o.UpperAirEnergy = (float[])UpperAirEnergy.Clone();
 			o.UpperAirPressure = (float[])UpperAirPressure.Clone();
@@ -195,7 +193,6 @@ public partial class World {
 			States[i].Plate = new int[s];
 			States[i].Elevation = new float[s];
 			States[i].CloudElevation = new float[s];
-			States[i].LandEnergy = new float[s];
 			States[i].UpperAirEnergy = new float[s];
 			States[i].UpperAirTemperature = new float[s];
 			States[i].UpperAirPressure = new float[s];

@@ -4,7 +4,14 @@ using UnityEngine;
 
 public class TileInfoPanel : MonoBehaviour
 {
-	public UnityEngine.UI.Text Text;
+	public UnityEngine.UI.Text TextGeo;
+	public UnityEngine.UI.Text TextUpperAtmosphere;
+	public UnityEngine.UI.Text TextLowerAtmosphere;
+	public UnityEngine.UI.Text TextSurfaceOcean;
+	public UnityEngine.UI.Text TextDeepOcean;
+	public UnityEngine.UI.Text TextTerrain;
+	public UnityEngine.GameObject OceanPanel;
+	public UnityEngine.GameObject TerrainPanel;
 	public WorldComponent World;
 	public Vector2Int TileInfoPoint;
 
@@ -19,39 +26,61 @@ public class TileInfoPanel : MonoBehaviour
     {
 		int index = World.World.GetIndex(TileInfoPoint.x, TileInfoPoint.y);
 		var state = World.World.States[World.World.CurRenderStateIndex];
-		string text = "";
+		string textGeo = "";
+		string textUpperAtmosphere = "";
+		string textLowerAtmosphere = "";
+		string textSurfaceOcean = "";
+		string textDeepOcean = "";
+		string textTerrain = "";
 		if (TileInfoPoint.x >= 0 && TileInfoPoint.x < World.World.Size && TileInfoPoint.y >= 0 && TileInfoPoint.y < World.World.Size)
 		{
 			float elevation = state.Elevation[index];
-			text += "Index: " + index;
-			text += "\nPlate: " + state.Plate[index];
-			text += "\nElevation: " + (int)elevation;
-			text += "\nCloudCover: " + state.CloudCover[index].ToString("0.00");
-			text += "\nRainfall: " + (state.Rainfall[index] * World.World.Data.TicksPerYear).ToString("0.00");
-			text += "\nUpper Temp: " + (int)World.ConvertTemperature(state.UpperAirTemperature[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
-			text += "\nUpper Pressure: " + (state.UpperAirPressure[index]).ToString("0.00");
-			text += "\nLower Temp: " + (int)World.ConvertTemperature(state.LowerAirTemperature[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
-			text += "\nLower Pressure: " + (state.LowerAirPressure[index]).ToString("0.00");
-			text += "\nHumidity: " + state.Humidity[index].ToString("0.00");
-			text += "\nEvaporation: " + (state.Evaporation[index] * World.World.Data.TicksPerYear).ToString("0.00");
-			text += "\nWaterTableDepth: " + (int)state.WaterTableDepth[index];
-			text += "\nSurfaceIce: " + state.SurfaceIce[index].ToString("0.00");
-			text += "\nSoilFertility: " + (int)(state.SoilFertility[index] * 100);
+			textGeo += "GEOLOGY";
+			textGeo += "\nIndex: " + index;
+			textGeo += "\nPlate: " + state.Plate[index];
+			textGeo += "\nElevation: " + (int)elevation;
+			textGeo += "\nWaterTableDepth: " + (int)state.WaterTableDepth[index];
+			textGeo += "\nSurfaceIce: " + state.SurfaceIce[index].ToString("0.00");
+
+			textUpperAtmosphere += "UPPER ATMOS";
+			textUpperAtmosphere += "\nTemperature: " + (int)World.ConvertTemperature(state.UpperAirTemperature[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
+			textUpperAtmosphere += "\nPressure: " + (state.UpperAirPressure[index]).ToString("0.00");
+			textUpperAtmosphere += "\nWind: " + (state.UpperWind[index]).ToString();
+
+			textLowerAtmosphere += "LOWER ATMOS";
+			textLowerAtmosphere += "\nTemperature: " + (int)World.ConvertTemperature(state.LowerAirTemperature[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
+			textLowerAtmosphere += "\nPressure: " + (state.LowerAirPressure[index]).ToString("0.00");
+			textLowerAtmosphere += "\nWind: " + (state.LowerWind[index]).ToString();
+
+			//textPrecipitation += "\nCloudCover: " + state.CloudCover[index].ToString("0.00");
+			//textPrecipitation += "\nRainfall: " + (state.Rainfall[index] * World.World.Data.TicksPerYear).ToString("0.00");
+			//textPrecipitation += "\nHumidity: " + state.Humidity[index].ToString("0.00");
+			//textPrecipitation += "\nEvaporation: " + (state.Evaporation[index] * World.World.Data.TicksPerYear).ToString("0.00");
 
 			if (World.World.IsOcean(elevation, state.SeaLevel))
 			{
-				text += "\nShallow Temp: " + (int)World.ConvertTemperature(Sim.Atmosphere.GetWaterTemperature(World.World, state.OceanEnergyShallow[index], World.Data.DeepOceanDepth), World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
-				text += "\nDeep Temp: " + (int)World.ConvertTemperature(Sim.Atmosphere.GetWaterTemperature(World.World, state.OceanEnergyDeep[index], state.SeaLevel - elevation), World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
-				text += "\nShallow Salinity: " + state.OceanSalinityShallow[index].ToString("0.00");
-				text += "\nDeep Salinity: " + state.OceanSalinityDeep[index].ToString("0.00");
-				text += "\nDensity: " + state.OceanDensityDeep[index].ToString("0.00");
+				textSurfaceOcean += "SURFACE OCEAN";
+				textSurfaceOcean += "\nTemperature: " + (int)World.ConvertTemperature(Sim.Atmosphere.GetWaterTemperature(World.World, state.OceanEnergyShallow[index], World.Data.DeepOceanDepth), World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
+				textSurfaceOcean += "\nSalinity: " + state.OceanSalinityShallow[index].ToString("0.00");
+				textSurfaceOcean += "\nCurrent: " + state.OceanCurrentShallow[index].ToString();
+
+				textDeepOcean += "DEEP OCEAN";
+				textDeepOcean += "\nTemperature: " + (int)World.ConvertTemperature(Sim.Atmosphere.GetWaterTemperature(World.World, state.OceanEnergyDeep[index], state.SeaLevel - elevation), World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
+				textDeepOcean += "\nSalinity: " + state.OceanSalinityDeep[index].ToString("0.00");
+				textDeepOcean += "\nDensity: " + state.OceanDensityDeep[index].ToString("0.00");
+				textDeepOcean += "\nCurrent: " + state.OceanCurrentDeep[index].ToString();
+				OceanPanel.SetActive(true);
+				TerrainPanel.SetActive(false);
 			}
 			else
 			{
-				text += "\nGroundWater: " + state.GroundWater[index].ToString("0.00");
-				text += "\nSurfaceWater: " + state.SurfaceWater[index].ToString("0.00");
-				text += "\nCanopy: " + (int)(state.Canopy[index] * 100);
-				text += "\nTerrain Energy: " + (int)(state.LandEnergy[index]);
+				textTerrain += "TERRAIN";
+				textTerrain += "\nCanopy: " + (int)(state.Canopy[index] * 100);
+				textTerrain += "\nSoilFertility: " + (int)(state.SoilFertility[index] * 100);
+				textTerrain += "\nGroundWater: " + state.GroundWater[index].ToString("0.00");
+				textTerrain += "\nSurfaceWater: " + state.SurfaceWater[index].ToString("0.00");
+				TerrainPanel.SetActive(true);
+				OceanPanel.SetActive(false);
 			}
 			//	spriteBatch.DrawString(font, "Wind: " + Wind[index], new Vector2(5, textY += 15), Color.White);
 			//for (int s = 0; s < World.MaxGroupsPerTile; s++)
@@ -69,7 +98,12 @@ public class TileInfoPanel : MonoBehaviour
 			//}
 		}
 
-		Text.text = text;
+		TextGeo.text = textGeo;
+		TextUpperAtmosphere.text = textUpperAtmosphere;
+		TextLowerAtmosphere.text = textLowerAtmosphere;
+		TextTerrain.text = textTerrain;
+		TextSurfaceOcean.text = textSurfaceOcean;
+		TextDeepOcean.text = textDeepOcean;
 
 	}
 }

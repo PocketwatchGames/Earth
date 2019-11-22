@@ -29,7 +29,6 @@ namespace Sim {
 					float elevation = state.Elevation[index];
 					float elevationOrSeaLevel = Math.Max(state.SeaLevel, elevation);
 					float cloudCover = state.CloudCover[index];
-					float landEnergy = state.LandEnergy[index];
 					float lowerAirTemperature = state.LowerAirTemperature[index];
 					float lowerAirEnergy = state.LowerAirEnergy[index];
 					float lowerAirPressure = state.LowerAirPressure[index];
@@ -72,7 +71,6 @@ namespace Sim {
 					float newCloudCover = cloudCover;
 					float newSurfaceWater = surfaceWater;
 					float newSurfaceIce = surfaceIce;
-					float newLandEnergy = landEnergy;
 					float newCloudElevation = cloudElevation;
 					float rainfall = 0;
 					float newRadiation = radiation;
@@ -264,7 +262,6 @@ namespace Sim {
 					nextState.UpperAirEnergy[index] = newUpperAirEnergy;
 					nextState.LowerAirMass[index] = newLowerAirMass;
 					nextState.UpperAirMass[index] = newUpperAirMass;
-					nextState.LandEnergy[index] = newLandEnergy;
 					nextState.Evaporation[index] = newEvaporation;
 					nextState.SurfaceWater[index] = newSurfaceWater;
 					nextState.SurfaceIce[index] = newSurfaceIce;

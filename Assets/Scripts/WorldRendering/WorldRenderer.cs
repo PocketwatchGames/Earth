@@ -231,22 +231,22 @@ public partial class WorldComponent {
 				{
 					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, -50+World.Data.FreezingTemperature),
-											new CVP(Color.blue, -25+World.Data.FreezingTemperature),
-											new CVP(Color.green, 0+World.Data.FreezingTemperature),
+											new CVP(Color.white, -25+World.Data.FreezingTemperature),
+											new CVP(Color.blue, 0+World.Data.FreezingTemperature),
 											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
 											new CVP(Color.red, 50+World.Data.FreezingTemperature),
-											new CVP(Color.white, 75 + World.Data.FreezingTemperature) },
+											new CVP(Color.magenta, 75 + World.Data.FreezingTemperature) },
 						state.LowerAirTemperature[index]);
 				}
 				else if (showLayers.HasFlag(Layers.UpperAirTemperature))
 				{
 					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, -50+World.Data.FreezingTemperature),
-											new CVP(Color.blue, -25+World.Data.FreezingTemperature),
-											new CVP(Color.green, 0+World.Data.FreezingTemperature),
+											new CVP(Color.white, -25+World.Data.FreezingTemperature),
+											new CVP(Color.blue, 0+World.Data.FreezingTemperature),
 											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
 											new CVP(Color.red, 50+World.Data.FreezingTemperature),
-											new CVP(Color.white, 75 + World.Data.FreezingTemperature) },
+											new CVP(Color.magenta, 75 + World.Data.FreezingTemperature) },
 						state.UpperAirTemperature[index]);
 				}
 				else if (showLayers.HasFlag(Layers.LowerAirPressure))
@@ -312,22 +312,22 @@ public partial class WorldComponent {
 				{
 					oceanColor = Lerp(new List<CVP> {
 											new CVP(Color.black, -50+World.Data.FreezingTemperature),
-											new CVP(Color.blue, -25+World.Data.FreezingTemperature),
-											new CVP(Color.green, 0+World.Data.FreezingTemperature),
+											new CVP(Color.white, -25+World.Data.FreezingTemperature),
+											new CVP(Color.blue, 0+World.Data.FreezingTemperature),
 											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
 											new CVP(Color.red, 50+World.Data.FreezingTemperature),
-											new CVP(Color.white, 75 + World.Data.FreezingTemperature) },
+											new CVP(Color.magenta, 75 + World.Data.FreezingTemperature) },
 						Atmosphere.GetWaterTemperature(World, state.OceanEnergyShallow[index], World.Data.DeepOceanDepth));
 				}
 				else if (showLayers.HasFlag(Layers.OceanTemperatureDeep))
 				{
 					oceanColor = Lerp(new List<CVP> {
 											new CVP(Color.black, -50+World.Data.FreezingTemperature),
-											new CVP(Color.blue, -25+World.Data.FreezingTemperature),
-											new CVP(Color.green, 0+World.Data.FreezingTemperature),
+											new CVP(Color.white, -25+World.Data.FreezingTemperature),
+											new CVP(Color.blue, 0+World.Data.FreezingTemperature),
 											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
 											new CVP(Color.red, 50+World.Data.FreezingTemperature),
-											new CVP(Color.white, 75 + World.Data.FreezingTemperature) },
+											new CVP(Color.magenta, 75 + World.Data.FreezingTemperature) },
 						Atmosphere.GetWaterTemperature(World, state.OceanEnergyDeep[index], Math.Max(0, state.SeaLevel - elevation)));
 				}
 				else if (showLayers.HasFlag(Layers.OceanSalinityShallow))
@@ -372,7 +372,7 @@ public partial class WorldComponent {
 				if (showLayers.HasFlag(Layers.LowerAirWind))
 				{
 					var wind = state.LowerWind[index];
-					UpdateWindArrow(state, x, y, index, wind, 40);
+					UpdateWindArrow(state, x, y, index, wind, 50);
 				}
 				else if (showLayers.HasFlag(Layers.UpperAirWind))
 				{
@@ -382,12 +382,12 @@ public partial class WorldComponent {
 				else if (showLayers.HasFlag(Layers.OceanCurrentShallow))
 				{
 					var current = state.OceanCurrentShallow[index];
-					UpdateWindArrow(state, x, y, index, current, 1);
+					UpdateWindArrow(state, x, y, index, current, 5);
 				}
 				else if (showLayers.HasFlag(Layers.OceanCurrentDeep))
 				{
 					var current = state.OceanCurrentDeep[index];
-					UpdateWindArrow(state, x, y, index, current, 0.1f);
+					UpdateWindArrow(state, x, y, index, current, 0.2f);
 				}
 
 			}

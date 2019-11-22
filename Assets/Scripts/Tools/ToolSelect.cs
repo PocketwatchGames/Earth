@@ -20,7 +20,9 @@ public class ToolSelect : GameTool
 		{
 			return;
 		}
-		TileInfoPanel.TileInfoPoint = World.ScreenToWorld(Input.mousePosition);
+		var p = World.ScreenToWorld(Input.mousePosition);
+		TileInfoPanel.TileInfoPoint = p;
+		TileInfoPanel.gameObject.SetActive(p.x >= 0 && p.x < World.World.Size && p.y >= 0 && p.y < World.World.Size);
 	}
 
 	public override void OnSelect()
