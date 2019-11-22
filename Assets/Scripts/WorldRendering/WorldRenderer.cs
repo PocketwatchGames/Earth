@@ -227,7 +227,7 @@ public partial class WorldComponent {
 
 
 
-				if (showLayers.HasFlag(Layers.Temperature))
+				if (showLayers.HasFlag(Layers.LowerAirTemperature))
 				{
 					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, -50+World.Data.FreezingTemperature),
@@ -238,11 +238,28 @@ public partial class WorldComponent {
 											new CVP(Color.white, 75 + World.Data.FreezingTemperature) },
 						state.LowerAirTemperature[index]);
 				}
-				else if (showLayers.HasFlag(Layers.Pressure))
+				else if (showLayers.HasFlag(Layers.UpperAirTemperature))
 				{
-					float minPressure = World.Data.StaticPressure - 10000;
-					float maxPressure = World.Data.StaticPressure + 30000;
+					oceanColor = color = Lerp(new List<CVP> {
+											new CVP(Color.black, -50+World.Data.FreezingTemperature),
+											new CVP(Color.blue, -25+World.Data.FreezingTemperature),
+											new CVP(Color.green, 0+World.Data.FreezingTemperature),
+											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
+											new CVP(Color.red, 50+World.Data.FreezingTemperature),
+											new CVP(Color.white, 75 + World.Data.FreezingTemperature) },
+						state.UpperAirTemperature[index]);
+				}
+				else if (showLayers.HasFlag(Layers.LowerAirPressure))
+				{
+					float minPressure = 120;
+					float maxPressure = 220;
 					oceanColor = color = Lerp(new List<CVP> { new CVP(Color.blue, minPressure), new CVP(Color.white, (maxPressure + minPressure) / 2), new CVP(Color.red, maxPressure) }, state.LowerAirPressure[index]);
+				}
+				else if (showLayers.HasFlag(Layers.UpperAirPressure))
+				{
+					float minPressure = 120;
+					float maxPressure = 220;
+					oceanColor = color = Lerp(new List<CVP> { new CVP(Color.blue, minPressure), new CVP(Color.white, (maxPressure + minPressure) / 2), new CVP(Color.red, maxPressure) }, state.UpperAirPressure[index]);
 				}
 				else if (showLayers.HasFlag(Layers.WaterVapor))
 				{
@@ -352,10 +369,15 @@ public partial class WorldComponent {
 					cloudCols[index].a = 0;
 				}
 				cloudVerts[index].z = -Mathf.Max(elevation+1, state.CloudElevation[index]) * ElevationScale;
-				if (showLayers.HasFlag(Layers.Wind))
+				if (showLayers.HasFlag(Layers.LowerAirWind))
 				{
-					var wind = state.Wind[index];
-					UpdateWindArrow(state, x, y, index, wind, 10);
+					var wind = state.LowerWind[index];
+					UpdateWindArrow(state, x, y, index, wind, 40);
+				}
+				else if (showLayers.HasFlag(Layers.UpperAirWind))
+				{
+					var wind = state.UpperWind[index];
+					UpdateWindArrow(state, x, y, index, wind, 200);
 				}
 				else if (showLayers.HasFlag(Layers.OceanCurrentShallow))
 				{

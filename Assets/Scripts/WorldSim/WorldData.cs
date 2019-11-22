@@ -12,7 +12,6 @@ public struct WindInfo
 	public float yaw;
 	public float tropopauseElevationMax;
 	public float coriolisPower;
-	public Vector3 tradeWind;
 }
 
 public class WorldData : MonoBehaviour
@@ -26,6 +25,7 @@ public class WorldData : MonoBehaviour
 	public float MaxTemperature = 323.15f;
 	public float planetTiltAngle = -23.5f;
 	public float troposphereElevation = 10000;
+	public float BoundaryZoneElevation = 1000;
 	public float stratosphereElevation = 50000;
 	public float MaxTropopauseElevation = 17000f;
 	public float MinTropopauseElevation = 9000f;
@@ -56,33 +56,30 @@ public class WorldData : MonoBehaviour
 
 	[Header("Atmosphere")]
 	public float tradeWindSpeed = 12.0f; // average wind speeds around trade winds around 12 m/s
-	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
+										 //	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
+	public float pressureToHorizontalWindSpeed = 0.01f;
+	public float pressureToVerticalWindSpeed = 0.01f;
 	public float heatLossPreventionCarbonDioxide = 200;
 	public float temperatureLapseRate = -0.0065f;
-	public float energyWindMovement = 0.0001f;
+	public float MassEarthAir = 1.29f;
+	public float MassSeaWater = 1024f;
+	public float LowerAirDensity = 1.2f;
+	public float UpperAirDensity = 0.4f;
+	public float massWindMovement = 0.0001f;
 	public float windInertia = 0.0f;
 	public float StaticPressure = 101325;
 	public float StdTemp = 288.15f;
-	public float StdTempLapseRate = -0.0065f;
 	public float GravitationalAcceleration = 9.80665f;
 	public float MolarMassEarthAir = 0.0289644f;
 	public float UniversalGasConstant = 8.3144598f;
-	public float verticalWindPressureAdjustment = 100;
-	public float temperatureGradientPressureAdjustment = 10;
-	public float upperAtmosphereCoolingRate = 0.0f;
-	public float windElevationFactor = 1.0f / 2000;
-	public float maxWindFrictionElevation = 1000;
-	public float temperatureToPressure = 1000;
-	public float temperatureDeltaToPressure = 1000;
-	public float pressureEqualizationSpeed = 0.001f;
-	public float airEnergyDispersalSpeed = 0.01f;
+	public float airDispersalSpeed = 0.01f;
 	public float humidityDispersalSpeed = 0.01f;
 
 	// atmospheric heat balance https://energyeducation.ca/encyclopedia/Earth%27s_heat_balance
 	// https://en.wikipedia.org/wiki/Earth%27s_energy_budget
 	public float localSunHeat = 5; // sun can add about 5 degrees celsius
 	public float SolarRadiation = 118; // extraterrestrial solar radiation // https://en.wikipedia.org/wiki/Sunlight (1367 w/m^2) *seconds per day (86400)
-	public float AtmosphericHeatAbsorption = 0.23f;
+	public float AtmosphericHeatAbsorption = 0.23f; // total absorbed by atmosphere about 23%
 	public float AtmosphericHeatReflection = 0.23f;
 	public float EvaporativeHeatLoss = 0.065f; // global average = 78 watts -- TODO: get this in line with average evaportaion (2.5M per year)
 	public float OceanHeatRadiation = 0.00001021f; // global average = 66 watts
@@ -96,6 +93,8 @@ public class WorldData : MonoBehaviour
 	public float LandRadiation = 0.5f;
 	public float SpecificHeatSeaWater = 3.85f; // specific heat is joules to raise one degree
 	public float SpecificHeatAtmosphere = 1.158f; // specific heat is joules to raise one degree
+	public float StratosphereMass = 2583;
+	public float TroposphereMass = 7749;
 
 	[Header("Water Vapor")]
 	public float EvapRateWind = 1.0f;
@@ -123,16 +122,14 @@ public class WorldData : MonoBehaviour
 	public float iceMeltRadiationRate = 0.0001f;
 	public float DeepOceanDepth = 500;
 	public float WindToOceanCurrentFactor = 0.1f;
-	public float oceanEnergyMovement = 0.001f;
-	public float oceanSalinityMovement = 0.01f;
-	public float horizontalMixing = 0.01f;
-	public float upwellingSpeed = 10000.0f;
-	public float downwellingSpeed = 100.0f;
-	public float oceanSalinityIncrease = 0.1f;
-	public float temperatureMixingSpeed = 0.0001f;
-	public float salinityMixingSpeed = 0.001f;
-	public float OceanSalinityDensity = 1.0f;
-	public float OceanTemperatureDensity = 10.0f;
+	public float OceanEnergyCurrentSpeed = 0.001f;
+	public float OceanSalinityCurrentSpeed = 0.01f;
+	public float OceanHorizontalMixingSpeed = 0.01f;
+	public float OceanUpwellingSpeed = 0.0001f;
+	public float OceanTemperatureVerticalMixingSpeed = 0.0001f;
+	public float SalinityVerticalMixingSpeed = 0.001f;
+	public float OceanDensityPerSalinity = 1.0f;
+	public float OceanDensityPerTemperature = 10.0f;
 
 	[NonSerialized]
 	public WindInfo[] windInfo;
@@ -157,7 +154,6 @@ public class WorldData : MonoBehaviour
 
 		EvapRateWind /= TicksPerYear;
 		EvapRateTemperature /= TicksPerYear;
-		pressureDifferentialWindSpeed /= StaticPressure; // hurricane wind speeds 70 m/s
 		RainfallRate /= TicksPerYear;
 		FlowSpeed /= (tileSize / 1000) * TicksPerHour; // mississippi travels at around 3 km/h
 		GroundWaterReplenishmentSpeed /= TicksPerYear;
@@ -169,8 +165,7 @@ public class WorldData : MonoBehaviour
 		cloudMovementFromWind *= SecondsPerTick / tileSize / TicksPerYear;
 		cloudElevationDeltaSpeed /= TicksPerYear;
 		windVerticalCloudSpeedMultiplier /= TicksPerYear;
-		PressureExponent = GravitationalAcceleration * MolarMassEarthAir / (UniversalGasConstant * StdTempLapseRate);
-		upperAtmosphereCoolingRate /= TicksPerYear;
+		PressureExponent = GravitationalAcceleration * MolarMassEarthAir / (UniversalGasConstant * temperatureLapseRate);
 		iceFreezeRate /= TicksPerYear;
 		iceMeltRate /= TicksPerYear;
 
@@ -179,7 +174,6 @@ public class WorldData : MonoBehaviour
 			humidityLossFromWind = 0;
 		}
 		if (!activeFeatures.HasFlag(World.SimFeature.TemperatureMovesOnWind)) {
-			energyWindMovement = 0;
 		}
 		if (!activeFeatures.HasFlag(World.SimFeature.Evaporation)) {
 			EvapRateTemperature = 0;
@@ -213,9 +207,6 @@ public class WorldData : MonoBehaviour
 		}
 		if (!activeFeatures.HasFlag(World.SimFeature.TradeWinds)) {
 			tradeWindSpeed = 0;
-		}
-		if (!activeFeatures.HasFlag(World.SimFeature.PressureWinds )) {
-			pressureDifferentialWindSpeed = 0;
 		}
 		if (!activeFeatures.HasFlag(World.SimFeature.WindCoriolisForce )) {
 		}
@@ -254,7 +245,6 @@ public class WorldData : MonoBehaviour
 				yaw = yaw,
 				tropopauseElevationMax = tropopauseElevation,
 				coriolisPower = -Mathf.Sin(latitude*Mathf.PI/2),
-				tradeWind = wind
 			};
 		}
 

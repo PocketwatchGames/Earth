@@ -20,10 +20,10 @@ public partial class WorldComponent : MonoBehaviour
 		Animals = 1 << 8,
 		CloudCoverage = 1 << 9,
 		CloudHeight = 1 << 11,
-		Temperature = 1 << 12,
+		LowerAirTemperature = 1 << 12,
 		TemperatureSubtle = 1 << 13,
-		Wind = 1 << 14,
-		Pressure = 1 << 15,
+		LowerAirWind = 1 << 14,
+		LowerAirPressure = 1 << 15,
 		RelativeHumidity = 1 << 16,
 		Rainfall = 1 << 17,
 		Probes = 1 << 18,
@@ -35,6 +35,9 @@ public partial class WorldComponent : MonoBehaviour
 		OceanTemperatureDeep = 1 << 24,
 		OceanSalinityShallow = 1 << 25,
 		OceanSalinityDeep = 1 << 26,
+		UpperAirTemperature = 1 << 27,
+		UpperAirPressure = 1 << 28,
+		UpperAirWind = 1 << 29
 	}
 	public enum TemperatureDisplayType {
 		Kelvin,

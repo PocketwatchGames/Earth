@@ -20,28 +20,33 @@ namespace Sim {
 				{
 					int index = world.GetIndex(x, y);
 
+					float upperPressure = state.UpperAirPressure[index];
+					float lowerPressure = state.LowerAirPressure[index];
+
+					// within 1 km of the ground, frictional forces slow wind down
+					var pressureGradientUpper = GetPressureGradient(world, x, y, state.UpperAirPressure, upperPressure);
+					nextState.UpperWind[index] = Quaternion.Euler(0, 0, windInfo.coriolisPower * 90) * pressureGradientUpper * world.Data.pressureToHorizontalWindSpeed / world.Data.UpperAirDensity;
+
+					var normal = state.Normal[index];
+					float friction = 0.1f + 0.9f * Mathf.Sin((1.0f - normal.z) * Mathf.PI / 2);
+					float speedReduction = (1.0f - friction) / world.Data.LowerAirDensity;
+					var pressureGradientLower = GetPressureGradient(world, x, y, state.LowerAirPressure, lowerPressure);
+					var lowerWind = Quaternion.Euler(0, 0, windInfo.coriolisPower * 90 * speedReduction) * pressureGradientLower * world.Data.pressureToHorizontalWindSpeed * speedReduction;
+
+					lowerWind.z = (lowerPressure - upperPressure) * world.Data.pressureToVerticalWindSpeed;
+
+					nextState.LowerWind[index] = lowerWind;
+
 					if (world.IsOcean(state.Elevation[index], state.SeaLevel))
 					{
-
-						float pressure = state.LowerAirPressure[index];
-						var normal = state.Normal[index];
-						float friction = (1.0f - normal.z) * 0.5f;
-
-						// within 1 km of the ground, frictional forces slow wind down
-						var newWind = UpdateWind(world, state, x, y, latitude, pressure, friction, windInfo.coriolisPower, windInfo.tradeWind.z);
-						nextState.Wind[index] = newWind;
 						if (state.SurfaceIce[index] == 0)
 						{
-							nextState.OceanCurrentShallow[index] = Quaternion.Euler(0, 0, windInfo.coriolisPower * 90) * new Vector3(newWind.x, newWind.y, 0) * world.Data.WindToOceanCurrentFactor;
+							nextState.OceanCurrentShallow[index] = Quaternion.Euler(0, 0, windInfo.coriolisPower * 90) * new Vector3(lowerWind.x, lowerWind.y, 0) * world.Data.WindToOceanCurrentFactor;
 						}
 						else
 						{
 							nextState.OceanCurrentShallow[index] = Vector3.zero;
 						}
-
-
-
-
 
 						float density = state.OceanDensityDeep[index];
 						Vector2 densityDifferential = Vector2.zero;
@@ -72,8 +77,6 @@ namespace Sim {
 							}
 						}
 						nextState.OceanCurrentDeep[index] = new Vector3(densityDifferential.x, densityDifferential.y, 0);
-
-
 					}
 				}
 			}
@@ -117,7 +120,7 @@ namespace Sim {
 		}
 
 
-		static private Vector3 UpdateWind(World world, World.State state, int x, int y, float latitude, float pressure, float friction, float coriolisPower, float verticalWindSpeed)
+		static private Vector3 GetPressureGradient(World world, int x, int y, float[] neighbors, float pressure)
 		{
 			Vector2 pressureDifferential = Vector2.zero;
 			Vector3 nWind = Vector3.zero;
@@ -131,23 +134,20 @@ namespace Sim {
 				switch (i)
 				{
 					case 0:
-						pressureDifferential.x += state.LowerAirPressure[nIndex] - pressure;
+						pressureDifferential.x += neighbors[nIndex] - pressure;
 						break;
 					case 1:
-						pressureDifferential.x -= state.LowerAirPressure[nIndex] - pressure;
+						pressureDifferential.x -= neighbors[nIndex] - pressure;
 						break;
 					case 2:
-						pressureDifferential.y -= state.LowerAirPressure[nIndex] - pressure;
+						pressureDifferential.y -= neighbors[nIndex] - pressure;
 						break;
 					case 3:
-						pressureDifferential.y += state.LowerAirPressure[nIndex] - pressure;
+						pressureDifferential.y += neighbors[nIndex] - pressure;
 						break;
 				}
 			}
-			var pressureGradient = new Vector3(pressureDifferential.x, pressureDifferential.y, (pressureDifferential.x + pressureDifferential.y) / 4) * world.Data.pressureDifferentialWindSpeed;
-			var newWind = Quaternion.Euler(0, 0, coriolisPower * 90) * pressureGradient;
-			newWind.z = verticalWindSpeed;
-			return newWind;
+			return new Vector3(pressureDifferential.x, pressureDifferential.y, (pressureDifferential.x + pressureDifferential.y) / 4);
 
 		}
 

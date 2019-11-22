@@ -28,7 +28,8 @@ public class TimePanel : MonoBehaviour
 			_ticksLastSecond = state.Ticks;
 		}
 
-		TimeText.text = ((int)(World.World.GetTimeOfYear(state.Ticks) * 12)).ToString() + "/" + ((int)(World.World.GetYear(state.Ticks) * 12)).ToString() + " [x" + ((int)World.World.TimeScale) + "] Actual: " + _ticksToDisplay;
+		TimeText.text = ((int)(World.World.GetTimeOfYear(state.Ticks) * 12)).ToString() + "/" + ((int)(World.World.GetYear(state.Ticks) * 12)).ToString() + " [x" + ((int)World.World.TimeScale) + "] Actual: " + _ticksToDisplay + " Ticks: " + state.Ticks;
 
 	}
+
 }

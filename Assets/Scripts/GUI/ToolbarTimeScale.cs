@@ -32,4 +32,9 @@ public class ToolbarTimeScale : Toolbar
 			World.World.TimeTillTick = 0;
 		}
 	}
+	public void OnAdvanceFrameClicked()
+	{
+		World.World.TimeScale = 0;
+		World.World.TimeTillTick = 0;
+	}
 }

@@ -26,11 +26,13 @@ public class TileInfoPanel : MonoBehaviour
 			text += "Index: " + index;
 			text += "\nPlate: " + state.Plate[index];
 			text += "\nElevation: " + (int)elevation;
-			text += "\nTemperature: " + (int)World.ConvertTemperature(state.LowerAirTemperature[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
-			text += "\nPressure: " + (state.LowerAirPressure[index] / World.World.Data.StaticPressure).ToString("0.00");
-			text += "\nHumidity: " + state.Humidity[index].ToString("0.00");
 			text += "\nCloudCover: " + state.CloudCover[index].ToString("0.00");
 			text += "\nRainfall: " + (state.Rainfall[index] * World.World.Data.TicksPerYear).ToString("0.00");
+			text += "\nUpper Temp: " + (int)World.ConvertTemperature(state.UpperAirTemperature[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
+			text += "\nUpper Pressure: " + (state.UpperAirPressure[index]).ToString("0.00");
+			text += "\nLower Temp: " + (int)World.ConvertTemperature(state.LowerAirTemperature[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
+			text += "\nLower Pressure: " + (state.LowerAirPressure[index]).ToString("0.00");
+			text += "\nHumidity: " + state.Humidity[index].ToString("0.00");
 			text += "\nEvaporation: " + (state.Evaporation[index] * World.World.Data.TicksPerYear).ToString("0.00");
 			text += "\nWaterTableDepth: " + (int)state.WaterTableDepth[index];
 			text += "\nSurfaceIce: " + state.SurfaceIce[index].ToString("0.00");
@@ -49,7 +51,7 @@ public class TileInfoPanel : MonoBehaviour
 				text += "\nGroundWater: " + state.GroundWater[index].ToString("0.00");
 				text += "\nSurfaceWater: " + state.SurfaceWater[index].ToString("0.00");
 				text += "\nCanopy: " + (int)(state.Canopy[index] * 100);
-				text += "\nPotential Energy: " + (int)(state.LandEnergy[index]);
+				text += "\nTerrain Energy: " + (int)(state.LandEnergy[index]);
 			}
 			//	spriteBatch.DrawString(font, "Wind: " + Wind[index], new Vector2(5, textY += 15), Color.White);
 			//for (int s = 0; s < World.MaxGroupsPerTile; s++)

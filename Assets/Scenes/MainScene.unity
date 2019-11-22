@@ -6827,7 +6827,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   World: {fileID: 3028139988544203110}
-  Layer: 16384
+  Layer: 536870912
 --- !u!114 &1501563617
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10891,6 +10891,31 @@ PrefabInstance:
       propertyPath: energyWindMovement
       value: 0.00001
       objectReference: {fileID: 0}
+    - target: {fileID: 6078235804126165679, guid: e80f16b7b156b0942b53d750c587a39c,
+        type: 3}
+      propertyPath: pressureDifferentialWindSpeed
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 6078235804126165679, guid: e80f16b7b156b0942b53d750c587a39c,
+        type: 3}
+      propertyPath: pressureToHorizontalWindSpeed
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6078235804126165679, guid: e80f16b7b156b0942b53d750c587a39c,
+        type: 3}
+      propertyPath: pressureToVerticalWindSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6078235804126165679, guid: e80f16b7b156b0942b53d750c587a39c,
+        type: 3}
+      propertyPath: massWindMovement
+      value: 0.00001
+      objectReference: {fileID: 0}
+    - target: {fileID: 6078235804126165679, guid: e80f16b7b156b0942b53d750c587a39c,
+        type: 3}
+      propertyPath: airDispersalSpeed
+      value: 0.1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e80f16b7b156b0942b53d750c587a39c, type: 3}
 --- !u!4 &2097833156 stripped
@@ -11455,7 +11480,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   World: {fileID: 3028139988544203110}
-  Layer: 32768
+  Layer: 268435456
 --- !u!1 &413110297350479019
 GameObject:
   m_ObjectHideFlags: 0
@@ -12511,7 +12536,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   World: {fileID: 3028139988544203110}
-  Layer: 4096
+  Layer: 134217728
 --- !u!114 &4091740659584843404
 MonoBehaviour:
   m_ObjectHideFlags: 0

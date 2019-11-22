@@ -99,14 +99,63 @@ public partial class World {
 					GetPerlinMinMax(noise, x, y, 2.0f, 30, Data.MinElevation, Data.MaxElevation) * 0.1f;
 				state.Elevation[index] = e;
 				float latitude = GetLatitude(y);
+
+				float elevationOrSeaLevel = Math.Max(0, e);
+				float troposphereColumnHeight = Data.troposphereElevation - elevationOrSeaLevel;
+				float troposphereMass = Data.TroposphereMass * troposphereColumnHeight / Data.troposphereElevation;
+				float upperAirColumnHeight = troposphereColumnHeight - Data.BoundaryZoneElevation;
+
 				state.LowerAirTemperature[index] = (1.0f - Mathf.Clamp(e - state.SeaLevel, 0, Data.MaxElevation) / (Data.MaxElevation - state.SeaLevel)) * (1.0f - latitude * latitude) * (Data.MaxTemperature - Data.MinTemperature) + Data.MinTemperature;
-				state.LowerAirEnergy[index] = Atmosphere.GetAirEnergy(this, state.LowerAirTemperature[index], Math.Max(0, e));
+				state.UpperAirTemperature[index] = state.LowerAirTemperature[index] + Data.temperatureLapseRate * (Data.troposphereElevation - elevationOrSeaLevel);
+
+				float lowerDensity = Data.LowerAirDensity - (Data.LowerAirDensity - Data.UpperAirDensity) * (elevationOrSeaLevel / Data.troposphereElevation);
+				float upperDensity = Data.LowerAirDensity - (Data.LowerAirDensity - Data.UpperAirDensity) * ((Data.troposphereElevation + (elevationOrSeaLevel + Data.BoundaryZoneElevation)) / 2 / Data.troposphereElevation);
+
+				//upperPressure == lowerPressure;
+
+				//upperMass + lowerMass = troposphereMass;
+
+				//upperMass * upperTemperature * upperDensity * world.Data.MassEarthAir / (Data.troposphereElevation - (elevationOrSeaLevel + Data.BoundaryZoneElevation)) ==
+				//lowerMass * lowerTemperature * lowerDensity * world.Data.MassEarthAir / Data.BoundaryZoneElevation;
+
+				//upperMass / lowerMass =
+				//(lowerTemperature * lowerDensity / Data.BoundaryZoneElevation) / 
+				//(upperTemperature * upperDensity / (Data.troposphereElevation - (elevationOrSeaLevel + Data.BoundaryZoneElevation)));
+
+				//upperMass = troposphereMass - lowerMass;
+				//upperMass / lowerMass = troposphereMass / lowerMass - 1;
+				//lowerMass = troposphereMass / (upperMass / lowerMass + 1);
+
+				//lowerMass =
+				//troposphereMass / (1 +
+				//(lowerTemperature * lowerDensity / Data.BoundaryZoneElevation) /
+				//(upperTemperature * upperDensity / (Data.troposphereElevation - (elevationOrSeaLevel + Data.BoundaryZoneElevation))));
+
+				float lowerMass =
+				troposphereMass / (1 +
+				(state.LowerAirTemperature[index] * lowerDensity / Data.BoundaryZoneElevation) /
+				(state.UpperAirTemperature[index] * upperDensity / (Data.troposphereElevation - (elevationOrSeaLevel + Data.BoundaryZoneElevation))));
+
+				state.UpperAirMass[index] = troposphereMass - lowerMass;
+				state.LowerAirMass[index] = lowerMass;
+
+
+
+				//state.UpperAirMass[index] = (upperAirColumnHeight * Data.UpperAirDensity) / (upperAirColumnHeight * Data.UpperAirDensity + Data.BoundaryZoneElevation * Data.LowerAirDensity) * troposphereMass;
+				//state.LowerAirMass[index] = (Data.BoundaryZoneElevation * Data.LowerAirDensity) / (upperAirColumnHeight * Data.UpperAirDensity + Data.BoundaryZoneElevation * Data.LowerAirDensity) * troposphereMass;
+
+				state.UpperAirEnergy[index] = Atmosphere.GetAirEnergy(this, state.UpperAirTemperature[index], state.UpperAirMass[index]);
+				state.LowerAirEnergy[index] = Atmosphere.GetAirEnergy(this, state.LowerAirTemperature[index], state.LowerAirMass[index]);
+
+				state.UpperAirPressure[index] = Atmosphere.GetAirPressure(this, state.UpperAirMass[index], state.UpperAirTemperature[index], (Data.troposphereElevation + (elevationOrSeaLevel + Data.BoundaryZoneElevation)) / 2, Data.troposphereElevation - (elevationOrSeaLevel + Data.BoundaryZoneElevation));
+				state.LowerAirPressure[index] = Atmosphere.GetAirPressure(this, state.LowerAirMass[index], state.LowerAirTemperature[index], elevationOrSeaLevel, Data.BoundaryZoneElevation);
+
 				state.CloudCover[index] = GetPerlinMinMax(noise, x, y, 3.0f, 2000, 0, 2);
 				state.Humidity[index] = GetPerlinMinMax(noise, x, y, 3.0f, 3000, 0, 2);
 				state.CloudElevation[index] = state.Elevation[index] + 1000;
 				state.WaterTableDepth[index] = GetPerlinMinMax(noise, x, y, 1.0f, 200, Data.MinWaterTableDepth, Data.MaxWaterTableDepth);
 				state.SoilFertility[index] = GetPerlinNormalized(noise, x, y, 1.0f, 400);
-				state.LowerAirPressure[index] = Data.StaticPressure;
+				state.SurfaceIce[index] = Mathf.Clamp(Data.FreezingTemperature - state.LowerAirTemperature[index], 0, 5);
 				if (e >= 0)
 				{
 					state.SurfaceWater[index] = GetPerlinMinMax(noise, x, y, 1.0f, 100, 0, 10.0f);
