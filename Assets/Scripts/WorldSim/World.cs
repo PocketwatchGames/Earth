@@ -99,6 +99,7 @@ public partial class World {
 		public float[] OceanDensityDeep;
 		public float[] OceanEnergyDeep;
 		public float[] OceanEnergyShallow;
+		public float[] OceanTemperatureShallow;
 		public Vector3[] OceanCurrentShallow;
 		public Vector3[] OceanCurrentDeep;
 		public float[] SurfaceIce;
@@ -152,6 +153,7 @@ public partial class World {
 			o.OceanDensityDeep = (float[])OceanDensityDeep.Clone();
 			o.OceanEnergyDeep = (float[])OceanEnergyDeep.Clone();
 			o.OceanEnergyShallow = (float[])OceanEnergyShallow.Clone();
+			o.OceanTemperatureShallow = (float[])OceanTemperatureShallow.Clone();
 			o.SurfaceIce = (float[])SurfaceIce.Clone();
 			o.SubmergedIce = (float[])SubmergedIce.Clone();
 			o.SoilFertility = (float[])SoilFertility.Clone();
@@ -222,6 +224,7 @@ public partial class World {
 			States[i].OceanDensityDeep = new float[s];
 			States[i].OceanEnergyDeep = new float[s];
 			States[i].OceanEnergyShallow = new float[s];
+			States[i].OceanTemperatureShallow = new float[s];
 			States[i].SurfaceIce = new float[s];
 			States[i].SubmergedIce = new float[s];
 			States[i].SoilFertility = new float[s];

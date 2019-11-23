@@ -25,7 +25,7 @@ public class WorldData
 	public float heatLossPreventionCarbonDioxide = 200;
 	public float LowerAirDensity = 1.2f;
 	public float UpperAirDensity = 0.4f;
-	public float massWindMovement = 0.00001f;
+	public float massWindMovement = 0.0001f;
 	public float MaxTerrainNormalForFriction = 0.25f;
 	public float WindLandFrictionMinimum = 0.2f;
 	public float airDispersalSpeed = 0.01f;
@@ -39,6 +39,7 @@ public class WorldData
 	public float EvaporativeHeatLoss = 0.065f; // global average = 78 watts -- TODO: get this in line with average evaportaion (2.5M per year)
 	public float OceanHeatRadiation = 0.00001021f; // global average = 66 watts
 	public float OceanAirConduction = 1.3824f; // global avg = 16 watts per degree delta between air and ocean
+	public float OceanIceConduction = 0.01f; // small
 	public float AlbedoWater = 0.06f; // How much heat is reflected back by the water
 	public float AlbedoIce = 0.5f; // How much heat is reflected back by the water
 	public float AlbedoLand = 0.4f;
@@ -66,10 +67,6 @@ public class WorldData
 	public float windVerticalCloudSpeedMultiplier = 100000;
 
 	[Header("Ocean")]
-	public float maxIce = 2.0f;
-	public float iceFreezeRate = 10.0f;
-	public float iceMeltRate = 10.0f;
-	public float iceMeltRadiationRate = 0.0001f;
 	public float DeepOceanDepth = 500;
 	public float WindToOceanCurrentFactor = 0.1f;
 	public float OceanEnergyCurrentSpeed = 0.001f;
@@ -80,6 +77,7 @@ public class WorldData
 	public float SalinityVerticalMixingSpeed = 0.001f;
 	public float OceanDensityPerSalinity = 1.0f;
 	public float OceanDensityPerTemperature = 10.0f;
+	public float FullIceCoverage = 1.0f;
 
 	[Header("Ecology")]
 	public float canopyGrowthRate = 100.0f;
@@ -122,6 +120,8 @@ public class WorldData
 	public float dewPointZero = 213.0f;
 	public float MassEarthAir = 1.29f;
 	public float MassSeaWater = 1024f;
+	public float MassIce = 919f;
+	public float SpecificHeatIce = 2.108f; // specific heat is joules to raise one degree
 	public float SpecificHeatSeaWater = 3.85f; // specific heat is joules to raise one degree
 	public float SpecificHeatAtmosphere = 1.158f; // specific heat is joules to raise one degree
 	public float FreezingTemperature = 273.15f;
@@ -162,8 +162,6 @@ public class WorldData
 		cloudElevationDeltaSpeed /= TicksPerYear;
 		windVerticalCloudSpeedMultiplier /= TicksPerYear;
 		PressureExponent = GravitationalAcceleration * MolarMassEarthAir / (UniversalGasConstant * temperatureLapseRate);
-		iceFreezeRate /= TicksPerYear;
-		iceMeltRate /= TicksPerYear;
 
 
 		for (int y = 0; y < size; y++)

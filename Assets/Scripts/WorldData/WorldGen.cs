@@ -158,7 +158,7 @@ public partial class World {
 				state.CloudElevation[index] = state.Elevation[index] + 1000;
 				state.WaterTableDepth[index] = GetPerlinMinMax(noise, x, y, 1.0f, 200, Data.MinWaterTableDepth, Data.MaxWaterTableDepth);
 				state.SoilFertility[index] = GetPerlinNormalized(noise, x, y, 1.0f, 400);
-				state.SurfaceIce[index] = Mathf.Clamp(Data.FreezingTemperature - state.LowerAirTemperature[index], 0, 5);
+				state.SurfaceIce[index] = 0;
 				if (e >= 0)
 				{
 					state.SurfaceWater[index] = GetPerlinMinMax(noise, x, y, 1.0f, 100, 0, 10.0f);
@@ -166,7 +166,8 @@ public partial class World {
 					state.Canopy[index] = GetPerlinNormalized(noise, x, y, 2.0f, 1000);
 				} else
 				{
-					state.OceanEnergyShallow[index] = Atmosphere.GetWaterEnergy(this, Math.Max(Data.FreezingTemperature, state.LowerAirTemperature[index]), Data.DeepOceanDepth);
+					state.OceanTemperatureShallow[index] = Math.Max(Data.FreezingTemperature, state.LowerAirTemperature[index]);
+					state.OceanEnergyShallow[index] = Atmosphere.GetWaterEnergy(this, state.OceanTemperatureShallow[index], Data.DeepOceanDepth);
 					state.OceanEnergyDeep[index] = Atmosphere.GetWaterEnergy(this, Data.FreezingTemperature + 3, Math.Max(0, -e));
 					state.OceanSalinityShallow[index] = (1.0f - Math.Abs(latitude)) * Data.DeepOceanDepth;
 					float deepOceanVolume = state.SeaLevel - state.Elevation[index];

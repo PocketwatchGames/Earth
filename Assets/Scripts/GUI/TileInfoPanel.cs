@@ -60,7 +60,7 @@ public class TileInfoPanel : MonoBehaviour
 			if (World.World.IsOcean(elevation, state.SeaLevel))
 			{
 				textSurfaceOcean += "SURFACE OCEAN";
-				textSurfaceOcean += "\nTemperature: " + (int)World.ConvertTemperature(Sim.Atmosphere.GetWaterTemperature(World.World, state.OceanEnergyShallow[index], World.World.Data.DeepOceanDepth), World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
+				textSurfaceOcean += "\nTemperature: " + (int)World.ConvertTemperature(state.OceanTemperatureShallow[index], World.TemperatureDisplay) + ((World.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 				textSurfaceOcean += "\nSalinity: " + state.OceanSalinityShallow[index].ToString("0.00");
 				textSurfaceOcean += "\nCurrent: " + state.OceanCurrentShallow[index].ToString();
 

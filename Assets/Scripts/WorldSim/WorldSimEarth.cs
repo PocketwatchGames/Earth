@@ -122,6 +122,7 @@ namespace Sim {
 			nextState.SurfaceWater[newIndex] = state.SurfaceWater[index];
 			nextState.OceanSalinityShallow[newIndex] = state.OceanSalinityShallow[index];
 			nextState.OceanSalinityDeep[newIndex] = state.OceanSalinityDeep[index];
+			nextState.OceanTemperatureShallow[newIndex] = state.OceanTemperatureShallow[index];
 			nextState.OceanEnergyShallow[newIndex] = state.OceanEnergyShallow[index];
 			nextState.OceanEnergyDeep[newIndex] = state.OceanEnergyDeep[index];
 			nextState.SurfaceIce[newIndex] = state.SurfaceIce[index];

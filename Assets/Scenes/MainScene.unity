@@ -10451,7 +10451,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1709956332}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1750521102}
+        m_MethodName: OnAdvanceFrameClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1709956332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10801,7 +10812,6 @@ MonoBehaviour:
   - {fileID: 1091294927}
   - {fileID: 1020956809}
   - {fileID: 758745560}
-  - {fileID: 1709956331}
   World: {fileID: 3028139988544203110}
 --- !u!1 &1752473167
 GameObject:
@@ -14604,10 +14614,10 @@ MonoBehaviour:
     heatLossPreventionCarbonDioxide: 200
     LowerAirDensity: 1.2
     UpperAirDensity: 0.4
-    massWindMovement: 0.00001
+    massWindMovement: 0.00005
     MaxTerrainNormalForFriction: 0.25
     WindLandFrictionMinimum: 0.2
-    airDispersalSpeed: 0.05
+    airDispersalSpeed: 0.1
     humidityDispersalSpeed: 0.01
     localSunHeat: 5
     AtmosphericHeatAbsorption: 0.23
@@ -14615,6 +14625,7 @@ MonoBehaviour:
     EvaporativeHeatLoss: 0.065
     OceanHeatRadiation: 0.00001021
     OceanAirConduction: 1.3824
+    OceanIceConduction: 0.01
     AlbedoWater: 0.06
     AlbedoIce: 0.5
     AlbedoLand: 0.4
@@ -14638,10 +14649,6 @@ MonoBehaviour:
     cloudMovementFromWind: 20
     cloudElevationDeltaSpeed: 10
     windVerticalCloudSpeedMultiplier: 100000
-    maxIce: 2
-    iceFreezeRate: 10
-    iceMeltRate: 10
-    iceMeltRadiationRate: 0.0001
     DeepOceanDepth: 500
     WindToOceanCurrentFactor: 0.1
     OceanEnergyCurrentSpeed: 0.001
@@ -14652,6 +14659,7 @@ MonoBehaviour:
     SalinityVerticalMixingSpeed: 0.001
     OceanDensityPerSalinity: 1
     OceanDensityPerTemperature: 10
+    FullIceCoverage: 1
     canopyGrowthRate: 100
     canopyDeathRate: 0.2
     freshWaterMaxAvailability: 0.1
@@ -14686,6 +14694,8 @@ MonoBehaviour:
     dewPointZero: 213
     MassEarthAir: 1.29
     MassSeaWater: 1024
+    MassIce: 919
+    SpecificHeatIce: 2.108
     SpecificHeatSeaWater: 3.85
     SpecificHeatAtmosphere: 1.158
     FreezingTemperature: 273.15

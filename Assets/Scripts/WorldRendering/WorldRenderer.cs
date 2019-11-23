@@ -225,7 +225,8 @@ public partial class WorldComponent {
 				}
 				if (ice > 0)
 				{
-					oceanColor = Color.Lerp(color, new Color(0.6f, 0.5f, 1.0f), Math.Min(1.0f, ice / World.Data.maxIce));
+					oceanColor = Color.Lerp(oceanColor, new Color(0.4f, 0.6f, 1.0f), 0.25f + 0.75f * Mathf.Clamp01(ice / World.Data.FullIceCoverage));
+					color = Color.Lerp(color, new Color(0.4f, 0.5f, 1.0f), 0.75f * Mathf.Clamp01(ice / World.Data.FullIceCoverage));
 				}
 
 
@@ -350,7 +351,7 @@ public partial class WorldComponent {
 											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
 											new CVP(Color.red, 50+World.Data.FreezingTemperature),
 											new CVP(Color.magenta, 75 + World.Data.FreezingTemperature) },
-						Atmosphere.GetWaterTemperature(World, state.OceanEnergyShallow[index], World.Data.DeepOceanDepth));
+						state.OceanTemperatureShallow[index]);
 				}
 				else if (showLayers.HasFlag(Layers.OceanTemperatureDeep))
 				{
