@@ -14,6 +14,10 @@ namespace Sim {
 		{
 			float timeOfYear = world.GetTimeOfYear(state.Ticks);
 			float declinationOfSun = GetDeclinationOfSun(world.Data.planetTiltAngle, timeOfYear);
+			float globalEnergyLost = 0;
+			float globalEnergyGained = 0;
+			float globalEnergy = 0;
+
 			for (int y = 0; y < world.Size; y++)
 			{
 				float latitude = world.GetLatitude(y);
@@ -86,7 +90,7 @@ namespace Sim {
 					float groundWaterSaturation = Animals.GetGroundWaterSaturation(state.GroundWater[index], state.WaterTableDepth[index], soilFertility * world.Data.MaxSoilPorousness);
 					float incomingRadiation = world.Data.SolarRadiation * sunAngle * lengthOfDay / 2;
 					float outgoingRadiation = 0;
-					float heatAbsorbed = 0;
+					float energyAbsorbed = 0;
 
 					// reflect some rads off atmosphere and clouds
 					incomingRadiation -= incomingRadiation * (world.Data.AtmosphericHeatReflection + world.Data.cloudReflectionRate * cloudOpacity);
@@ -101,24 +105,24 @@ namespace Sim {
 						float absorbedByUpperAtmosphereIncoming = incomingRadiation * world.Data.AtmosphericHeatAbsorption * (upperAirMass / massOfAtmosphericColumn);
 						newLowerAirEnergy += absorbedByUpperAtmosphereIncoming;
 						incomingRadiation -= absorbedByUpperAtmosphereIncoming;
-						heatAbsorbed += absorbedByUpperAtmosphereIncoming;
+						energyAbsorbed += absorbedByUpperAtmosphereIncoming;
 
 						float absorbedByLowerAtmosphereIncoming = incomingRadiation * world.Data.AtmosphericHeatAbsorption * (lowerAirMass / massOfAtmosphericColumn);
 						newLowerAirEnergy += absorbedByLowerAtmosphereIncoming;
 						incomingRadiation -= absorbedByLowerAtmosphereIncoming;
-						heatAbsorbed += absorbedByLowerAtmosphereIncoming;
+						energyAbsorbed += absorbedByLowerAtmosphereIncoming;
 					}
 
 					// reflection off surface
-					float heatReflected = 0;
+					float energyReflected = 0;
 					{
 						if (surfaceIce > 0)
 						{
-							heatReflected += incomingRadiation * Math.Min(1.0f, surfaceIce) * world.Data.AlbedoIce;
+							energyReflected += incomingRadiation * Math.Min(1.0f, surfaceIce) * world.Data.AlbedoIce;
 						}
 						if (world.IsOcean(elevation, state.SeaLevel))
 						{
-							heatReflected = incomingRadiation * world.Data.AlbedoWater * Math.Max(0, (1.0f - surfaceIce));
+							energyReflected = incomingRadiation * world.Data.AlbedoWater * Math.Max(0, (1.0f - surfaceIce));
 						}
 						else
 						{
@@ -127,10 +131,10 @@ namespace Sim {
 							float waterReflectivity = surfaceWater * world.Data.AlbedoWater;
 							float soilReflectivity = world.Data.AlbedoLand - world.Data.AlbedoReductionSoilQuality * soilFertility;
 							float heatReflectedLand = canopy * world.Data.AlbedoFoliage + Math.Max(0, 1.0f - canopy) * (surfaceWater * world.Data.AlbedoWater + Math.Max(0, 1.0f - surfaceWater) * soilReflectivity);
-							heatReflected += incomingRadiation * heatReflectedLand * Math.Max(0, (1.0f - surfaceIce));
+							energyReflected += incomingRadiation * heatReflectedLand * Math.Max(0, (1.0f - surfaceIce));
 						}
-						incomingRadiation -= heatReflected;
-						newLowerAirEnergy += heatReflected;
+						incomingRadiation -= energyReflected;
+						newLowerAirEnergy += energyReflected;
 					}
 
 					// ice
@@ -181,7 +185,7 @@ namespace Sim {
 						{
 							// absorb remaining incoming radiation (we've already absorbed radiation in surface ice above)
 							newOceanEnergyShallow += incomingRadiation;
-							heatAbsorbed += incomingRadiation;
+							energyAbsorbed += incomingRadiation;
 
 							// heat transfer (both ways) based on temperature differential
 							// conduction to ice from below
@@ -218,7 +222,7 @@ namespace Sim {
 						else
 						{
 							newLowerAirEnergy += incomingRadiation;
-							heatAbsorbed += incomingRadiation;
+							energyAbsorbed += incomingRadiation;
 						}
 					}
 
@@ -251,7 +255,8 @@ namespace Sim {
 					//float humidityPercentage = humidity / atmosphereMass;
 					//float heatLossFactor = (1.0f - world.Data.carbonDioxide * world.Data.heatLossPreventionCarbonDioxide) * (1.0f - humidityPercentage);
 					//float loss = airEnergy * (1.0f - cloudReflectionFactor) * (world.Data.heatLoss * heatLossFactor * airPressureInverse);
-					newUpperAirEnergy -= world.Data.AtmosphericHeatLossToSpace * upperAirEnergy;
+					float energyLostToSpace = world.Data.AtmosphericHeatLossToSpace * upperAirEnergy;
+					newUpperAirEnergy -= energyLostToSpace;
 
 
 
@@ -297,10 +302,17 @@ namespace Sim {
 
 					nextState.Evaporation[index] = evaporation;
 					nextState.Rainfall[index] = rainfall;
-					nextState.HeatAbsorbed[index] = heatAbsorbed;
+					nextState.EnergyAbsorbed[index] = energyAbsorbed;
 
+					globalEnergyGained += energyAbsorbed;
+					globalEnergy += newLowerAirEnergy + newUpperAirEnergy + newOceanEnergyDeep + newOceanEnergyShallow;
+					globalEnergyLost += energyLostToSpace;
 				}
 			}
+
+			nextState.GlobalEnergyLost = globalEnergyLost;
+			nextState.GlobalEnergyGained = globalEnergyGained;
+			nextState.GlobalEnergy = globalEnergy;
 
 		}
 

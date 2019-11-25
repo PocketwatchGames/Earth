@@ -83,7 +83,6 @@ public class Probe {
 		Humidity[CurSampleIndex] = state.Humidity[index];
 		CloudCover[CurSampleIndex] = state.CloudCover[index];
 		Rainfall[CurSampleIndex] = state.Rainfall[index];
-		Evaporation[CurSampleIndex] = state.Evaporation[index];
 		GroundWater[CurSampleIndex] = state.GroundWater[index];
 		SurfaceWater[CurSampleIndex] = state.SurfaceWater[index];
 		Canopy[CurSampleIndex] = state.Canopy[index];

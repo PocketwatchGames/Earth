@@ -28,7 +28,7 @@ namespace Sim {
 					nextState.UpperWind[index] = Quaternion.Euler(0, 0, windInfo.coriolisPower * 90) * pressureGradientUpper * world.Data.pressureToHorizontalWindSpeed / world.Data.UpperAirDensity;
 
 					var normal = state.Normal[index];
-					float friction = world.Data.WindLandFrictionMinimum + (1.0f - world.Data.WindLandFrictionMinimum) * Mathf.Clamp01(1.0f - normal.z / world.Data.MaxTerrainNormalForFriction);
+					float friction = world.Data.WindLandFrictionMinimum + (1.0f - world.Data.WindLandFrictionMinimum) * Mathf.Clamp01((1.0f - normal.z) / world.Data.MaxTerrainNormalForFriction);
 					float speedReduction = (1.0f - friction) / world.Data.LowerAirDensity;
 					var pressureGradientLower = GetPressureGradient(world, x, y, state.LowerAirPressure, lowerPressure);
 					var lowerWind = Quaternion.Euler(0, 0, windInfo.coriolisPower * 90 * speedReduction) * pressureGradientLower * world.Data.pressureToHorizontalWindSpeed * speedReduction;
@@ -77,6 +77,7 @@ namespace Sim {
 							}
 						}
 						nextState.OceanCurrentDeep[index] = new Vector3(densityDifferential.x, densityDifferential.y, 0);
+						nextState.OceanCurrentShallow[index] += new Vector3(densityDifferential.x, densityDifferential.y, 0);
 					}
 				}
 			}

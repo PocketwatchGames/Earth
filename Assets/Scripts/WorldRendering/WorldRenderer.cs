@@ -281,7 +281,7 @@ public partial class WorldComponent {
 											new CVP(Color.yellow, 100),
 											new CVP(Color.red, 150),
 											new CVP(Color.white, 200) },
-						state.HeatAbsorbed[index]);
+						state.EnergyAbsorbed[index]);
 				}
 				else if (showLayers.HasFlag(Layers.LowerAirPressure))
 				{

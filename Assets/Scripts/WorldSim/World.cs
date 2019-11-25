@@ -70,7 +70,6 @@ public partial class World {
 		public float AtmosphereCO2;
 		public float AtmosphereO2;
 		public float AtmosphereN;
-		public float GlobalTemperature;
 		public float SeaLevel;
 		public float StratosphereMass;
 
@@ -116,7 +115,11 @@ public partial class World {
 		// for display
 		public float[] Rainfall;
 		public float[] Evaporation;
-		public float[] HeatAbsorbed;
+		public float[] EnergyAbsorbed;
+		public float GlobalEnergyLost;
+		public float GlobalEnergyGained;
+		public float GlobalEnergy;
+		public float GlobalTemperature;
 
 		public object Clone()
 		{
@@ -128,6 +131,9 @@ public partial class World {
 			o.GlobalTemperature = GlobalTemperature;
 			o.SeaLevel = SeaLevel;
 			o.StratosphereMass = StratosphereMass;
+			o.GlobalEnergyLost = GlobalEnergyLost;
+			o.GlobalEnergyGained = GlobalEnergyGained;
+			o.GlobalEnergy = GlobalEnergy;
 
 			o.Species = (SpeciesType[])Species.Clone();
 			o.SpeciesStats = (SpeciesStat[])SpeciesStats.Clone();
@@ -167,9 +173,9 @@ public partial class World {
 			o.FlowDirection = (Vector2[])FlowDirection.Clone();
 			o.Normal = (Vector3[])Normal.Clone();
 
+			o.EnergyAbsorbed = (float[])EnergyAbsorbed.Clone();
 			o.Rainfall = (float[])Rainfall.Clone();
 			o.Evaporation = (float[])Evaporation.Clone();
-			o.HeatAbsorbed = (float[])HeatAbsorbed.Clone();
 
 			return o;
 		}
@@ -216,9 +222,9 @@ public partial class World {
 			States[i].WaterTableDepth = new float[s];
 			States[i].GroundWater = new float[s];
 			States[i].SurfaceWater = new float[s];
+			States[i].EnergyAbsorbed = new float[s];
 			States[i].Rainfall = new float[s];
 			States[i].Evaporation = new float[s];
-			States[i].HeatAbsorbed = new float[s];
 			States[i].OceanSalinityDeep = new float[s];
 			States[i].OceanSalinityShallow = new float[s];
 			States[i].OceanDensityDeep = new float[s];

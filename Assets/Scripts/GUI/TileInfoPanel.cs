@@ -10,6 +10,9 @@ public class TileInfoPanel : MonoBehaviour
 	public UnityEngine.UI.Text TextSurfaceOcean;
 	public UnityEngine.UI.Text TextDeepOcean;
 	public UnityEngine.UI.Text TextTerrain;
+	public UnityEngine.UI.Text TextGlobal;
+	public UnityEngine.GameObject GeoPanel;
+	public UnityEngine.GameObject AtmospherePanel;
 	public UnityEngine.GameObject OceanPanel;
 	public UnityEngine.GameObject TerrainPanel;
 	public WorldComponent World;
@@ -32,8 +35,18 @@ public class TileInfoPanel : MonoBehaviour
 		string textSurfaceOcean = "";
 		string textDeepOcean = "";
 		string textTerrain = "";
+		string textGlobal = "";
+
+		int totalTiles = World.World.Size * World.World.Size;
+		textGlobal += "GLOBAL";
+		textGlobal += "\n+Energy: " + (state.GlobalEnergyLost / totalTiles).ToString("0.0");
+		textGlobal += "\n-Energy: " + (state.GlobalEnergyGained / totalTiles).ToString("0.0");
+		textGlobal += "\nTotal Energy: " + (state.GlobalEnergy / 1000000).ToString("0");
+
 		if (TileInfoPoint.x >= 0 && TileInfoPoint.x < World.World.Size && TileInfoPoint.y >= 0 && TileInfoPoint.y < World.World.Size)
 		{
+			GeoPanel.SetActive(true);
+			AtmospherePanel.SetActive(true);
 			float elevation = state.Elevation[index];
 			textGeo += "GEOLOGY";
 			textGeo += "\nIndex: " + index;
@@ -96,8 +109,13 @@ public class TileInfoPanel : MonoBehaviour
 			//			new Vector2(25, textY), Color.white);
 			//	}
 			//}
+		} else
+		{
+			GeoPanel.SetActive(false);
+			AtmospherePanel.SetActive(false);
 		}
 
+		TextGlobal.text = textGlobal;
 		TextGeo.text = textGeo;
 		TextUpperAtmosphere.text = textUpperAtmosphere;
 		TextLowerAtmosphere.text = textLowerAtmosphere;
