@@ -17,6 +17,14 @@ namespace Sim {
 			float globalEnergyLost = 0;
 			float globalEnergyGained = 0;
 			float globalEnergy = 0;
+			float globalEnergyIncoming = 0;
+			float globalEnergyReflectedAtmosphere = 0;
+			float globalEnergyReflectedSurface = 0;
+			float globalEnergyAbsorbedUpperAtmosphere = 0;
+			float globalEnergyAbsorbedLowerAtmosphere = 0;
+			float globalEnergyAbsorbedSurface = 0;
+			float globalOceanCoverage = 0;
+			float globalTemperature = 0;
 
 			for (int y = 0; y < world.Size; y++)
 			{
@@ -89,11 +97,18 @@ namespace Sim {
 					float cloudOpacity = Math.Min(1.0f, cloudCover / world.Data.cloudContentFullAbsorption);
 					float groundWaterSaturation = Animals.GetGroundWaterSaturation(state.GroundWater[index], state.WaterTableDepth[index], soilFertility * world.Data.MaxSoilPorousness);
 					float incomingRadiation = world.Data.SolarRadiation * sunAngle * lengthOfDay / 2;
-					float outgoingRadiation = 0;
 					float energyAbsorbed = 0;
 
+					if (world.IsOcean(elevation, state.SeaLevel))
+					{
+						globalOceanCoverage++;
+					}
+					globalEnergyIncoming += incomingRadiation;
+
 					// reflect some rads off atmosphere and clouds
-					incomingRadiation -= incomingRadiation * (world.Data.AtmosphericHeatReflection + world.Data.cloudReflectionRate * cloudOpacity);
+					float energyReflectedAtmosphere = incomingRadiation * (world.Data.AtmosphericHeatReflection + world.Data.cloudReflectionRate * cloudOpacity);
+					incomingRadiation -= energyReflectedAtmosphere;
+					globalEnergyReflectedAtmosphere += energyReflectedAtmosphere;
 
 					// Absorbed by atmosphere
 					{
@@ -111,6 +126,9 @@ namespace Sim {
 						newLowerAirEnergy += absorbedByLowerAtmosphereIncoming;
 						incomingRadiation -= absorbedByLowerAtmosphereIncoming;
 						energyAbsorbed += absorbedByLowerAtmosphereIncoming;
+
+						globalEnergyAbsorbedLowerAtmosphere += absorbedByLowerAtmosphereIncoming;
+						globalEnergyAbsorbedUpperAtmosphere += absorbedByUpperAtmosphereIncoming;
 					}
 
 					// reflection off surface
@@ -134,7 +152,10 @@ namespace Sim {
 							energyReflected += incomingRadiation * heatReflectedLand * Math.Max(0, (1.0f - surfaceIce));
 						}
 						incomingRadiation -= energyReflected;
-						newLowerAirEnergy += energyReflected;
+
+						// TODO: do we absorb some of this energy on the way back out of the atmosphere?
+	//					newLowerAirEnergy += energyReflected;
+						globalEnergyReflectedSurface += energyReflected;
 					}
 
 					// ice
@@ -180,6 +201,7 @@ namespace Sim {
 
 					// absorbed by surface
 					{
+						globalEnergyAbsorbedSurface += incomingRadiation;
 						// absorb the remainder and radiate heat
 						if (world.IsOcean(elevation, state.SeaLevel))
 						{
@@ -247,6 +269,7 @@ namespace Sim {
 					float heatTransferToUpper = lowerWind.z;
 					newLowerAirEnergy -= heatTransferToUpper;
 					newUpperAirEnergy += heatTransferToUpper;
+					globalEnergyAbsorbedUpperAtmosphere += heatTransferToUpper;
 					MoveAtmosphereOnWind(world, state, x, y, elevationOrSeaLevel, lowerAirEnergy, upperAirEnergy, lowerAirMass, upperAirMass, lowerWind, upperWind, humidity, ref newLowerAirEnergy, ref newUpperAirEnergy, ref newLowerAirMass, ref newUpperAirMass, ref newHumidity);
 
 
@@ -313,6 +336,14 @@ namespace Sim {
 			nextState.GlobalEnergyLost = globalEnergyLost;
 			nextState.GlobalEnergyGained = globalEnergyGained;
 			nextState.GlobalEnergy = globalEnergy;
+			nextState.GlobalEnergyIncoming = globalEnergyIncoming;
+			nextState.GlobalEnergyReflectedAtmosphere = globalEnergyReflectedAtmosphere;
+			nextState.GlobalEnergyReflectedSurface = globalEnergyReflectedSurface;
+			nextState.GlobalEnergyAbsorbedUpperAtmosphere = globalEnergyAbsorbedUpperAtmosphere;
+			nextState.GlobalEnergyAbsorbedLowerAtmosphere = globalEnergyAbsorbedLowerAtmosphere;
+			nextState.GlobalEnergyAbsorbedSurface = globalEnergyAbsorbedSurface;
+			nextState.GlobalTemperature = globalTemperature;
+			nextState.GlobalOceanCoverage = globalOceanCoverage / (world.Size * world.Size);
 
 		}
 

@@ -5,7 +5,7 @@ using UnityEngine;
 public class TimePanel : MonoBehaviour
 {
 	public UnityEngine.UI.Text TimeText;
-	public WorldComponent World;
+	public WorldComponent WorldComponent;
 
 	public float _tickTimer;
 	public int _ticksLastSecond, _ticksToDisplay;
@@ -18,7 +18,7 @@ public class TimePanel : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-		var state = World.World.States[World.World.CurRenderStateIndex];
+		var state = WorldComponent.World.States[WorldComponent.World.CurRenderStateIndex];
 
 		_tickTimer += Time.deltaTime;
 		if (_tickTimer >= 1)
@@ -28,7 +28,7 @@ public class TimePanel : MonoBehaviour
 			_ticksLastSecond = state.Ticks;
 		}
 
-		TimeText.text = ((int)(World.World.GetTimeOfYear(state.Ticks) * 12)).ToString() + "/" + ((int)(World.World.GetYear(state.Ticks) * 12)).ToString() + " [x" + ((int)World.World.TimeScale) + "] Actual: " + _ticksToDisplay + " Ticks: " + state.Ticks;
+		TimeText.text = ((int)(WorldComponent.World.GetTimeOfYear(state.Ticks) * 12)).ToString() + "/" + ((int)(WorldComponent.World.GetYear(state.Ticks) * 12)).ToString() + " [x" + ((int)WorldComponent.World.TimeScale) + "] Actual: " + _ticksToDisplay + " Ticks: " + state.Ticks;
 
 	}
 

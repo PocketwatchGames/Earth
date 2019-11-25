@@ -139,6 +139,7 @@ public partial class World {
 				(state.LowerAirTemperature[index] * lowerDensity / Data.BoundaryZoneElevation) /
 				(state.UpperAirTemperature[index] * upperDensity / (Data.troposphereElevation - (elevationOrSeaLevel + Data.BoundaryZoneElevation))));
 
+				state.StratosphereMass = worldGenData.StratosphereMass;
 				state.UpperAirMass[index] = troposphereMass - lowerMass;
 				state.LowerAirMass[index] = lowerMass;
 

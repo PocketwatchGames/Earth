@@ -116,10 +116,17 @@ public partial class World {
 		public float[] Rainfall;
 		public float[] Evaporation;
 		public float[] EnergyAbsorbed;
+		public float GlobalEnergyIncoming;
+		public float GlobalEnergyReflectedAtmosphere;
+		public float GlobalEnergyReflectedSurface;
 		public float GlobalEnergyLost;
 		public float GlobalEnergyGained;
+		public float GlobalEnergyAbsorbedUpperAtmosphere;
+		public float GlobalEnergyAbsorbedLowerAtmosphere;
+		public float GlobalEnergyAbsorbedSurface;
 		public float GlobalEnergy;
 		public float GlobalTemperature;
+		public float GlobalOceanCoverage;
 
 		public object Clone()
 		{
@@ -131,11 +138,20 @@ public partial class World {
 			o.GlobalTemperature = GlobalTemperature;
 			o.SeaLevel = SeaLevel;
 			o.StratosphereMass = StratosphereMass;
+			o.GlobalEnergyIncoming = GlobalEnergyIncoming;
+			o.GlobalEnergyReflectedAtmosphere = GlobalEnergyReflectedAtmosphere;
+			o.GlobalEnergyReflectedSurface = GlobalEnergyReflectedSurface;
 			o.GlobalEnergyLost = GlobalEnergyLost;
 			o.GlobalEnergyGained = GlobalEnergyGained;
+			o.GlobalEnergyAbsorbedUpperAtmosphere = GlobalEnergyAbsorbedUpperAtmosphere;
+			o.GlobalEnergyAbsorbedLowerAtmosphere = GlobalEnergyAbsorbedLowerAtmosphere;
+			o.GlobalEnergyAbsorbedSurface = GlobalEnergyAbsorbedSurface;
 			o.GlobalEnergy = GlobalEnergy;
+			o.GlobalTemperature = GlobalTemperature;
+			o.GlobalOceanCoverage = GlobalOceanCoverage;
 
-			o.Species = (SpeciesType[])Species.Clone();
+
+		o.Species = (SpeciesType[])Species.Clone();
 			o.SpeciesStats = (SpeciesStat[])SpeciesStats.Clone();
 			o.Herds = (Herd[])Herds.Clone();
 			o.Plate = (int[])Plate.Clone();
