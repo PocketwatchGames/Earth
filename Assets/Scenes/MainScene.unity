@@ -4271,7 +4271,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 3930111053076604644, guid: 2d14138c0ebc5ab4eb2d4ced7e5ea7fc, type: 3}
+    - {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 2d14138c0ebc5ab4eb2d4ced7e5ea7fc, type: 3}
 --- !u!224 &634610744 stripped
 RectTransform:
@@ -7402,8 +7402,7 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 3930111053076604644, guid: 2d14138c0ebc5ab4eb2d4ced7e5ea7fc, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2d14138c0ebc5ab4eb2d4ced7e5ea7fc, type: 3}
 --- !u!224 &1300376346 stripped
 RectTransform:
@@ -13258,7 +13257,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 955, y: 0}
+  m_AnchoredPosition: {x: 963, y: 0}
   m_SizeDelta: {x: 150, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &167160498003851629
@@ -14204,16 +14203,18 @@ MonoBehaviour:
     MinElevation: -11000
     StratosphereMass: 2583
     TroposphereMass: 7749
+    MinTemperature: 253.15
+    MaxTemperature: 323.15
   Data:
-    pressureToHorizontalWindSpeed: 5
-    pressureToVerticalWindSpeed: 10
+    pressureToHorizontalWindSpeed: 1
+    pressureToVerticalWindSpeed: 1
     heatLossPreventionCarbonDioxide: 200
     LowerAirDensity: 1.2
     UpperAirDensity: 0.4
     massWindMovement: 0.00005
     MaxTerrainNormalForFriction: 0.25
     WindLandFrictionMinimum: 0.2
-    airDispersalSpeed: 0.1
+    airDispersalSpeed: 0.01
     humidityDispersalSpeed: 0.01
     localSunHeat: 5
     AtmosphericHeatAbsorption: 0.23
@@ -14259,6 +14260,8 @@ MonoBehaviour:
     canopyGrowthRate: 100
     canopyDeathRate: 0.2
     freshWaterMaxAvailability: 0.1
+    MinTemperatureCanopy: 223.15
+    MaxTemperatureCanopy: 323.15
     populationExpansionPercent: 0.2
     minPopulationDensityForExpansion: 0.1
     FlowSpeed: 10
@@ -14271,8 +14274,6 @@ MonoBehaviour:
     TicksPerYear: 360
     tileSize: 400000
     carbonDioxide: 0.001
-    MinTemperature: 223.15
-    MaxTemperature: 323.15
     planetTiltAngle: -23.5
     troposphereElevation: 10000
     BoundaryZoneElevation: 1000
@@ -14304,6 +14305,8 @@ MonoBehaviour:
   CameraMoveSpeed: 3
   CameraZoomSpeed: 2
   TemperatureDisplay: 1
+  minPressure: 300
+  maxPressure: 600
   MainCamera: {fileID: 963194227}
   WorldIcons: {fileID: 870706485}
   LandMesh: {fileID: 1752473170}
@@ -14495,6 +14498,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 759025781}
     m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: World
+      value: 
+      objectReference: {fileID: 3028139988544203110}
     - target: {fileID: 3930111053076604446, guid: 2d14138c0ebc5ab4eb2d4ced7e5ea7fc,
         type: 3}
       propertyPath: m_Name
@@ -14613,11 +14620,6 @@ PrefabInstance:
     - target: {fileID: 3930111053076604440, guid: 2d14138c0ebc5ab4eb2d4ced7e5ea7fc,
         type: 3}
       propertyPath: WorldComponent
-      value: 
-      objectReference: {fileID: 3028139988544203110}
-    - target: {fileID: 3930111053076604644, guid: 2d14138c0ebc5ab4eb2d4ced7e5ea7fc,
-        type: 3}
-      propertyPath: World
       value: 
       objectReference: {fileID: 3028139988544203110}
     - target: {fileID: 3930111053559619694, guid: 2d14138c0ebc5ab4eb2d4ced7e5ea7fc,
@@ -14791,7 +14793,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 3930111053076604644, guid: 2d14138c0ebc5ab4eb2d4ced7e5ea7fc, type: 3}
+    - {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 2d14138c0ebc5ab4eb2d4ced7e5ea7fc, type: 3}
 --- !u!1 &3938633673544580901
 GameObject:

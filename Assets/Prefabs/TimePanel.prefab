@@ -131,7 +131,6 @@ GameObject:
   - component: {fileID: 3930111053076604443}
   - component: {fileID: 3930111053076604440}
   - component: {fileID: 3930111053076604645}
-  - component: {fileID: 3930111053076604644}
   m_Layer: 5
   m_Name: TimePanel
   m_TagString: Untagged
@@ -209,7 +208,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TimeText: {fileID: 3930111054318552403}
-  World: {fileID: 0}
+  WorldComponent: {fileID: 0}
   _tickTimer: 0
   _ticksLastSecond: 0
   _ticksToDisplay: 0
@@ -238,23 +237,6 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
---- !u!114 &3930111053076604644
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3930111053076604446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ecd66dd209e84e4dbc02893e37bc5b7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TimeText: {fileID: 3930111054318552403}
-  World: {fileID: 0}
-  _tickTimer: 0
-  _ticksLastSecond: 0
-  _ticksToDisplay: 0
 --- !u!1 &3930111053246459161
 GameObject:
   m_ObjectHideFlags: 0

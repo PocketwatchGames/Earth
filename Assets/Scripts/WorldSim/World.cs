@@ -36,7 +36,12 @@ public struct SpeciesDisplayData {
 	public Sprite Sprite;
 	public int SpeciesIndex;
 }
-
+public enum Direction {
+	West,
+	East,
+	South,
+	North
+}
 
 public partial class World {
 
@@ -127,6 +132,7 @@ public partial class World {
 		public float GlobalEnergy;
 		public float GlobalTemperature;
 		public float GlobalOceanCoverage;
+		public float AtmosphericMass;
 
 		public object Clone()
 		{
@@ -149,7 +155,7 @@ public partial class World {
 			o.GlobalEnergy = GlobalEnergy;
 			o.GlobalTemperature = GlobalTemperature;
 			o.GlobalOceanCoverage = GlobalOceanCoverage;
-
+			o.AtmosphericMass = AtmosphericMass;
 
 		o.Species = (SpeciesType[])Species.Clone();
 			o.SpeciesStats = (SpeciesStat[])SpeciesStats.Clone();

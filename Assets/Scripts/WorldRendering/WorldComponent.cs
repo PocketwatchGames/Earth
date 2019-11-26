@@ -61,6 +61,8 @@ public partial class WorldComponent : MonoBehaviour
 	public float CameraMoveSpeed = 2;
 	public float CameraZoomSpeed = 2;
 	public TemperatureDisplayType TemperatureDisplay;
+	public float minPressure = 300;
+	public float maxPressure = 600;
 
 
 	[Header("Internal")]
@@ -100,7 +102,7 @@ public partial class WorldComponent : MonoBehaviour
 		//		ActiveFeatures &= ~(SimFeature.TradeWinds);
 
 		Data.Init(WorldGenData.Size);
-		World.Generate(SpeciesSprites, Data, WorldGenData);
+		WorldGen.Generate(World, SpeciesSprites, Data, WorldGenData);
 		CreateWorldMesh();
 		MainCamera.transform.position = new Vector3(World.Size / 2, World.Size / 2, MainCamera.transform.position.z);
 

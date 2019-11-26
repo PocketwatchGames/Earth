@@ -7,123 +7,125 @@ using Unity;
 using UnityEngine;
 using Sim;
 
-public partial class World {
+public static class WorldGen {
 
-	private float GetPerlinMinMax(FastNoise noise, int x, int y, float frequency, float hash, float min, float max)
+	private static float GetPerlinMinMax(World world, FastNoise noise, int x, int y, float frequency, float hash, float min, float max)
 	{
-		return (noise.GetPerlin((float)x / Size * frequency + hash, (float)y / Size * frequency) + 1.0f) * (max - min) / 2 + min;
+		return (noise.GetPerlin((float)x / world.Size * frequency + hash, (float)y / world.Size * frequency) + 1.0f) * (max - min) / 2 + min;
 	}
-	private float GetPerlinNormalized(FastNoise noise, int x, int y, float frequency, float hash)
+	private static float GetPerlinNormalized(World world, FastNoise noise, int x, int y, float frequency, float hash)
 	{
-		return (noise.GetPerlin((float)x / Size * frequency + hash, (float)y / Size * frequency) + 1.0f) / 2;
+		return (noise.GetPerlin((float)x / world.Size * frequency + hash, (float)y / world.Size * frequency) + 1.0f) / 2;
 	}
-	private float GetPerlin(FastNoise noise, int x, int y, float frequency, float hash)
+	private static float GetPerlin(World world, FastNoise noise, int x, int y, float frequency, float hash)
 	{
-		return noise.GetPerlin((float)x / Size * frequency + hash, (float)y / Size * frequency);
+		return noise.GetPerlin((float)x / world.Size * frequency + hash, (float)y / world.Size * frequency);
 	}
-	public void Generate(List<Sprite> speciesSprites, WorldData data, WorldGenData worldGenData)
+	public static void Generate(World world, List<Sprite> speciesSprites, WorldData data, WorldGenData worldGenData)
 	{
-		Data = data;
-		Init(worldGenData.Size, Data);
+		world.Data = data;
+		world.Init(worldGenData.Size, world.Data);
 
-		ref var state = ref States[0];
+		ref var state = ref world.States[0];
 		FastNoise noise = new FastNoise(67687);
 		noise.SetFrequency(10);
 		state.SeaLevel = 0;
 		int numPlates = 12;
 
 		int numSpecies = 4;
-		SpeciesDisplay[0].Name = "Hot Herb";
-		SpeciesDisplay[0].Color = new Color(100, 60, 20);
-		SpeciesDisplay[0].Sprite = speciesSprites[0];
+		world.SpeciesDisplay[0].Name = "Hot Herb";
+		world.SpeciesDisplay[0].Color = new Color(100, 60, 20);
+		world.SpeciesDisplay[0].Sprite = speciesSprites[0];
 		state.Species[0].Food = SpeciesType.FoodType.Herbivore;
-		state.Species[0].Lifespan = 10 * Data.TicksPerYear;
-		state.Species[0].MovementSpeed = 0.1f / Data.tileSize * Data.SecondsPerTick;
+		state.Species[0].Lifespan = 10 * data.TicksPerYear;
+		state.Species[0].MovementSpeed = 0.1f / data.tileSize * data.SecondsPerTick;
 		state.Species[0].speciesMaxPopulation = 10000;
-		state.Species[0].RestingTemperature = Data.FreezingTemperature + 50;
+		state.Species[0].RestingTemperature = data.FreezingTemperature + 50;
 		state.Species[0].TemperatureRange = 5000;
-		state.Species[0].speciesGrowthRate = 1.0f / Data.TicksPerYear;
-		state.Species[0].speciesEatRate = 1.0f / Data.TicksPerYear / 10000;
-		state.Species[0].starvationSpeed = 12.0f / Data.TicksPerYear;
-		state.Species[0].dehydrationSpeed = 12.0f / Data.TicksPerYear;
+		state.Species[0].speciesGrowthRate = 1.0f / data.TicksPerYear;
+		state.Species[0].speciesEatRate = 1.0f / data.TicksPerYear / 10000;
+		state.Species[0].starvationSpeed = 12.0f / data.TicksPerYear;
+		state.Species[0].dehydrationSpeed = 12.0f / data.TicksPerYear;
 
-		SpeciesDisplay[1].Name = "Basic Beast";
-		SpeciesDisplay[1].Color = new Color(120, 100, 20);
-		SpeciesDisplay[1].Sprite = speciesSprites[0];
+		world.SpeciesDisplay[1].Name = "Basic Beast";
+		world.SpeciesDisplay[1].Color = new Color(120, 100, 20);
+		world.SpeciesDisplay[1].Sprite = speciesSprites[0];
 		state.Species[1].Food = SpeciesType.FoodType.Herbivore;
-		state.Species[1].RestingTemperature = Data.FreezingTemperature + 35;
-		state.Species[1].Lifespan = 20 * Data.TicksPerYear;
-		state.Species[1].MovementSpeed = 0.1f / Data.tileSize * Data.SecondsPerTick;
+		state.Species[1].RestingTemperature = data.FreezingTemperature + 35;
+		state.Species[1].Lifespan = 20 * data.TicksPerYear;
+		state.Species[1].MovementSpeed = 0.1f / data.tileSize * data.SecondsPerTick;
 		state.Species[1].speciesMaxPopulation = 10000;
 		state.Species[1].TemperatureRange = 3000;
-		state.Species[1].speciesGrowthRate = 1.0f / Data.TicksPerYear;
-		state.Species[1].speciesEatRate = 1.0f / Data.TicksPerYear / 10000;
-		state.Species[1].starvationSpeed = 12.0f / Data.TicksPerYear;
-		state.Species[1].dehydrationSpeed = 12.0f / Data.TicksPerYear;
+		state.Species[1].speciesGrowthRate = 1.0f / data.TicksPerYear;
+		state.Species[1].speciesEatRate = 1.0f / data.TicksPerYear / 10000;
+		state.Species[1].starvationSpeed = 12.0f / data.TicksPerYear;
+		state.Species[1].dehydrationSpeed = 12.0f / data.TicksPerYear;
 
-		SpeciesDisplay[2].Name = "Supacold";
-		SpeciesDisplay[2].Color = new Color(60, 20, 100);
-		SpeciesDisplay[2].Sprite = speciesSprites[0];
+		world.SpeciesDisplay[2].Name = "Supacold";
+		world.SpeciesDisplay[2].Color = new Color(60, 20, 100);
+		world.SpeciesDisplay[2].Sprite = speciesSprites[0];
 		state.Species[2].Food = SpeciesType.FoodType.Herbivore;
-		state.Species[2].Lifespan = 15 * Data.TicksPerYear;
-		state.Species[2].MovementSpeed = 0.1f / Data.tileSize * Data.SecondsPerTick;
+		state.Species[2].Lifespan = 15 * data.TicksPerYear;
+		state.Species[2].MovementSpeed = 0.1f / data.tileSize * data.SecondsPerTick;
 		state.Species[2].speciesMaxPopulation = 10000;
-		state.Species[2].RestingTemperature = Data.FreezingTemperature + 20;
+		state.Species[2].RestingTemperature = data.FreezingTemperature + 20;
 		state.Species[2].TemperatureRange = 3000;
-		state.Species[2].speciesGrowthRate = 1.0f / Data.TicksPerYear;
-		state.Species[2].speciesEatRate = 1.0f / Data.TicksPerYear / 10000;
-		state.Species[2].starvationSpeed = 12.0f / Data.TicksPerYear;
-		state.Species[2].dehydrationSpeed = 12.0f / Data.TicksPerYear;
+		state.Species[2].speciesGrowthRate = 1.0f / data.TicksPerYear;
+		state.Species[2].speciesEatRate = 1.0f / data.TicksPerYear / 10000;
+		state.Species[2].starvationSpeed = 12.0f / data.TicksPerYear;
+		state.Species[2].dehydrationSpeed = 12.0f / data.TicksPerYear;
 
-		SpeciesDisplay[3].Name = "Eatasaurus";
-		SpeciesDisplay[3].Color = new Color(255, 0, 50);
-		SpeciesDisplay[3].Sprite = speciesSprites[0];
+		world.SpeciesDisplay[3].Name = "Eatasaurus";
+		world.SpeciesDisplay[3].Color = new Color(255, 0, 50);
+		world.SpeciesDisplay[3].Sprite = speciesSprites[0];
 		state.Species[3].Food = SpeciesType.FoodType.Carnivore;
-		state.Species[3].RestingTemperature = Data.FreezingTemperature + 30;
-		state.Species[3].Lifespan = 15 * Data.TicksPerYear;
-		state.Species[3].MovementSpeed = 0.1f / Data.tileSize * Data.SecondsPerTick;
+		state.Species[3].RestingTemperature = data.FreezingTemperature + 30;
+		state.Species[3].Lifespan = 15 * data.TicksPerYear;
+		state.Species[3].MovementSpeed = 0.1f / data.tileSize * data.SecondsPerTick;
 		state.Species[3].speciesMaxPopulation = 10000;
 		state.Species[3].TemperatureRange = 4000;
-		state.Species[3].speciesGrowthRate = 1.0f / Data.TicksPerYear;
-		state.Species[3].speciesEatRate = 1.0f / Data.TicksPerYear;
-		state.Species[3].starvationSpeed = 12.0f / Data.TicksPerYear;
-		state.Species[3].dehydrationSpeed = 12.0f / Data.TicksPerYear;
+		state.Species[3].speciesGrowthRate = 1.0f / data.TicksPerYear;
+		state.Species[3].speciesEatRate = 1.0f / data.TicksPerYear;
+		state.Species[3].starvationSpeed = 12.0f / data.TicksPerYear;
+		state.Species[3].dehydrationSpeed = 12.0f / data.TicksPerYear;
 		int animalCount = 0;
 
-		for (int y = 0; y < Size; y++)
+		for (int y = 0; y < world.Size; y++)
 		{
-			for (int x = 0; x < Size; x++)
+			for (int x = 0; x < world.Size; x++)
 			{
-				int index = GetIndex(x, y);
+				int index = world.GetIndex(x, y);
 				var e =
-					GetPerlinMinMax(noise, x, y, 0.25f, 0, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.4f +
-					GetPerlinMinMax(noise, x, y, 0.5f, 10, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.3f +
-					GetPerlinMinMax(noise, x, y, 1.0f, 20, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.2f +
-					GetPerlinMinMax(noise, x, y, 2.0f, 30, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.1f;
+					GetPerlinMinMax(world, noise, x, y, 0.25f, 0, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.4f +
+					GetPerlinMinMax(world, noise, x, y, 0.5f, 10, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.3f +
+					GetPerlinMinMax(world, noise, x, y, 1.0f, 20, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.2f +
+					GetPerlinMinMax(world, noise, x, y, 2.0f, 30, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.1f;
 				state.Elevation[index] = e;
-				float latitude = GetLatitude(y);
+				float latitude = world.GetLatitude(y);
 
 				float elevationOrSeaLevel = Math.Max(0, e);
-				float troposphereColumnHeight = Data.troposphereElevation - elevationOrSeaLevel;
-				float troposphereMass = worldGenData.TroposphereMass * troposphereColumnHeight / Data.troposphereElevation;
-				float upperAirColumnHeight = troposphereColumnHeight - Data.BoundaryZoneElevation;
+				float troposphereColumnHeight = data.troposphereElevation - elevationOrSeaLevel;
+				float troposphereMass = worldGenData.TroposphereMass * troposphereColumnHeight / data.troposphereElevation;
+				float upperAirColumnHeight = troposphereColumnHeight - data.BoundaryZoneElevation;
+				float upperAirVolume = data.troposphereElevation - elevationOrSeaLevel - data.BoundaryZoneElevation;
+				float lowerAirVolume = data.BoundaryZoneElevation;
 
-				state.LowerAirTemperature[index] = (1.0f - Mathf.Clamp(e - state.SeaLevel, 0, worldGenData.MaxElevation) / (worldGenData.MaxElevation - state.SeaLevel)) * (1.0f - latitude * latitude) * (Data.MaxTemperature - Data.MinTemperature) + Data.MinTemperature;
-				state.UpperAirTemperature[index] = state.LowerAirTemperature[index] + Data.temperatureLapseRate * (Data.troposphereElevation - elevationOrSeaLevel);
+				state.LowerAirTemperature[index] = (1.0f - Mathf.Clamp(e - state.SeaLevel, 0, worldGenData.MaxElevation) / (worldGenData.MaxElevation - state.SeaLevel)) * (1.0f - latitude * latitude) * (worldGenData.MaxTemperature - worldGenData.MinTemperature) + worldGenData.MinTemperature;
+				state.UpperAirTemperature[index] = state.LowerAirTemperature[index] + data.temperatureLapseRate * (data.troposphereElevation - elevationOrSeaLevel);
 
-				float lowerDensity = Data.LowerAirDensity - (Data.LowerAirDensity - Data.UpperAirDensity) * (elevationOrSeaLevel / Data.troposphereElevation);
-				float upperDensity = Data.LowerAirDensity - (Data.LowerAirDensity - Data.UpperAirDensity) * ((Data.troposphereElevation + (elevationOrSeaLevel + Data.BoundaryZoneElevation)) / 2 / Data.troposphereElevation);
+				float lowerDensity = data.LowerAirDensity - (data.LowerAirDensity - data.UpperAirDensity) * (elevationOrSeaLevel / data.troposphereElevation);
+				float upperDensity = data.UpperAirDensity;
 
 				//upperPressure == lowerPressure;
 
 				//upperMass + lowerMass = troposphereMass;
 
-				//upperMass * upperTemperature * upperDensity * world.Data.MassEarthAir / (Data.troposphereElevation - (elevationOrSeaLevel + Data.BoundaryZoneElevation)) ==
-				//lowerMass * lowerTemperature * lowerDensity * world.Data.MassEarthAir / Data.BoundaryZoneElevation;
+				//upperMass * upperTemperature * world.data.MassEarthAir / (upperDensity * upperAirVolume) ==
+				//lowerMass * lowerTemperature * world.data.MassEarthAir / (lowerDensity * lowerAirVolume);
 
 				//upperMass / lowerMass =
-				//(lowerTemperature * lowerDensity / Data.BoundaryZoneElevation) / 
-				//(upperTemperature * upperDensity / (Data.troposphereElevation - (elevationOrSeaLevel + Data.BoundaryZoneElevation)));
+				//(lowerTemperature / (lowerDensity * lowerAirVolume)) / 
+				//(upperTemperature / (upperDensity * upperAirVolume));
 
 				//upperMass = troposphereMass - lowerMass;
 				//upperMass / lowerMass = troposphereMass / lowerMass - 1;
@@ -131,49 +133,44 @@ public partial class World {
 
 				//lowerMass =
 				//troposphereMass / (1 +
-				//(lowerTemperature * lowerDensity / Data.BoundaryZoneElevation) /
-				//(upperTemperature * upperDensity / (Data.troposphereElevation - (elevationOrSeaLevel + Data.BoundaryZoneElevation))));
+				//(lowerTemperature / (lowerDensity * lowerAirVolume)) /
+				//(upperTemperature / (upperDensity * upperAirVolume)));
 
 				float lowerMass =
 				troposphereMass / (1 +
-				(state.LowerAirTemperature[index] * lowerDensity / Data.BoundaryZoneElevation) /
-				(state.UpperAirTemperature[index] * upperDensity / (Data.troposphereElevation - (elevationOrSeaLevel + Data.BoundaryZoneElevation))));
+				(state.LowerAirTemperature[index] / (lowerDensity * lowerAirVolume)) /
+				(state.UpperAirTemperature[index] / (upperDensity * upperAirVolume)));
 
 				state.StratosphereMass = worldGenData.StratosphereMass;
 				state.UpperAirMass[index] = troposphereMass - lowerMass;
 				state.LowerAirMass[index] = lowerMass;
 
+				state.UpperAirEnergy[index] = Atmosphere.GetAirEnergy(world, state.UpperAirTemperature[index], state.UpperAirMass[index]);
+				state.LowerAirEnergy[index] = Atmosphere.GetAirEnergy(world, state.LowerAirTemperature[index], state.LowerAirMass[index]);
 
+				state.UpperAirPressure[index] = Atmosphere.GetAirPressure(world, state.UpperAirMass[index], state.UpperAirTemperature[index], data.troposphereElevation, upperAirVolume);
+				state.LowerAirPressure[index] = Atmosphere.GetAirPressure(world, state.LowerAirMass[index], state.LowerAirTemperature[index], elevationOrSeaLevel, lowerAirVolume);
 
-				//state.UpperAirMass[index] = (upperAirColumnHeight * Data.UpperAirDensity) / (upperAirColumnHeight * Data.UpperAirDensity + Data.BoundaryZoneElevation * Data.LowerAirDensity) * troposphereMass;
-				//state.LowerAirMass[index] = (Data.BoundaryZoneElevation * Data.LowerAirDensity) / (upperAirColumnHeight * Data.UpperAirDensity + Data.BoundaryZoneElevation * Data.LowerAirDensity) * troposphereMass;
-
-				state.UpperAirEnergy[index] = Atmosphere.GetAirEnergy(this, state.UpperAirTemperature[index], state.UpperAirMass[index]);
-				state.LowerAirEnergy[index] = Atmosphere.GetAirEnergy(this, state.LowerAirTemperature[index], state.LowerAirMass[index]);
-
-				state.UpperAirPressure[index] = Atmosphere.GetAirPressure(this, state.UpperAirMass[index], state.UpperAirTemperature[index], (Data.troposphereElevation + (elevationOrSeaLevel + Data.BoundaryZoneElevation)) / 2, Data.troposphereElevation - (elevationOrSeaLevel + Data.BoundaryZoneElevation));
-				state.LowerAirPressure[index] = Atmosphere.GetAirPressure(this, state.LowerAirMass[index], state.LowerAirTemperature[index], elevationOrSeaLevel, Data.BoundaryZoneElevation);
-
-				state.CloudCover[index] = GetPerlinMinMax(noise, x, y, 3.0f, 2000, 0, 2);
-				state.Humidity[index] = GetPerlinMinMax(noise, x, y, 3.0f, 3000, 0, 2);
+				state.CloudCover[index] = GetPerlinMinMax(world, noise, x, y, 3.0f, 2000, 0, 2);
+				state.Humidity[index] = GetPerlinMinMax(world, noise, x, y, 3.0f, 3000, 0, 2);
 				state.CloudElevation[index] = state.Elevation[index] + 1000;
-				state.WaterTableDepth[index] = GetPerlinMinMax(noise, x, y, 1.0f, 200, Data.MinWaterTableDepth, Data.MaxWaterTableDepth);
-				state.SoilFertility[index] = GetPerlinNormalized(noise, x, y, 1.0f, 400);
+				state.WaterTableDepth[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 200, data.MinWaterTableDepth, data.MaxWaterTableDepth);
+				state.SoilFertility[index] = GetPerlinNormalized(world, noise, x, y, 1.0f, 400);
 				state.SurfaceIce[index] = 0;
 				if (e >= 0)
 				{
-					state.SurfaceWater[index] = GetPerlinMinMax(noise, x, y, 1.0f, 100, 0, 10.0f);
-					state.GroundWater[index] = GetPerlinMinMax(noise, x, y, 1.0f, 300, 0, state.WaterTableDepth[index] * state.SoilFertility[index] * Data.MaxSoilPorousness);
-					state.Canopy[index] = GetPerlinNormalized(noise, x, y, 2.0f, 1000);
+					state.SurfaceWater[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 100, 0, 10.0f);
+					state.GroundWater[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 300, 0, state.WaterTableDepth[index] * state.SoilFertility[index] * data.MaxSoilPorousness);
+					state.Canopy[index] = GetPerlinNormalized(world, noise, x, y, 2.0f, 1000);
 				} else
 				{
-					state.OceanTemperatureShallow[index] = Math.Max(Data.FreezingTemperature, state.LowerAirTemperature[index]);
-					state.OceanEnergyShallow[index] = Atmosphere.GetWaterEnergy(this, state.OceanTemperatureShallow[index], Data.DeepOceanDepth);
-					state.OceanEnergyDeep[index] = Atmosphere.GetWaterEnergy(this, Data.FreezingTemperature + 3, Math.Max(0, -e));
-					state.OceanSalinityShallow[index] = (1.0f - Math.Abs(latitude)) * Data.DeepOceanDepth;
+					state.OceanTemperatureShallow[index] = Math.Max(data.FreezingTemperature, state.LowerAirTemperature[index]);
+					state.OceanEnergyShallow[index] = Atmosphere.GetWaterEnergy(world, state.OceanTemperatureShallow[index], data.DeepOceanDepth);
+					state.OceanEnergyDeep[index] = Atmosphere.GetWaterEnergy(world, data.FreezingTemperature + 3, Math.Max(0, -e));
+					state.OceanSalinityShallow[index] = (1.0f - Math.Abs(latitude)) * data.DeepOceanDepth;
 					float deepOceanVolume = state.SeaLevel - state.Elevation[index];
 					state.OceanSalinityDeep[index] = (Math.Abs(latitude)+1) * deepOceanVolume;
-					state.OceanDensityDeep[index] = Atmosphere.GetOceanDensity(this, state.OceanEnergyDeep[index], state.OceanSalinityDeep[index], deepOceanVolume);
+					state.OceanDensityDeep[index] = Atmosphere.GetOceanDensity(world, state.OceanEnergyDeep[index], state.OceanSalinityDeep[index], deepOceanVolume);
 				}
 			}
 		}
@@ -185,7 +182,7 @@ public partial class World {
 			int p = (int)((noise.GetWhiteNoiseInt(h, 1) * 0.5f + 0.5f) * state.Species[s].speciesMaxPopulation);
 			if (p > 0)
 			{
-				Vector2Int position = new Vector2Int((int)((noise.GetWhiteNoiseInt(h, 2) * 0.5f + 0.5f) * Size), (int)((noise.GetWhiteNoiseInt(h, 3) * 0.5f + 0.5f) * Size));
+				Vector2Int position = new Vector2Int((int)((noise.GetWhiteNoiseInt(h, 2) * 0.5f + 0.5f) * world.Size), (int)((noise.GetWhiteNoiseInt(h, 3) * 0.5f + 0.5f) * world.Size));
 				state.Herds[h] = new Herd() {
 					SpeciesIndex = s,
 					DesiredMutationHealth = 0.5f,
@@ -226,25 +223,25 @@ public partial class World {
 		{
 			const float MaxPlateRadius = 40;
 			const float MinPlateRadius = 2;
-			Vector2Int plateCenter = new Vector2Int((int)(Size * (noise.GetWhiteNoiseInt(i, 0)) / 2 + 0.5f), (int)(Size * (noise.GetWhiteNoiseInt(i, 1) / 2 + 0.5f)));
+			Vector2Int plateCenter = new Vector2Int((int)(world.Size * (noise.GetWhiteNoiseInt(i, 0)) / 2 + 0.5f), (int)(world.Size * (noise.GetWhiteNoiseInt(i, 1) / 2 + 0.5f)));
 			float radius = (noise.GetWhiteNoiseInt(i, 2) / 2 + 0.5f) * (MaxPlateRadius - MinPlateRadius) + MinPlateRadius;
 			for (int x = (int)-Math.Ceiling(radius); x < (int)Math.Ceiling(radius); x++)
 			{
 				for (int y = (int)-Math.Ceiling(radius); y < (int)Math.Ceiling(radius); y++)
 				{
-					Vector2Int pos = new Vector2Int(WrapX(plateCenter.x + x), WrapY(plateCenter.y+ y));
+					Vector2Int pos = new Vector2Int(world.WrapX(plateCenter.x + x), world.WrapY(plateCenter.y+ y));
 					Vector2 diff = new Vector2(x, y);
 					if (diff.SqrMagnitude() <= radius * radius)
 					{
-						state.Plate[GetIndex(pos.x, pos.y)] = i;
+						state.Plate[world.GetIndex(pos.x, pos.y)] = i;
 					}
 				}
 			}
 		}
 
-		for (int i = 1; i < StateCount; i++)
+		for (int i = 1; i < World.StateCount; i++)
 		{
-			States[i] = (State)States[0].Clone();
+			world.States[i] = (World.State)world.States[0].Clone();
 		}
 	}
 }

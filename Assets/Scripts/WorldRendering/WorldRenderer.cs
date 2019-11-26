@@ -285,14 +285,10 @@ public partial class WorldComponent {
 				}
 				else if (showLayers.HasFlag(Layers.LowerAirPressure))
 				{
-					float minPressure = 120;
-					float maxPressure = 220;
 					oceanColor = color = Lerp(new List<CVP> { new CVP(Color.blue, minPressure), new CVP(Color.white, (maxPressure + minPressure) / 2), new CVP(Color.red, maxPressure) }, state.LowerAirPressure[index]);
 				}
 				else if (showLayers.HasFlag(Layers.UpperAirPressure))
 				{
-					float minPressure = 120;
-					float maxPressure = 220;
 					oceanColor = color = Lerp(new List<CVP> { new CVP(Color.blue, minPressure), new CVP(Color.white, (maxPressure + minPressure) / 2), new CVP(Color.red, maxPressure) }, state.UpperAirPressure[index]);
 				}
 				else if (showLayers.HasFlag(Layers.WaterVapor))

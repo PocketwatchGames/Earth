@@ -20,8 +20,8 @@ public class WorldData
 	[Header("Atmosphere")]
 	//public float tradeWindSpeed = 12.0f; // average wind speeds around trade winds around 12 m/s
 										 //	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
-	public float pressureToHorizontalWindSpeed = 5f;
-	public float pressureToVerticalWindSpeed = 10;
+	public float pressureToHorizontalWindSpeed = 1f;
+	public float pressureToVerticalWindSpeed = 1;
 	public float heatLossPreventionCarbonDioxide = 200;
 	public float LowerAirDensity = 1.2f;
 	public float UpperAirDensity = 0.4f;
@@ -34,7 +34,7 @@ public class WorldData
 	// atmospheric heat balance https://energyeducation.ca/encyclopedia/Earth%27s_heat_balance
 	// https://en.wikipedia.org/wiki/Earth%27s_energy_budget
 	public float localSunHeat = 5; // sun can add about 5 degrees celsius
-	public float AtmosphericHeatAbsorption = 0.23f; // total absorbed by atmosphere about 23%
+	public float AtmosphericHeatAbsorption = 0.297f; // total absorbed by atmosphere AFTER reflection about 30%
 	public float AtmosphericHeatReflection = 0.23f;
 	public float EvaporativeHeatLoss = 0.065f; // global average = 78 watts -- TODO: get this in line with average evaportaion (2.5M per year)
 	public float OceanHeatRadiation = 0.00001021f; // global average = 66 watts
@@ -83,6 +83,8 @@ public class WorldData
 	public float canopyGrowthRate = 100.0f;
 	public float canopyDeathRate = 0.2f;
 	public float freshWaterMaxAvailability = 0.1f;
+	public float MinTemperatureCanopy = 223.15f;
+	public float MaxTemperatureCanopy = 323.15f;
 
 	[Header("Animals")]
 	public float populationExpansionPercent = 0.2f;
@@ -101,8 +103,6 @@ public class WorldData
 	public int TicksPerYear = 360;
 	public float tileSize = 400000;
 	public float carbonDioxide = 0.001f;
-	public float MinTemperature = 223.15f;
-	public float MaxTemperature = 323.15f;
 	public float planetTiltAngle = -23.5f;
 	public float troposphereElevation = 10000;
 	public float BoundaryZoneElevation = 1000;

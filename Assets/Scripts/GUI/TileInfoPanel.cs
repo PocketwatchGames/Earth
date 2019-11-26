@@ -45,6 +45,7 @@ public class TileInfoPanel : MonoBehaviour
 		int totalTiles = WorldComponent.World.Size * WorldComponent.World.Size;
 		textGlobal += "GLOBAL";
 		textGlobal += "\nOcean Coverage: " + (state.GlobalOceanCoverage * 100).ToString("0.0") + "%";
+		textGlobal += "\nAtmospheric Mass: " + (state.AtmosphericMass).ToString("0") + "";
 		textGlobal += "\nENERGY";
 		textGlobal += "\nTotal: " + (state.GlobalEnergy).ToString("0");
 		textGlobal += "\nIncoming: " + ConvertTileEnergyToWatts(state.GlobalEnergyIncoming / totalTiles).ToString("0.0");
@@ -53,7 +54,7 @@ public class TileInfoPanel : MonoBehaviour
 		textGlobal += "\nReflected Surf: " + ConvertTileEnergyToWatts(state.GlobalEnergyReflectedSurface / totalTiles).ToString("0.0");
 		textGlobal += "\nAbs Upper Atm: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedUpperAtmosphere / totalTiles).ToString("0.0");
 		textGlobal += "\nAbs Lower Atm: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedLowerAtmosphere / totalTiles).ToString("0.0");
-		textGlobal += "\nAbs Ocean: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedSurface / totalTiles).ToString("0.0");
+		textGlobal += "\nAbs Surface: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedSurface / totalTiles).ToString("0.0");
 
 		if (TileInfoPoint.x >= 0 && TileInfoPoint.x < WorldComponent.World.Size && TileInfoPoint.y >= 0 && TileInfoPoint.y < WorldComponent.World.Size)
 		{
@@ -70,6 +71,7 @@ public class TileInfoPanel : MonoBehaviour
 			textUpperAtmosphere += "UPPER ATMOS";
 			textUpperAtmosphere += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(state.UpperAirTemperature[index], WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 			textUpperAtmosphere += "\nPressure: " + (state.UpperAirPressure[index]).ToString("0.00");
+			textUpperAtmosphere += "\nMass: " + (state.UpperAirMass[index]).ToString("0.00");
 			textUpperAtmosphere += "\nWind: " + (state.UpperWind[index]).ToString();
 			textUpperAtmosphere += "\nCloudCover: " + state.CloudCover[index].ToString("0.00");
 			textUpperAtmosphere += "\nRainfall: " + (state.Rainfall[index] * WorldComponent.World.Data.TicksPerYear).ToString("0.00");
@@ -77,6 +79,7 @@ public class TileInfoPanel : MonoBehaviour
 			textLowerAtmosphere += "LOWER ATMOS";
 			textLowerAtmosphere += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(state.LowerAirTemperature[index], WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 			textLowerAtmosphere += "\nPressure: " + (state.LowerAirPressure[index]).ToString("0.00");
+			textLowerAtmosphere += "\nMass: " + (state.LowerAirMass[index]).ToString("0.00");
 			textLowerAtmosphere += "\nWind: " + (state.LowerWind[index]).ToString();
 			textLowerAtmosphere += "\nHumidity: " + state.Humidity[index].ToString("0.00");
 			textLowerAtmosphere += "\nEvaporation: " + (state.Evaporation[index] * WorldComponent.World.Data.TicksPerYear).ToString("0.00");
