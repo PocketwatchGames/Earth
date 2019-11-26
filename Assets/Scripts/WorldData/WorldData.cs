@@ -17,54 +17,49 @@ public struct WindInfo
 [Serializable]
 public class WorldData
 {
-	[Header("Atmosphere")]
+	[Header("Pressure and Wind")]
 	//public float tradeWindSpeed = 12.0f; // average wind speeds around trade winds around 12 m/s
 										 //	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
-	public float pressureToHorizontalWindSpeed = 2f;
-	public float pressureToVerticalWindSpeed = 5;
-	public float heatLossPreventionCarbonDioxide = 200;
+	public float PressureToHorizontalWindSpeed = 1f;
+	public float PressureToVerticalWindSpeed = 5;
 	public float LowerAirDensity = 1.2f;
 	public float UpperAirDensity = 0.4f;
-	public float massWindMovement = 0.0002f;
 	public float MaxTerrainNormalForFriction = 0.25f;
+	public float AirDispersalSpeed = 0.1f;
+	public float HumidityDispersalSpeed = 0.01f;
 	public float WindLandFrictionMinimum = 0.2f;
-	public float airDispersalSpeed = 0.1f;
-	public float humidityDispersalSpeed = 0.01f;
+	public float WindAirMovement = 0.00002f;
+	public float WindHumidityMovement = 0.00002f;
+	public float WindCloudMovement = 0.01f;
 
+	[Header("Atmospheric Energy Cycle")]
 	// atmospheric heat balance https://energyeducation.ca/encyclopedia/Earth%27s_heat_balance
 	// https://en.wikipedia.org/wiki/Earth%27s_energy_budget
-	public float localSunHeat = 5; // sun can add about 5 degrees celsius
 	public float AtmosphericHeatAbsorption = 0.297f; // total absorbed by atmosphere AFTER reflection about 30%
 	public float AtmosphericHeatReflection = 0.23f;
-	public float EvaporativeHeatLoss = 0.065f; // global average = 78 watts -- TODO: get this in line with average evaportaion (2.5M per year)
+	public float CloudContentFullAbsorption = 5.0f; // how much heat gain/loss is caused by cloud cover
+	public float CloudAbsorptionRate = 0.06f; // 6% absorbed by clouds
+	public float CloudReflectionRate = 0.20f; // 20% reflected back to space
+	public float EvaporativeHeatLoss = 0.065f; // global average = 78 watts
 	public float OceanHeatRadiation = 0.00001021f; // global average = 66 watts
 	public float OceanAirConduction = 1.3824f; // global avg = 16 watts per degree delta between air and ocean
 	public float OceanIceConduction = 0.01f; // small
-	public float AlbedoWater = 0.06f; // How much heat is reflected back by the water
-	public float AlbedoIce = 0.5f; // How much heat is reflected back by the water
-	public float AlbedoLand = 0.4f;
-	public float AlbedoReductionSoilQuality = 0.15f;
-	public float AlbedoFoliage = 0.1f;
 	public float AtmosphericHeatLossToSpace = 0.000001024f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
-	public float LandRadiation = 0.5f;
+	public float HeatLossPreventionCarbonDioxide = 200;
+	public float localSunHeat = 5; // sun can add about 5 degrees celsius
 
-	[Header("Water Vapor")]
-	public float EvapRateWind = 1.0f;
-	public float EvapRateTemperature = 1.0f;
-	public float dewPointTemperatureRange = 100.0f;
-	public float dewPointRange = 0.06f;
-	public float RainfallRate = 10.0f;
-	public float cloudContentFullAbsorption = 5.0f; // how much heat gain/loss is caused by cloud cover
-	public float cloudAbsorptionRate = 0.06f; // 6% absorbed by clouds
-	public float cloudReflectionRate = 0.20f; // 20% reflected back to space
-	public float evapMinTemperature = 253; // -20 celsius
-	public float evapMaxTemperature = 413; // 140 celsius
+	[Header("Evap, Humidity and Clouds")]
+	public float HumidityToCloudSpeed = 0.1f;
+	public float CloudElevationSpeed = 100.0f;
+	public float DewPointTemperatureRange = 100.0f;
+	public float DewPointRange = 0.06f;
+	public float DewPointZero = 213.0f;
+	public float RainfallRate = 0.1f;
+	public float EvapMinTemperature = 253; // -20 celsius
+	public float EvapMaxTemperature = 413; // 140 celsius
+	public float EvaporationRate = 0.01f; // evaporation on earth maxes out around 2.5M per year
 	public float evapTemperatureRange;
 	public float rainPointTemperatureMultiplier = 0.00075f; // adjustment for temperature
-	public float humidityLossFromWind = 0.1f;
-	public float cloudMovementFromWind = 20.0f;
-	public float cloudElevationDeltaSpeed = 10.0f;
-	public float windVerticalCloudSpeedMultiplier = 100000;
 
 	[Header("Ocean")]
 	public float DeepOceanDepth = 500;
@@ -79,6 +74,15 @@ public class WorldData
 	public float OceanDensityPerTemperature = 10.0f;
 	public float FullIceCoverage = 1.0f;
 
+	[Header("Fresh Water")]
+	public float FlowSpeed = 10.0f; // mississippi travels at around 3 km/h
+	public float FlowSpeedExponent = 0.25f; // arbitrary exponent to make flow speeds work at lower gradients
+	public float MaxWaterTableDepth = 1000.0f; // There is still a lot of water below a kilometer, but it's generally not worth simulating
+	public float MinWaterTableDepth = 0.0f;
+	public float MaxSoilPorousness = 0.1f;
+	public float GroundWaterReplenishmentSpeed = 10.0f;
+	public float GroundWaterFlowSpeed = 0.5f;
+
 	[Header("Ecology")]
 	public float canopyGrowthRate = 100.0f;
 	public float canopyDeathRate = 0.2f;
@@ -90,42 +94,40 @@ public class WorldData
 	public float populationExpansionPercent = 0.2f;
 	public float minPopulationDensityForExpansion = 0.1f;
 
-	[Header("Water")]
-	public float FlowSpeed = 10.0f; // mississippi travels at around 3 km/h
-	public float FlowSpeedExponent = 0.25f; // arbitrary exponent to make flow speeds work at lower gradients
-	public float MaxWaterTableDepth = 1000.0f; // There is still a lot of water below a kilometer, but it's generally not worth simulating
-	public float MinWaterTableDepth = 0.0f;
-	public float MaxSoilPorousness = 0.1f;
-	public float GroundWaterReplenishmentSpeed = 10.0f;
-	public float GroundWaterFlowSpeed = 0.5f;
-
 	[Header("Planetary")]
 	public int TicksPerYear = 360;
 	public float tileSize = 400000;
-	public float carbonDioxide = 0.001f;
-	public float planetTiltAngle = -23.5f;
 	public float troposphereElevation = 10000;
 	public float BoundaryZoneElevation = 1000;
 	public float stratosphereElevation = 50000;
 	public float MaxTropopauseElevation = 17000f;
 	public float MinTropopauseElevation = 9000f;
 	public float TropopauseElevationSeason = 1000f;
-	public float troposphereAtmosphereContent = 0.8f;
 	public float temperatureLapseRate = -0.0065f;
 	public float GravitationalAcceleration = 9.80665f;
 	public float StaticPressure = 101325;
 	public float StdTemp = 288.15f;
 	public float MolarMassEarthAir = 0.0289644f;
 	public float UniversalGasConstant = 8.3144598f;
-	public float dewPointZero = 213.0f;
-	public float MassEarthAir = 1.29f;
-	public float MassSeaWater = 1024f;
-	public float MassIce = 919f;
+	public float FreezingTemperature = 273.15f;
+
+	[Header("Albedo")]
+	public float AlbedoWater = 0.06f; // How much heat is reflected back by the water
+	public float AlbedoIce = 0.5f; // How much heat is reflected back by the water
+	public float AlbedoLand = 0.4f;
+	public float AlbedoReductionSoilQuality = 0.15f;
+	public float AlbedoFoliage = 0.1f;
+
+	[Header("Specific Heats")]
 	public float SpecificHeatIce = 2.108f; // specific heat is joules to raise one degree
 	public float SpecificHeatSeaWater = 3.85f; // specific heat is joules to raise one degree
 	public float SpecificHeatAtmosphere = 1.158f; // specific heat is joules to raise one degree
-	public float FreezingTemperature = 273.15f;
-	public float SolarRadiation = 118; // extraterrestrial solar radiation // https://en.wikipedia.org/wiki/Sunlight (1367 w/m^2) *seconds per day (86400)
+
+	[Header("Masses")]
+	public float MassEarthAir = 1.29f;
+	public float MassSeaWater = 1024f;
+	public float MassIce = 919f;
+
 
 	[NonSerialized]
 	public WindInfo[] windInfo;
@@ -148,19 +150,11 @@ public class WorldData
 		canopyGrowthRate /= TicksPerYear;
 		canopyDeathRate /= TicksPerYear;
 
-		EvapRateWind /= TicksPerYear;
-		EvapRateTemperature /= TicksPerYear;
-		RainfallRate /= TicksPerYear;
 		FlowSpeed /= (tileSize / 1000) * TicksPerHour; // mississippi travels at around 3 km/h
 		GroundWaterReplenishmentSpeed /= TicksPerYear;
 		GroundWaterFlowSpeed /= TicksPerYear;
-		planetTiltAngle = Mathf.Deg2Rad * planetTiltAngle;
 
-		evapTemperatureRange = evapMaxTemperature - evapMinTemperature;
-		humidityLossFromWind *= SecondsPerTick / tileSize / TicksPerYear;
-		cloudMovementFromWind *= SecondsPerTick / tileSize / TicksPerYear;
-		cloudElevationDeltaSpeed /= TicksPerYear;
-		windVerticalCloudSpeedMultiplier /= TicksPerYear;
+		evapTemperatureRange = EvapMaxTemperature - EvapMinTemperature;
 		PressureExponent = GravitationalAcceleration * MolarMassEarthAir / (UniversalGasConstant * temperatureLapseRate);
 
 

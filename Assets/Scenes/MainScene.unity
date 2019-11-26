@@ -14205,47 +14205,44 @@ MonoBehaviour:
     TroposphereMass: 7749
     MinTemperature: 253.15
     MaxTemperature: 323.15
+    CarbonDioxide: 0.001
+    PlanetTiltAngle: -23.5
+    SolarRadiation: 118
   Data:
-    pressureToHorizontalWindSpeed: 2
-    pressureToVerticalWindSpeed: 5
-    heatLossPreventionCarbonDioxide: 200
+    PressureToHorizontalWindSpeed: 1
+    PressureToVerticalWindSpeed: 5
     LowerAirDensity: 1.2
     UpperAirDensity: 0.4
-    massWindMovement: 0.00002
     MaxTerrainNormalForFriction: 0.25
+    AirDispersalSpeed: 0.1
+    HumidityDispersalSpeed: 0.01
     WindLandFrictionMinimum: 0.2
-    airDispersalSpeed: 0.1
-    humidityDispersalSpeed: 0.01
-    localSunHeat: 5
+    WindAirMovement: 0.00002
+    WindHumidityMovement: 0.00002
+    WindCloudMovement: 0.01
     AtmosphericHeatAbsorption: 0.297
     AtmosphericHeatReflection: 0.23
+    CloudContentFullAbsorption: 5
+    CloudAbsorptionRate: 0.06
+    CloudReflectionRate: 0.2
     EvaporativeHeatLoss: 0.065
     OceanHeatRadiation: 0.00001021
     OceanAirConduction: 1.3824
     OceanIceConduction: 0.01
-    AlbedoWater: 0.06
-    AlbedoIce: 0.5
-    AlbedoLand: 0.4
-    AlbedoReductionSoilQuality: 0.15
-    AlbedoFoliage: 0.1
     AtmosphericHeatLossToSpace: 0.000001024
-    LandRadiation: 0.5
-    EvapRateWind: 1
-    EvapRateTemperature: 1
-    dewPointTemperatureRange: 100
-    dewPointRange: 0.06
-    RainfallRate: 10
-    cloudContentFullAbsorption: 5
-    cloudAbsorptionRate: 0.06
-    cloudReflectionRate: 0.2
-    evapMinTemperature: 253
-    evapMaxTemperature: 413
+    HeatLossPreventionCarbonDioxide: 200
+    localSunHeat: 5
+    HumidityToCloudSpeed: 0.1
+    CloudElevationSpeed: 100
+    DewPointTemperatureRange: 100
+    DewPointRange: 0.06
+    DewPointZero: 213
+    RainfallRate: 0.01
+    EvapMinTemperature: 253
+    EvapMaxTemperature: 413
+    EvaporationRate: 0.0001
     evapTemperatureRange: 0
     rainPointTemperatureMultiplier: 0.00075
-    humidityLossFromWind: 0.1
-    cloudMovementFromWind: 20
-    cloudElevationDeltaSpeed: 10
-    windVerticalCloudSpeedMultiplier: 100000
     DeepOceanDepth: 500
     WindToOceanCurrentFactor: 0.1
     OceanEnergyCurrentSpeed: 0.001
@@ -14257,13 +14254,6 @@ MonoBehaviour:
     OceanDensityPerSalinity: 1
     OceanDensityPerTemperature: 10
     FullIceCoverage: 1
-    canopyGrowthRate: 100
-    canopyDeathRate: 0.2
-    freshWaterMaxAvailability: 0.1
-    MinTemperatureCanopy: 223.15
-    MaxTemperatureCanopy: 323.15
-    populationExpansionPercent: 0.2
-    minPopulationDensityForExpansion: 0.1
     FlowSpeed: 10
     FlowSpeedExponent: 0.25
     MaxWaterTableDepth: 1000
@@ -14271,32 +14261,39 @@ MonoBehaviour:
     MaxSoilPorousness: 0.1
     GroundWaterReplenishmentSpeed: 10
     GroundWaterFlowSpeed: 0.5
+    canopyGrowthRate: 100
+    canopyDeathRate: 0.2
+    freshWaterMaxAvailability: 0.1
+    MinTemperatureCanopy: 223.15
+    MaxTemperatureCanopy: 323.15
+    populationExpansionPercent: 0.2
+    minPopulationDensityForExpansion: 0.1
     TicksPerYear: 360
     tileSize: 400000
-    carbonDioxide: 0.001
-    planetTiltAngle: -23.5
     troposphereElevation: 10000
     BoundaryZoneElevation: 1000
     stratosphereElevation: 50000
     MaxTropopauseElevation: 17000
     MinTropopauseElevation: 9000
     TropopauseElevationSeason: 1000
-    troposphereAtmosphereContent: 0.8
     temperatureLapseRate: -0.0065
     GravitationalAcceleration: 9.80665
     StaticPressure: 101325
     StdTemp: 288.15
     MolarMassEarthAir: 0.0289644
     UniversalGasConstant: 8.31446
-    dewPointZero: 213
-    MassEarthAir: 1.29
-    MassSeaWater: 1024
-    MassIce: 919
+    FreezingTemperature: 273.15
+    AlbedoWater: 0.06
+    AlbedoIce: 0.5
+    AlbedoLand: 0.4
+    AlbedoReductionSoilQuality: 0.15
+    AlbedoFoliage: 0.1
     SpecificHeatIce: 2.108
     SpecificHeatSeaWater: 3.85
     SpecificHeatAtmosphere: 1.158
-    FreezingTemperature: 273.15
-    SolarRadiation: 118
+    MassEarthAir: 1.29
+    MassSeaWater: 1024
+    MassIce: 919
   ShowLayers: 8602
   ElevationScale: 0.002
   MinZoom: 5

@@ -77,6 +77,9 @@ public partial class World {
 		public float AtmosphereN;
 		public float SeaLevel;
 		public float StratosphereMass;
+		public float CarbonDioxide;
+		public float PlanetTiltAngle;
+		public float SolarRadiation;
 
 		public SpeciesType[] Species;
 		public SpeciesStat[] SpeciesStats;
@@ -144,6 +147,9 @@ public partial class World {
 			o.GlobalTemperature = GlobalTemperature;
 			o.SeaLevel = SeaLevel;
 			o.StratosphereMass = StratosphereMass;
+			o.CarbonDioxide = CarbonDioxide;
+			o.PlanetTiltAngle = PlanetTiltAngle;
+			o.SolarRadiation = SolarRadiation;
 			o.GlobalEnergyIncoming = GlobalEnergyIncoming;
 			o.GlobalEnergyReflectedAtmosphere = GlobalEnergyReflectedAtmosphere;
 			o.GlobalEnergyReflectedSurface = GlobalEnergyReflectedSurface;

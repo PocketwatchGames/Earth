@@ -294,17 +294,35 @@ public partial class WorldComponent {
 				else if (showLayers.HasFlag(Layers.WaterVapor))
 				{
 					float maxHumidity = 15;
-					oceanColor = color = Color.Lerp(Color.black, Color.blue, Math.Min(1.0f, state.Humidity[index] / maxHumidity));
+					float humidityDisplay = state.Humidity[index] / maxHumidity;
+					color = oceanColor = Lerp(new List<CVP> {
+											new CVP(Color.black, 0),
+											new CVP(Color.blue, 0.2f),
+											new CVP(Color.green, 0.4f),
+											new CVP(Color.yellow, 0.6f),
+											new CVP(Color.red, 0.8f),
+											new CVP(Color.white, 1) }, 
+											humidityDisplay);
 				}
 				else if (showLayers.HasFlag(Layers.RelativeHumidity))
 				{
 					float timeOfYear = World.GetTimeOfYear(state.Ticks);
-					float declinationOfSun = Atmosphere.GetDeclinationOfSun(World.Data.planetTiltAngle, timeOfYear);
+					float declinationOfSun = Atmosphere.GetDeclinationOfSun(state.PlanetTiltAngle, timeOfYear);
 					float lengthOfDay = Atmosphere.GetLengthOfDay(World.GetLatitude(y), timeOfYear, declinationOfSun);
-					var sunVector = Atmosphere.GetSunVector(World, state.Ticks, World.GetLatitude(y)).z;
+					var sunVector = Atmosphere.GetSunVector(World, state.PlanetTiltAngle, state.Ticks, World.GetLatitude(y)).z;
 					float localTemperature = Atmosphere.GetLocalTemperature(World, Math.Max(0, sunVector), state.CloudCover[index], state.LowerAirTemperature[index], lengthOfDay);
-					float relativeHumidity = Atmosphere.GetRelativeHumidity(World, localTemperature, state.Humidity[index], state.CloudElevation[index], Math.Max(elevation, state.SeaLevel));
-					oceanColor = color = Color.Lerp(Color.black, Color.blue, Math.Min(1.0f, relativeHumidity / World.Data.dewPointRange));
+					float relativeHumidity = Atmosphere.GetRelativeHumidity(World, localTemperature, state.Humidity[index], state.LowerAirPressure[index]);
+
+					float humidityDisplay = relativeHumidity / World.Data.DewPointRange;
+					color = oceanColor = Lerp(new List<CVP> {
+											new CVP(Color.black, 0),
+											new CVP(Color.blue, 0.2f),
+											new CVP(Color.green, 0.4f),
+											new CVP(Color.yellow, 0.6f),
+											new CVP(Color.red, 0.8f),
+											new CVP(Color.white, 1) }, 
+											humidityDisplay);
+
 				}
 				else if (showLayers.HasFlag(Layers.Rainfall))
 				{
@@ -364,20 +382,22 @@ public partial class WorldComponent {
 				{
 					color = oceanColor = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.red, 0.5f),
-											new CVP(Color.blue, 1),
-											new CVP(Color.green, 1.5f),
-											new CVP(Color.white, 2) },
+											new CVP(Color.blue, 0.5f),
+											new CVP(Color.green, 1),
+											new CVP(Color.yellow, 1.5f),
+											new CVP(Color.red, 2f),
+											new CVP(Color.white, 2.5f) },
 						elevation < state.SeaLevel ? state.OceanSalinityShallow[index] / World.Data.DeepOceanDepth : 0);
 				} 
 				else if (showLayers.HasFlag(Layers.OceanSalinityDeep))
 				{
 					color = oceanColor = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.red, 0.5f),
-											new CVP(Color.blue, 1),
-											new CVP(Color.green, 1.5f),
-											new CVP(Color.white, 2) },
+											new CVP(Color.blue, 0.5f),
+											new CVP(Color.green, 1),
+											new CVP(Color.yellow, 1.5f),
+											new CVP(Color.red, 2f),
+											new CVP(Color.white, 2.5f) },
 						elevation < state.SeaLevel ? state.OceanSalinityDeep[index] / (state.SeaLevel - elevation) : 0);
 				}
 
@@ -398,7 +418,7 @@ public partial class WorldComponent {
 				{
 					cloudCols[index].a = 0;
 				}
-				cloudVerts[index].z = -Mathf.Max(elevation+1, state.CloudElevation[index]) * ElevationScale;
+				cloudVerts[index].z = -Mathf.Max(Math.Max(elevation, state.SeaLevel)+1, state.CloudElevation[index]) * ElevationScale;
 				if (showLayers.HasFlag(Layers.LowerAirWind))
 				{
 					var wind = state.LowerWind[index];

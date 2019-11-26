@@ -141,7 +141,10 @@ public static class WorldGen {
 				(state.LowerAirTemperature[index] / (lowerDensity * lowerAirVolume)) /
 				(state.UpperAirTemperature[index] / (upperDensity * upperAirVolume)));
 
+				state.SolarRadiation = worldGenData.SolarRadiation;
 				state.StratosphereMass = worldGenData.StratosphereMass;
+				state.CarbonDioxide = worldGenData.CarbonDioxide;
+				state.PlanetTiltAngle = Mathf.Deg2Rad * worldGenData.PlanetTiltAngle;
 				state.UpperAirMass[index] = troposphereMass - lowerMass;
 				state.LowerAirMass[index] = lowerMass;
 

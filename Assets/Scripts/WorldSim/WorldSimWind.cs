@@ -25,15 +25,15 @@ namespace Sim {
 
 					// within 1 km of the ground, frictional forces slow wind down
 					var pressureGradientUpper = GetPressureGradient(world, x, y, state.UpperAirPressure, upperPressure);
-					nextState.UpperWind[index] = Quaternion.Euler(0, 0, windInfo.coriolisPower * 90) * pressureGradientUpper * world.Data.pressureToHorizontalWindSpeed / world.Data.UpperAirDensity;
+					nextState.UpperWind[index] = Quaternion.Euler(0, 0, windInfo.coriolisPower * 90) * pressureGradientUpper * world.Data.PressureToHorizontalWindSpeed / world.Data.UpperAirDensity;
 
 					var normal = state.Normal[index];
 					float friction = world.Data.WindLandFrictionMinimum + (1.0f - world.Data.WindLandFrictionMinimum) * Mathf.Clamp01((1.0f - normal.z) / world.Data.MaxTerrainNormalForFriction);
 					float speedReduction = (1.0f - friction) / world.Data.LowerAirDensity;
 					var pressureGradientLower = GetPressureGradient(world, x, y, state.LowerAirPressure, lowerPressure);
-					var lowerWind = Quaternion.Euler(0, 0, windInfo.coriolisPower * 90 * speedReduction) * pressureGradientLower * world.Data.pressureToHorizontalWindSpeed * speedReduction;
+					var lowerWind = Quaternion.Euler(0, 0, windInfo.coriolisPower * 90 * speedReduction) * pressureGradientLower * world.Data.PressureToHorizontalWindSpeed * speedReduction;
 
-					lowerWind.z = (lowerPressure - upperPressure) * world.Data.pressureToVerticalWindSpeed;
+					lowerWind.z = (lowerPressure - upperPressure) * world.Data.PressureToVerticalWindSpeed;
 
 					nextState.LowerWind[index] = lowerWind;
 

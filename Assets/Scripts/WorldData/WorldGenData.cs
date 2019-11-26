@@ -15,5 +15,8 @@ public class WorldGenData {
 	public float TroposphereMass = 7749;
 	public float MinTemperature = 253.15f;
 	public float MaxTemperature = 323.15f;
+	public float CarbonDioxide = 0.001f;
+	public float PlanetTiltAngle = -23.5f;
+	public float SolarRadiation = 118; // extraterrestrial solar radiation // https://en.wikipedia.org/wiki/Sunlight (1367 w/m^2) *seconds per day (86400)
 
 }
