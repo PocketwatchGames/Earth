@@ -109,8 +109,7 @@ public partial class World {
 		public float[] OceanTemperatureShallow;
 		public Vector3[] OceanCurrentShallow;
 		public Vector3[] OceanCurrentDeep;
-		public float[] SurfaceIce;
-		public float[] SubmergedIce;
+		public float[] Ice;
 		public float[] SoilFertility;
 		public float[] Canopy;
 		public float[] Radiation;
@@ -188,8 +187,7 @@ public partial class World {
 			o.OceanEnergyDeep = (float[])OceanEnergyDeep.Clone();
 			o.OceanEnergyShallow = (float[])OceanEnergyShallow.Clone();
 			o.OceanTemperatureShallow = (float[])OceanTemperatureShallow.Clone();
-			o.SurfaceIce = (float[])SurfaceIce.Clone();
-			o.SubmergedIce = (float[])SubmergedIce.Clone();
+			o.Ice = (float[])Ice.Clone();
 			o.SoilFertility = (float[])SoilFertility.Clone();
 			o.Canopy = (float[])Canopy.Clone();
 			o.Radiation = (float[])Radiation.Clone();
@@ -259,8 +257,7 @@ public partial class World {
 			States[i].OceanEnergyDeep = new float[s];
 			States[i].OceanEnergyShallow = new float[s];
 			States[i].OceanTemperatureShallow = new float[s];
-			States[i].SurfaceIce = new float[s];
-			States[i].SubmergedIce = new float[s];
+			States[i].Ice = new float[s];
 			States[i].SoilFertility = new float[s];
 			States[i].Canopy = new float[s];
 			States[i].LowerWind = new Vector3[s];

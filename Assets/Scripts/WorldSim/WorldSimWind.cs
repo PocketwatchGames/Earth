@@ -39,7 +39,7 @@ namespace Sim {
 
 					if (world.IsOcean(state.Elevation[index], state.SeaLevel))
 					{
-						if (state.SurfaceIce[index] == 0)
+						if (state.Ice[index] == 0)
 						{
 							nextState.OceanCurrentShallow[index] = Quaternion.Euler(0, 0, windInfo.coriolisPower * 90) * new Vector3(lowerWind.x, lowerWind.y, 0) * world.Data.WindToOceanCurrentFactor;
 						}

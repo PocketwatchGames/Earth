@@ -63,6 +63,10 @@ public partial class WorldComponent : MonoBehaviour
 	public TemperatureDisplayType TemperatureDisplay;
 	public float minPressure = 300;
 	public float maxPressure = 600;
+	public float MinElevation = -11000;
+	public float MaxElevation = 10000;
+	public float maxHumidity = 3;
+	public float maxRainfall = 5.0f;
 
 
 	[Header("Internal")]

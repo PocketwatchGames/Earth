@@ -155,11 +155,11 @@ public static class WorldGen {
 				state.LowerAirPressure[index] = Atmosphere.GetAirPressure(world, state.LowerAirMass[index], state.LowerAirTemperature[index], elevationOrSeaLevel, lowerAirVolume);
 
 				state.CloudCover[index] = GetPerlinMinMax(world, noise, x, y, 3.0f, 2000, 0, 2);
-				state.Humidity[index] = GetPerlinMinMax(world, noise, x, y, 3.0f, 3000, 0, 2);
+				state.Humidity[index] = GetPerlinMinMax(world, noise, x, y, 3.0f, 3000, 0, 3) * Mathf.Cos(Mathf.PI / 2 * latitude);
 				state.CloudElevation[index] = state.Elevation[index] + 1000;
 				state.WaterTableDepth[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 200, data.MinWaterTableDepth, data.MaxWaterTableDepth);
 				state.SoilFertility[index] = GetPerlinNormalized(world, noise, x, y, 1.0f, 400);
-				state.SurfaceIce[index] = 0;
+				state.Ice[index] = 0;
 				if (e >= 0)
 				{
 					state.SurfaceWater[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 100, 0, 10.0f);

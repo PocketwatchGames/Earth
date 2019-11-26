@@ -50,6 +50,7 @@ public class WorldData
 
 	[Header("Evap, Humidity and Clouds")]
 	public float HumidityToCloudSpeed = 0.1f;
+	public float CloudToHumiditySpeed = 0.01f;
 	public float CloudElevationSpeed = 100.0f;
 	public float DewPointTemperatureRange = 100.0f;
 	public float DewPointRange = 0.06f;

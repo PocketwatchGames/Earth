@@ -58,7 +58,7 @@ namespace Sim {
 					float cloudElevation = state.CloudElevation[index];
 					float waterTableDepth = state.WaterTableDepth[index];
 					float soilFertility = state.SoilFertility[index];
-					float surfaceIce = state.SurfaceIce[index];
+					float surfaceIce = state.Ice[index];
 					float radiation = 0.001f;
 					float oceanEnergyDeep = state.OceanEnergyDeep[index];
 					float oceanEnergyShallow = state.OceanEnergyShallow[index];
@@ -200,7 +200,6 @@ namespace Sim {
 								// evaporation
 								float evapRate = GetEvaporationRate(world, surfaceIce, lowerAirTemperature, relativeHumidity, lowerAirPressure);
 								EvaporateWater(world, evapRate, elevation, state.SeaLevel, groundWater, waterTableDepth, ref newHumidity, ref newLowerAirEnergy, ref newOceanEnergyShallow, ref newGroundWater, ref newSurfaceWater, out evaporation);
-								MoveHumidityToClouds(world, humidity, relativeHumidity, lowerWind, ref newHumidity, ref newCloudCover);
 
 							}
 						}
@@ -273,6 +272,7 @@ namespace Sim {
 						}
 					}
 
+					MoveHumidityToClouds(world, world.IsOcean(elevation, state.SeaLevel), surfaceIce, humidity, relativeHumidity, lowerWind, cloudCover, lowerAirTemperature, ref newSurfaceWater, ref newSurfaceIce, ref newHumidity, ref newCloudCover);
 					MoveAtmosphereOnWind(world, state, x, y, elevationOrSeaLevel, lowerAirEnergy, upperAirEnergy, lowerAirMass, upperAirMass, lowerWind, upperWind, humidity, cloudCover, ref newLowerAirEnergy, ref newUpperAirEnergy, ref newLowerAirMass, ref newUpperAirMass, ref newHumidity, ref newCloudCover);
 
 					// lose some energy to space
@@ -301,7 +301,7 @@ namespace Sim {
 					nextState.LowerAirMass[index] = newLowerAirMass;
 					nextState.UpperAirMass[index] = newUpperAirMass;
 					nextState.SurfaceWater[index] = newSurfaceWater;
-					nextState.SurfaceIce[index] = newSurfaceIce;
+					nextState.Ice[index] = newSurfaceIce;
 					nextState.GroundWater[index] = newGroundWater;
 					nextState.Humidity[index] = newHumidity;
 					nextState.CloudCover[index] = newCloudCover;
@@ -347,10 +347,11 @@ namespace Sim {
 			nextState.AtmosphericMass = atmosphericMass;
 		}
 
+		// TODO: change this to use true atmospheric pressure
 		static public float GetAirPressure(World world, float mass, float temperature, float elevation, float volume)
 		{
 			float density = world.Data.LowerAirDensity - (world.Data.LowerAirDensity - world.Data.UpperAirDensity) * (elevation / world.Data.troposphereElevation);
-			float pressure = (float)(mass * temperature * world.Data.MassEarthAir / (volume * density));
+			float pressure = mass * temperature * world.Data.MassEarthAir / (volume * density);
 			return pressure;
 		}
 
@@ -399,11 +400,26 @@ namespace Sim {
 
 
 
-		static private void MoveHumidityToClouds(World world, float humidity, float relativeHumidity, Vector3 windAtSurface, ref float newHumidity, ref float newCloudCover)
+		static private void MoveHumidityToClouds(World world, bool isOcean, float ice, float humidity, float relativeHumidity, Vector3 windAtSurface, float cloudCover, float temperature, ref float newSurfaceWater, ref float newIce, ref float newHumidity, ref float newCloudCover)
 		{
-			float humidityToCloud = humidity * Mathf.Clamp01(windAtSurface.z * relativeHumidity * world.Data.HumidityToCloudSpeed);
-			newHumidity -= humidityToCloud;
-			newCloudCover += humidityToCloud;
+			// condensation
+			if (relativeHumidity > 1) {
+				float humidityToGround = humidity * Mathf.Max(1.0f, (relativeHumidity - 1) / relativeHumidity);
+				humidity -= humidityToGround;
+				newHumidity -= humidityToGround;
+				if (temperature <= world.Data.FreezingTemperature)
+				{
+					newIce += humidityToGround;
+				} else if (!isOcean)
+				{
+					newSurfaceWater += humidityToGround;
+				}
+			}
+
+			float humidityTransfer = humidity * Mathf.Clamp01(windAtSurface.z * relativeHumidity * world.Data.HumidityToCloudSpeed);
+			float cloudTransfer = cloudCover * world.Data.CloudToHumiditySpeed;
+			newHumidity -= humidityTransfer - cloudTransfer;
+			newCloudCover += humidityTransfer - cloudTransfer;
 		}
 
 		static private void UpdateCloudElevation(World world, float elevationOrSeaLevel, float temperature, float humidity, float atmosphereMass, Vector3 windAtCloudElevation, ref float newCloudElevation)

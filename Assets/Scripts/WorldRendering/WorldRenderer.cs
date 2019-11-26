@@ -67,9 +67,6 @@ public partial class WorldComponent {
 		new Color(0,0.5f,1),
 	};
 
-	public const float MinElevation = -11000;
-	public const float MaxElevation = 10000;
-
 	void CreateWorldMesh()
 	{
 		landVerts = new Vector3[World.Size * World.Size];
@@ -164,7 +161,7 @@ public partial class WorldComponent {
 				Color oceanColor;
 				Color color = Color.white;
 				float elevation = state.Elevation[index];
-				float ice = state.SurfaceIce[index];
+				float ice = state.Ice[index];
 				float normalizedElevation = (elevation - MinElevation) / (MaxElevation - MinElevation);
 				bool drawOcean = elevation < state.SeaLevel && showLayers.HasFlag(Layers.Water);
 
@@ -293,7 +290,6 @@ public partial class WorldComponent {
 				}
 				else if (showLayers.HasFlag(Layers.WaterVapor))
 				{
-					float maxHumidity = 15;
 					float humidityDisplay = state.Humidity[index] / maxHumidity;
 					color = oceanColor = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
@@ -306,27 +302,19 @@ public partial class WorldComponent {
 				}
 				else if (showLayers.HasFlag(Layers.RelativeHumidity))
 				{
-					float timeOfYear = World.GetTimeOfYear(state.Ticks);
-					float declinationOfSun = Atmosphere.GetDeclinationOfSun(state.PlanetTiltAngle, timeOfYear);
-					float lengthOfDay = Atmosphere.GetLengthOfDay(World.GetLatitude(y), timeOfYear, declinationOfSun);
-					var sunVector = Atmosphere.GetSunVector(World, state.PlanetTiltAngle, state.Ticks, World.GetLatitude(y)).z;
-					float localTemperature = Atmosphere.GetLocalTemperature(World, Math.Max(0, sunVector), state.CloudCover[index], state.LowerAirTemperature[index], lengthOfDay);
-					float relativeHumidity = Atmosphere.GetRelativeHumidity(World, localTemperature, state.Humidity[index], state.LowerAirPressure[index]);
-
-					float humidityDisplay = relativeHumidity / World.Data.DewPointRange;
+					float relativeHumidity = Mathf.Clamp01(Atmosphere.GetRelativeHumidity(World, state.LowerAirTemperature[index], state.Humidity[index], state.LowerAirPressure[index]));
 					color = oceanColor = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
 											new CVP(Color.blue, 0.2f),
 											new CVP(Color.green, 0.4f),
 											new CVP(Color.yellow, 0.6f),
 											new CVP(Color.red, 0.8f),
-											new CVP(Color.white, 1) }, 
-											humidityDisplay);
+											new CVP(Color.white, 1) },
+											relativeHumidity);
 
 				}
 				else if (showLayers.HasFlag(Layers.Rainfall))
 				{
-					float maxRainfall = 5.0f / World.Data.TicksPerYear;
 					oceanColor = color = Color.Lerp(Color.black, Color.blue, Math.Min(1.0f, state.Rainfall[index] / maxRainfall));
 				}
 				else if (showLayers.HasFlag(Layers.GroundWater))
