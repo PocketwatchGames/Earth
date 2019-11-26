@@ -14206,18 +14206,18 @@ MonoBehaviour:
     MinTemperature: 253.15
     MaxTemperature: 323.15
   Data:
-    pressureToHorizontalWindSpeed: 1
-    pressureToVerticalWindSpeed: 1
+    pressureToHorizontalWindSpeed: 2
+    pressureToVerticalWindSpeed: 5
     heatLossPreventionCarbonDioxide: 200
     LowerAirDensity: 1.2
     UpperAirDensity: 0.4
-    massWindMovement: 0.00005
+    massWindMovement: 0.00002
     MaxTerrainNormalForFriction: 0.25
     WindLandFrictionMinimum: 0.2
-    airDispersalSpeed: 0.01
+    airDispersalSpeed: 0.1
     humidityDispersalSpeed: 0.01
     localSunHeat: 5
-    AtmosphericHeatAbsorption: 0.23
+    AtmosphericHeatAbsorption: 0.297
     AtmosphericHeatReflection: 0.23
     EvaporativeHeatLoss: 0.065
     OceanHeatRadiation: 0.00001021

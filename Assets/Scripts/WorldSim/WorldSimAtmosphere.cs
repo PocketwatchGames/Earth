@@ -327,6 +327,8 @@ namespace Sim {
 					globalEnergy += newLowerAirEnergy + newUpperAirEnergy + newOceanEnergyDeep + newOceanEnergyShallow;
 					globalEnergyLost += energyLostToSpace;
 
+					atmosphericMass += newLowerAirMass + newUpperAirMass;
+
 				}
 			}
 
@@ -647,7 +649,7 @@ namespace Sim {
 				var neighbor = world.GetNeighbor(x, y, i);
 				int nIndex = world.GetIndex(neighbor.x, neighbor.y);
 				var nUpperWind = state.UpperWind[nIndex];
-				var nLowerWind = state.UpperWind[nIndex];
+				var nLowerWind = state.LowerWind[nIndex];
 				float nUpperEnergy = state.UpperAirEnergy[nIndex];
 				float nUpperMass = state.UpperAirMass[nIndex];
 				float nLowerEnergy = state.LowerAirEnergy[nIndex];
