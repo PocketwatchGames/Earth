@@ -302,7 +302,7 @@ public partial class WorldComponent {
 				}
 				else if (showLayers.HasFlag(Layers.RelativeHumidity))
 				{
-					float relativeHumidity = Mathf.Clamp01(Atmosphere.GetRelativeHumidity(World, state.LowerAirTemperature[index], state.Humidity[index], state.LowerAirPressure[index]));
+					float relativeHumidity = Mathf.Clamp01(Atmosphere.GetRelativeHumidity(World, state.LowerAirTemperature[index], state.Humidity[index], state.LowerAirMass[index]));
 					color = oceanColor = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
 											new CVP(Color.blue, 0.2f),
@@ -393,14 +393,10 @@ public partial class WorldComponent {
 					landCols[index] = color;
 				oceanCols[index] = oceanColor;
 
-				float minCloudsToDraw = 0.01f;
-				float maxCloudsWidth = 0.5f;
-				float maxCloudsToDraw = 1.0f;
-				float cloudCover = Mathf.Clamp(state.CloudCover[index] - minCloudsToDraw, 0.0f, maxCloudsToDraw);
-				if (cloudCover > 0)
+				if (state.CloudCover[index] > minCloudsToDraw)
 				{
-					float normalizedCloudCover = cloudCover / maxCloudsToDraw;
-					var cloudColor = Color.Lerp(Color.white, Color.black, normalizedCloudCover) * (float)Math.Sqrt(normalizedCloudCover) * 0.9f;
+					float normalizedCloudCover = (state.CloudCover[index] - minCloudsToDraw) / maxCloudColor;
+					var cloudColor = Color.Lerp(Color.white, Color.black, Mathf.Clamp01((state.CloudCover[index] - minCloudsToDraw) / maxCloudColor)) * (float)Math.Sqrt(Mathf.Clamp01((state.CloudCover[index] - minCloudsToDraw) / maxCloudAlpha)) * 0.9f;
 					cloudCols[index] = cloudColor;
 				} else
 				{

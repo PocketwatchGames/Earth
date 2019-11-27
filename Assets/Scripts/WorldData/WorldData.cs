@@ -53,8 +53,8 @@ public class WorldData
 	public float CloudToHumiditySpeed = 0.01f;
 	public float CloudElevationSpeed = 100.0f;
 	public float DewPointTemperatureRange = 100.0f;
-	public float DewPointRange = 0.06f;
-	public float DewPointZero = 213.0f;
+	public float DewPointZero = 253.0f;
+	public float WaterVaporMassToAirMassAtDewPoint = 0.2f;
 	public float RainfallRate = 0.1f;
 	public float EvapMinTemperature = 253; // -20 celsius
 	public float EvapMaxTemperature = 413; // 140 celsius
@@ -127,6 +127,7 @@ public class WorldData
 	[Header("Masses")]
 	public float MassEarthAir = 1.29f;
 	public float MassSeaWater = 1024f;
+	public float MassFreshWater = 1000f;
 	public float MassIce = 919f;
 
 

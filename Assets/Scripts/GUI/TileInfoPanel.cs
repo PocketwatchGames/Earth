@@ -81,7 +81,8 @@ public class TileInfoPanel : MonoBehaviour
 			textLowerAtmosphere += "\nPressure: " + (state.LowerAirPressure[index]).ToString("0.00");
 			textLowerAtmosphere += "\nMass: " + (state.LowerAirMass[index]).ToString("0.00");
 			textLowerAtmosphere += "\nWind: " + (state.LowerWind[index]).ToString();
-			textLowerAtmosphere += "\nHumidity: " + state.Humidity[index].ToString("0.00");
+			textLowerAtmosphere += "\nHumidity (Abs): " + state.Humidity[index].ToString("0.00");
+			textLowerAtmosphere += "\nHumidity (Rel): " + Sim.Atmosphere.GetRelativeHumidity(WorldComponent.World, state.LowerAirTemperature[index], state.Humidity[index], state.LowerAirMass[index]).ToString("0.00");
 			textLowerAtmosphere += "\nEvaporation: " + (state.Evaporation[index] * WorldComponent.World.Data.TicksPerYear).ToString("0.00");
 
 
