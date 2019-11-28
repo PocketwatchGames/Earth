@@ -258,7 +258,7 @@ public partial class WorldComponent {
 											new CVP(Color.yellow, 0.02f),
 											new CVP(Color.red, 0.03f),
 											new CVP(Color.white, 0.05f) },
-						state.Evaporation[index]);
+						state.Evaporation[index] * World.Data.TicksPerYear);
 				}
 				else if (showLayers.HasFlag(Layers.Rainfall))
 				{
@@ -274,10 +274,10 @@ public partial class WorldComponent {
 				{
 					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.blue, 50),
-											new CVP(Color.yellow, 100),
-											new CVP(Color.red, 150),
-											new CVP(Color.white, 200) },
+											new CVP(Color.blue, 10),
+											new CVP(Color.yellow, 20),
+											new CVP(Color.red, 30),
+											new CVP(Color.white, 40) },
 						state.EnergyAbsorbed[index]);
 				}
 				else if (showLayers.HasFlag(Layers.LowerAirPressure))
@@ -393,10 +393,10 @@ public partial class WorldComponent {
 					landCols[index] = color;
 				oceanCols[index] = oceanColor;
 
-				if (state.CloudCover[index] > minCloudsToDraw)
+				if (state.CloudMass[index] > minCloudsToDraw)
 				{
-					float normalizedCloudCover = (state.CloudCover[index] - minCloudsToDraw) / maxCloudColor;
-					var cloudColor = Color.Lerp(Color.white, Color.black, Mathf.Clamp01((state.CloudCover[index] - minCloudsToDraw) / maxCloudColor)) * (float)Math.Sqrt(Mathf.Clamp01((state.CloudCover[index] - minCloudsToDraw) / maxCloudAlpha)) * 0.9f;
+					float normalizedCloudCover = (state.CloudMass[index] - minCloudsToDraw) / maxCloudColor;
+					var cloudColor = Color.Lerp(Color.white, Color.black, Mathf.Clamp01((state.CloudMass[index] - minCloudsToDraw) / maxCloudColor)) * (float)Math.Sqrt(Mathf.Clamp01((state.CloudMass[index] - minCloudsToDraw) / maxCloudAlpha)) * 0.9f;
 					cloudCols[index] = cloudColor;
 				} else
 				{

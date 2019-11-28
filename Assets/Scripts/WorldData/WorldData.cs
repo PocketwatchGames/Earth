@@ -36,29 +36,33 @@ public class WorldData
 	// atmospheric heat balance https://energyeducation.ca/encyclopedia/Earth%27s_heat_balance
 	// https://en.wikipedia.org/wiki/Earth%27s_energy_budget
 	public float AtmosphericHeatAbsorption = 0.297f; // total absorbed by atmosphere AFTER reflection about 30%
-	public float AtmosphericHeatReflection = 0.23f;
-	public float CloudContentFullAbsorption = 5.0f; // how much heat gain/loss is caused by cloud cover
-	public float CloudAbsorptionRate = 0.06f; // 6% absorbed by clouds
-	public float CloudReflectionRate = 0.20f; // 20% reflected back to space
+	public float AtmosphericHeatReflection = 0.07f; // 7% is refelcted due to atmospheric scattering 
+	public float CloudIncomingAbsorptionRate = 0.06f; // 6% absorbed by clouds
+	public float CloudIncomingReflectionRate = 0.50f; // 24% incoming  reflected back to space by clouds (avg, globally)
 	public float EvaporativeHeatLoss = 0.065f; // global average = 78 watts
 	public float OceanHeatRadiation = 0.00001021f; // global average = 66 watts
 	public float OceanAirConduction = 1.3824f; // global avg = 16 watts per degree delta between air and ocean
 	public float OceanIceConduction = 0.01f; // small
-	public float AtmosphericHeatLossToSpace = 0.000001024f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
-	public float HeatLossPreventionCarbonDioxide = 200;
-	public float localSunHeat = 5; // sun can add about 5 degrees celsius
+
+	// TODO: tune these to match the science
+	public float CloudMassFullAbsorption = 300.0f; // how much heat gain/loss is caused by cloud cover
+	public float EnergyEmittedByAtmosphere = 0.000001024f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
+	public float CloudOutgoingAbsorptionRate = 0.1f;
+	public float CloudEnergyDispersalSpeed = 0.01f;
+	public float EnergyTrappedByGreenhouseGasses = 0.1f;
+	public float HumidityHeatAbsorption = 1.0f;
 
 	[Header("Evap, Humidity and Clouds")]
 	public float HumidityToCloudSpeed = 0.1f;
 	public float CloudToHumiditySpeed = 0.01f;
 	public float CloudElevationSpeed = 100.0f;
 	public float DewPointTemperatureRange = 100.0f;
-	public float DewPointZero = 253.0f;
+	public float DewPointZero = 213.0f;
 	public float WaterVaporMassToAirMassAtDewPoint = 0.2f;
-	public float RainfallRate = 0.1f;
-	public float EvapMinTemperature = 253; // -20 celsius
-	public float EvapMaxTemperature = 413; // 140 celsius
-	public float EvaporationRate = 0.01f; // evaporation on earth maxes out around 2.5M per year
+	public float RainfallRate = 0.01f;
+	public float EvapMinTemperature = 243; // -30 celsius
+	public float EvapMaxTemperature = 343; // 70 celsius
+	public float EvaporationRate = 0.0001f; // TODO: evaporation on earth maxes out around 2.5M per year 
 	public float evapTemperatureRange;
 	public float rainPointTemperatureMultiplier = 0.00075f; // adjustment for temperature
 
@@ -121,6 +125,7 @@ public class WorldData
 
 	[Header("Specific Heats")]
 	public float SpecificHeatIce = 2.108f; // specific heat is joules to raise one degree
+	public float SpecificHeatFreshWater = 4.187f; // specific heat is joules to raise one degree
 	public float SpecificHeatSeaWater = 3.85f; // specific heat is joules to raise one degree
 	public float SpecificHeatAtmosphere = 1.158f; // specific heat is joules to raise one degree
 

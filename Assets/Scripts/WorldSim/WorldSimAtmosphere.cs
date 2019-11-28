@@ -20,6 +20,7 @@ namespace Sim {
 			float globalEnergyIncoming = 0;
 			float globalEnergyReflectedAtmosphere = 0;
 			float globalEnergyReflectedSurface = 0;
+			float globalEnergyAbsorbedClouds = 0;
 			float globalEnergyAbsorbedUpperAtmosphere = 0;
 			float globalEnergyAbsorbedLowerAtmosphere = 0;
 			float globalEnergyAbsorbedSurface = 0;
@@ -30,10 +31,20 @@ namespace Sim {
 			for (int y = 0; y < world.Size; y++)
 			{
 				float latitude = world.GetLatitude(y);
-				var sunVector = GetSunVector(world, state.PlanetTiltAngle, state.Ticks, latitude);
-				float sunAngle = Math.Max(0, sunVector.z);
+				float sunAngle;
+				Vector3 sunVector;
+				GetSunVector(world, state.PlanetTiltAngle, state.Ticks, latitude, out sunAngle, out sunVector);
+				sunAngle = Math.Max(0, sunAngle);
 
 				float lengthOfDay = GetLengthOfDay(latitude, timeOfYear, declinationOfSun);
+
+				// get the actual atmospheric depth here based on radius of earth plus atmosphere
+				float inverseSunAngle = Mathf.PI / 2 + sunAngle;
+				float angleFromSunToLatitudeAndAtmophereEdge = Mathf.Asin(state.PlanetRadius * Mathf.Sin(inverseSunAngle) / (state.PlanetRadius + world.Data.troposphereElevation));
+				float angleFromPlanetCenterToLatitudeAndAtmosphereEdge = Mathf.PI - inverseSunAngle - angleFromSunToLatitudeAndAtmophereEdge;
+				float atmosphericDepthInMeters = Mathf.Sin(angleFromPlanetCenterToLatitudeAndAtmosphereEdge) * state.PlanetRadius / Mathf.Sin(angleFromSunToLatitudeAndAtmophereEdge);
+				float atmosphericDepth = Mathf.Max(1.0f, atmosphericDepthInMeters / world.Data.troposphereElevation);
+				float consumedByAtmosphere = 1.0f - Mathf.Pow(0.7f, Mathf.Pow(atmosphericDepth, 0.678f));
 
 				for (int x = 0; x < world.Size; x++)
 				{
@@ -41,7 +52,8 @@ namespace Sim {
 
 					float elevation = state.Elevation[index];
 					float elevationOrSeaLevel = Math.Max(state.SeaLevel, elevation);
-					float cloudCover = state.CloudCover[index];
+					float cloudMass = state.CloudMass[index];
+					float cloudEnergy = state.CloudEnergy[index];
 					float lowerAirTemperature = state.LowerAirTemperature[index];
 					float lowerAirEnergy = state.LowerAirEnergy[index];
 					float lowerAirPressure = state.LowerAirPressure[index];
@@ -81,7 +93,8 @@ namespace Sim {
 					float newLowerAirMass = lowerAirMass;
 					float newUpperAirEnergy = upperAirEnergy;
 					float newUpperAirMass = upperAirMass;
-					float newCloudCover = cloudCover;
+					float newCloudMass = cloudMass;
+					float newCloudEnergy = cloudEnergy;
 					float newSurfaceWater = surfaceWater;
 					float newSurfaceIce = surfaceIce;
 					float newCloudElevation = cloudElevation;
@@ -98,9 +111,9 @@ namespace Sim {
 					bool isOcean = world.IsOcean(elevation, state.SeaLevel);
 
 					float relativeHumidity = GetRelativeHumidity(world, lowerAirTemperature, humidity, lowerAirMass);
-					float cloudOpacity = Math.Min(1.0f, cloudCover / world.Data.CloudContentFullAbsorption);
+					float cloudOpacity = Math.Min(1.0f, cloudMass / world.Data.CloudMassFullAbsorption); // TODO: prob sqrt this and use a higher cap
 					float groundWaterSaturation = Animals.GetGroundWaterSaturation(state.GroundWater[index], state.WaterTableDepth[index], soilFertility * world.Data.MaxSoilPorousness);
-					float incomingRadiation = state.SolarRadiation * sunAngle * lengthOfDay / 2;
+					float incomingRadiation = state.SolarRadiation * lengthOfDay / 2;
 					float energyAbsorbed = 0;
 
 					if (isOcean)
@@ -109,51 +122,66 @@ namespace Sim {
 					}
 					globalEnergyIncoming += incomingRadiation;
 
+					// TODO: reflect/absorb more in the atmosphere with a lower sun angle
+
 					// reflect some rads off atmosphere and clouds
-					float energyReflectedAtmosphere = incomingRadiation * (world.Data.AtmosphericHeatReflection + world.Data.CloudReflectionRate * cloudOpacity);
+					// TODO: this process feels a little broken -- are we giving too much priority to reflecting/absorbing in certain layers?
+					float energyReflectedAtmosphere = incomingRadiation * consumedByAtmosphere * (world.Data.AtmosphericHeatReflection + world.Data.CloudIncomingReflectionRate * cloudOpacity);
+					float absorbedByCloudsIncoming = incomingRadiation * consumedByAtmosphere * (world.Data.CloudIncomingAbsorptionRate * cloudOpacity);
+					float absorbedByUpperAtmosphereIncoming = incomingRadiation * consumedByAtmosphere * world.Data.AtmosphericHeatAbsorption * (upperAirMass / massOfAtmosphericColumn);
+
 					incomingRadiation -= energyReflectedAtmosphere;
 					globalEnergyReflectedAtmosphere += energyReflectedAtmosphere;
 
 					// Absorbed by atmosphere
 					{
 						// stratosphere accounts for about a quarter of atmospheric mass
-					//	float absorbedByStratosphere = incomingRadiation * world.Data.AtmosphericHeatAbsorption * (state.StratosphereMass / massOfAtmosphericColumn);
+						//	float absorbedByStratosphere = incomingRadiation * world.Data.AtmosphericHeatAbsorption * (state.StratosphereMass / massOfAtmosphericColumn);
+
+						newCloudEnergy += absorbedByCloudsIncoming;
+						incomingRadiation -= absorbedByCloudsIncoming;
 
 						// absorb some rads directly in the atmosphere
-						float absorbedByUpperAtmosphereIncoming = incomingRadiation * world.Data.AtmosphericHeatAbsorption * (upperAirMass / massOfAtmosphericColumn);
 						newLowerAirEnergy += absorbedByUpperAtmosphereIncoming;
-						energyAbsorbed += absorbedByUpperAtmosphereIncoming;
-
-						float absorbedByLowerAtmosphereIncoming = incomingRadiation * world.Data.AtmosphericHeatAbsorption * (lowerAirMass / massOfAtmosphericColumn);
-						newLowerAirEnergy += absorbedByLowerAtmosphereIncoming;
-						energyAbsorbed += absorbedByLowerAtmosphereIncoming;
-
-					//	incomingRadiation -= absorbedByStratosphere;
 						incomingRadiation -= absorbedByUpperAtmosphereIncoming;
+
+						float absorbedByLowerAtmosphereIncoming = incomingRadiation * consumedByAtmosphere * world.Data.AtmosphericHeatAbsorption * (lowerAirMass / massOfAtmosphericColumn);
+						absorbedByLowerAtmosphereIncoming += incomingRadiation * consumedByAtmosphere * Mathf.Min(0.1f, humidity * world.Data.HumidityHeatAbsorption);
+						newLowerAirEnergy += absorbedByLowerAtmosphereIncoming;
 						incomingRadiation -= absorbedByLowerAtmosphereIncoming;
+
+						//	incomingRadiation -= absorbedByStratosphere;
 
 						globalEnergyAbsorbedLowerAtmosphere += absorbedByLowerAtmosphereIncoming;
 						globalEnergyAbsorbedUpperAtmosphere += absorbedByUpperAtmosphereIncoming;
+						globalEnergyAbsorbedClouds += absorbedByCloudsIncoming;
 					}
 
 					// reflection off surface
 					float energyReflected = 0;
 					{
+						float slopeAlbedo = 0;
+						if (!isOcean)
+						{
+							slopeAlbedo = 1.0f - Math.Max(0, Vector3.Dot(terrainNormal, sunVector));
+						} else
+						{
+							slopeAlbedo = 1.0f - Math.Max(0, sunVector.z);
+						}
 						if (surfaceIce > 0)
 						{
-							energyReflected += incomingRadiation * Math.Min(1.0f, surfaceIce) * world.Data.AlbedoIce;
+							energyReflected += incomingRadiation * Math.Min(1.0f, surfaceIce) * GetAlbedo(world.Data.AlbedoIce, slopeAlbedo);
 						}
 						if (isOcean)
 						{
-							energyReflected = incomingRadiation * world.Data.AlbedoWater * Math.Max(0, (1.0f - surfaceIce));
+							energyReflected = incomingRadiation * GetAlbedo(world.Data.AlbedoWater, slopeAlbedo) * Math.Max(0, (1.0f - surfaceIce));
 						}
 						else
 						{
 							// reflect some incoming radiation
-							var slope = Math.Max(0, Vector3.Dot(terrainNormal, sunVector));
 							float waterReflectivity = surfaceWater * world.Data.AlbedoWater;
-							float soilReflectivity = world.Data.AlbedoLand - world.Data.AlbedoReductionSoilQuality * soilFertility;
-							float heatReflectedLand = canopy * world.Data.AlbedoFoliage + Math.Max(0, 1.0f - canopy) * (surfaceWater * world.Data.AlbedoWater + Math.Max(0, 1.0f - surfaceWater) * soilReflectivity);
+							float soilReflectivity = GetAlbedo(world.Data.AlbedoLand - world.Data.AlbedoReductionSoilQuality * soilFertility, slopeAlbedo);
+							float heatReflectedLand = canopy * world.Data.AlbedoFoliage + Math.Max(0, 1.0f - canopy) * (surfaceWater * GetAlbedo(world.Data.AlbedoWater, slopeAlbedo) + Math.Max(0, 1.0f - surfaceWater) * soilReflectivity);
 							energyReflected += incomingRadiation * heatReflectedLand * Math.Max(0, (1.0f - surfaceIce));
 						}
 						incomingRadiation -= energyReflected;
@@ -211,12 +239,12 @@ namespace Sim {
 					// absorbed by surface
 					{
 						globalEnergyAbsorbedSurface += incomingRadiation;
+						energyAbsorbed += incomingRadiation;
 						// absorb the remainder and radiate heat
 						if (isOcean)
 						{
 							// absorb remaining incoming radiation (we've already absorbed radiation in surface ice above)
 							newOceanEnergyShallow += incomingRadiation;
-							energyAbsorbed += incomingRadiation;
 
 							// heat transfer (both ways) based on temperature differential
 							// conduction to ice from below
@@ -253,7 +281,6 @@ namespace Sim {
 						else
 						{
 							newLowerAirEnergy += incomingRadiation;
-							energyAbsorbed += incomingRadiation;
 						}
 					}
 
@@ -274,30 +301,67 @@ namespace Sim {
 						}
 					}
 
-					MoveWaterVaporVertically(world, isOcean, surfaceIce, humidity, relativeHumidity, lowerWind, cloudCover, lowerAirTemperature, ref newSurfaceWater, ref newSurfaceIce, ref newHumidity, ref newCloudCover);
-					MoveAtmosphereOnWind(world, state, x, y, elevationOrSeaLevel, lowerAirEnergy, upperAirEnergy, lowerAirMass, upperAirMass, lowerWind, upperWind, humidity, cloudCover, ref newLowerAirEnergy, ref newUpperAirEnergy, ref newLowerAirMass, ref newUpperAirMass, ref newHumidity, ref newCloudCover);
+					MoveWaterVaporVertically(
+						world, 
+						isOcean, 
+						surfaceIce, 
+						humidity, 
+						relativeHumidity, 
+						lowerWind, 
+						lowerAirMass, 
+						lowerAirEnergy, 
+						lowerAirTemperature, 
+						cloudMass, 
+						cloudEnergy, 
+						ref newSurfaceWater, 
+						ref newSurfaceIce, 
+						ref newHumidity, 
+						ref newLowerAirEnergy,
+						ref newCloudMass, 
+						ref newCloudEnergy);
+					MoveAtmosphereOnWind(world, state, x, y, elevationOrSeaLevel, lowerAirEnergy, upperAirEnergy, lowerAirMass, upperAirMass, lowerWind, upperWind, humidity, cloudMass, ref newLowerAirEnergy, ref newUpperAirEnergy, ref newLowerAirMass, ref newUpperAirMass, ref newHumidity, ref newCloudMass);
 
 					// lose some energy to space
 					//float cloudReflectionFactor = world.Data.cloudReflectionRate * cloudOpacity;
 					//float humidityPercentage = humidity / atmosphereMass;
 					//float heatLossFactor = (1.0f - world.Data.carbonDioxide * world.Data.heatLossPreventionCarbonDioxide) * (1.0f - humidityPercentage);
 					//float loss = airEnergy * (1.0f - cloudReflectionFactor) * (world.Data.heatLoss * heatLossFactor * airPressureInverse);
-					float energyLostToSpace = (float)(world.Data.AtmosphericHeatLossToSpace * upperAirEnergy);
+
+					// absorb some outgoing energy in clouds
+					float energyEmittedByUpperAtmosphere = world.Data.EnergyEmittedByAtmosphere * upperAirEnergy;
+					float outgoingEnergyAbsorbedByClouds = energyEmittedByUpperAtmosphere * world.Data.CloudOutgoingAbsorptionRate;
+					newCloudEnergy += outgoingEnergyAbsorbedByClouds;
+					energyEmittedByUpperAtmosphere -= outgoingEnergyAbsorbedByClouds;
+
+					// emit some remaining atmospheric energy to space
+					float energyLostToSpace = energyEmittedByUpperAtmosphere * Mathf.Max(1.0f, state.CarbonDioxide * (1.0f - world.Data.EnergyTrappedByGreenhouseGasses));
 					newUpperAirEnergy -= energyLostToSpace;
+
+					// emit some energy from clouds to space
+					float cloudTemperature = cloudEnergy / cloudMass * world.Data.SpecificHeatFreshWater;
+					float energyEmittedByClouds = cloudEnergy * Mathf.Clamp(world.Data.CloudEnergyDispersalSpeed * (upperAirTemperature - cloudTemperature), 0, 1) / world.Data.SpecificHeatFreshWater;
+					newCloudEnergy -= energyEmittedByClouds;
+					newUpperAirEnergy += energyEmittedByClouds;
 
 					MoveOceanOnCurrent(world, state, x, y, elevation, surfaceIce, oceanEnergyShallow, oceanEnergyDeep, oceanSalinityShallow, oceanSalinityDeep, oceanTemperatureShallow, oceanTemperatureDeep, oceanDensity, currentShallow, currentDeep, ref newOceanEnergyShallow, ref newOceanEnergyDeep, ref newOceanSalinityShallow, ref newOceanSalinityDeep);
 					FlowWater(world, state, x, y, gradient, soilFertility, ref newSurfaceWater, ref newGroundWater);
 					SeepWaterIntoGround(world, isOcean, soilFertility, waterTableDepth, ref newGroundWater, ref newSurfaceWater);
-					if (cloudCover > 0)
+					if (cloudMass > 0)
 					{
-						//			UpdateCloudElevation(world, elevationOrSeaLevel, lowerAirTemperature, humidity, atmosphereMass, wind, ref newCloudElevation);
-						rainfall = UpdateRainfall(world, state, isOcean, elevationOrSeaLevel, cloudCover, lowerAirTemperature, upperAirTemperature, cloudElevation, ref newSurfaceWater, ref newCloudCover);
+						UpdateCloudElevation(world, elevationOrSeaLevel, lowerAirTemperature, humidity, cloudMass, cloudEnergy, ref newCloudElevation);
+						rainfall = UpdateRainfall(world, state, isOcean, elevationOrSeaLevel, cloudMass, cloudEnergy, lowerAirTemperature, upperAirTemperature, upperAirMass, cloudElevation, ref newSurfaceWater, ref newCloudMass, ref newCloudEnergy);
 					}
 
 					//if (float.IsNaN(newLowerAirEnergy) || float.IsNaN(newEvaporation) || float.IsNaN(newSurfaceWater) || float.IsNaN(newSurfaceIce) || float.IsNaN(newGroundWater) || float.IsNaN(newHumidity) || float.IsNaN(newCloudCover) || float.IsNaN(newCloudElevation) || float.IsNaN(newLowerAirMass))
 					//{
 					//	break;
 					//}
+
+					if (float.IsNaN(newLowerAirEnergy) || float.IsNaN(newUpperAirEnergy) || float.IsNaN(newLowerAirMass) || float.IsNaN(newUpperAirEnergy) || float.IsNaN(newHumidity))
+					{
+						return;
+					}
+
 					nextState.LowerAirEnergy[index] = newLowerAirEnergy;
 					nextState.UpperAirEnergy[index] = newUpperAirEnergy;
 					nextState.LowerAirMass[index] = newLowerAirMass;
@@ -306,7 +370,8 @@ namespace Sim {
 					nextState.Ice[index] = newSurfaceIce;
 					nextState.GroundWater[index] = newGroundWater;
 					nextState.Humidity[index] = newHumidity;
-					nextState.CloudCover[index] = newCloudCover;
+					nextState.CloudMass[index] = newCloudMass;
+					nextState.CloudEnergy[index] = newCloudEnergy;
 					nextState.CloudElevation[index] = newCloudElevation;
 					nextState.Radiation[index] = newRadiation;
 					nextState.OceanTemperatureShallow[index] = GetWaterTemperature(world, newOceanEnergyShallow, Math.Max(0, world.Data.DeepOceanDepth - newSurfaceIce));
@@ -341,6 +406,7 @@ namespace Sim {
 			nextState.GlobalEnergyIncoming = globalEnergyIncoming;
 			nextState.GlobalEnergyReflectedAtmosphere = globalEnergyReflectedAtmosphere;
 			nextState.GlobalEnergyReflectedSurface = globalEnergyReflectedSurface;
+			nextState.GlobalEnergyAbsorbedCloud = globalEnergyAbsorbedClouds;
 			nextState.GlobalEnergyAbsorbedUpperAtmosphere = globalEnergyAbsorbedUpperAtmosphere;
 			nextState.GlobalEnergyAbsorbedLowerAtmosphere = globalEnergyAbsorbedLowerAtmosphere;
 			nextState.GlobalEnergyAbsorbedSurface = globalEnergyAbsorbedSurface;
@@ -367,11 +433,6 @@ namespace Sim {
 		}
 
 
-		static public float GetLocalTemperature(World world, float sunAngle, float cloudCover, float temperature, float lengthOfDay)
-		{
-			return temperature + (1.0f - Math.Min(cloudCover / world.Data.CloudContentFullAbsorption, 1.0f)) * sunAngle * world.Data.localSunHeat * lengthOfDay;
-		}
-
 		static public float GetPressureAtElevation(World world, World.State state, int index, float elevation)
 		{
 			// Units: Pascals
@@ -386,64 +447,92 @@ namespace Sim {
 		}
 
 
-		static public Vector3 GetSunVector(World world, float planetTiltAngle, int ticks, float latitude)
+
+
+		static private void MoveWaterVaporVertically(World world, bool isOcean, float ice, float humidity, float relativeHumidity, Vector3 windAtSurface, float lowerAtmosphereMass, float lowerAtmosphereEnergy, float lowerAirTemperature, float cloudMass, float cloudEnergy, ref float newSurfaceWater, ref float newIce, ref float newHumidity, ref float newLowerAtmosphereEnergy, ref float newCloudMass, ref float newCloudEnergy)
 		{
+			////////////////
+			// ACCURATE SIM
+			////////////////
 
-			float angleOfInclination = planetTiltAngle * (float)Math.Sin(Math.PI * 2 * (world.GetTimeOfYear(ticks) - 0.25f));
-			//float timeOfDay = (-sunPhase + 0.5f) * Math.PI * 2;
-			float timeOfDay = (float)0;
-			float azimuth = (float)Math.Atan2(Math.Sin(timeOfDay), Math.Cos(timeOfDay) * Math.Sin(latitude * Math.PI) - Math.Tan(angleOfInclination) * Math.Cos(latitude * Math.PI));
-			float elevation = (float)Math.Asin((Math.Sin(latitude) * Math.Sin(angleOfInclination) + Math.Cos(latitude) * Math.Cos(angleOfInclination) * Math.Cos(timeOfDay)));
-
-			float cosOfElevation = (float)Math.Cos(elevation);
-			Vector3 sunVec = new Vector3((float)Math.Sin(azimuth) * cosOfElevation, (float)Math.Cos(azimuth) * cosOfElevation, (float)Math.Sin(elevation));
-			return sunVec;
-		}
-
-
-
-		static private void MoveWaterVaporVertically(World world, bool isOcean, float ice, float humidity, float relativeHumidity, Vector3 windAtSurface, float cloudCover, float temperature, ref float newSurfaceWater, ref float newIce, ref float newHumidity, ref float newCloudCover)
-		{
 			// condensation
-			if (relativeHumidity > 1) {
-				float humidityToGround = humidity * Mathf.Max(1.0f, (relativeHumidity - 1) / relativeHumidity);
+			if (relativeHumidity > 1)
+			{
+				float humidityToGround = humidity * (relativeHumidity - 1.0f) / relativeHumidity;
 				humidity -= humidityToGround;
 				newHumidity -= humidityToGround;
-				if (temperature <= world.Data.FreezingTemperature)
+				if (lowerAirTemperature <= world.Data.FreezingTemperature)
 				{
 					newIce += humidityToGround / world.Data.MassFreshWater;
-				} else if (!isOcean)
+				}
+				else if (!isOcean)
 				{
 					newSurfaceWater += humidityToGround / world.Data.MassFreshWater;
 				}
 			}
 
 			float humidityTransfer = humidity * Mathf.Clamp01(windAtSurface.z * relativeHumidity * world.Data.HumidityToCloudSpeed);
-			float cloudTransfer = cloudCover * world.Data.CloudToHumiditySpeed;
-			newHumidity -= humidityTransfer - cloudTransfer;
-			newCloudCover += humidityTransfer - cloudTransfer;
-		}
+			float cloudTransfer = cloudMass * world.Data.CloudToHumiditySpeed;
+			float netTransfer = humidityTransfer - cloudTransfer;
+			newHumidity -= netTransfer;
+			newCloudMass += netTransfer;
 
-		static private void UpdateCloudElevation(World world, float elevationOrSeaLevel, float temperature, float humidity, float atmosphereMass, Vector3 windAtCloudElevation, ref float newCloudElevation)
-		{
-			//float dewPointTemp = (float)Math.Pow(humidity / (world.Data.DewPointRange * atmosphereMass), 0.25f) * world.Data.DewPointTemperatureRange + world.Data.DewPointZero;
-			//float dewPointElevation = Math.Max(0, (dewPointTemp - temperature) / world.Data.temperatureLapseRate) + elevationOrSeaLevel;
-
-			//float desiredDeltaZ = dewPointElevation - newCloudElevation;
-			//newCloudElevation = elevationOrSeaLevel + 1000;
-			////		newCloudElevation = newCloudElevation + desiredDeltaZ* Data.cloudElevationDeltaSpeed + windAtCloudElevation.z * Data.windVerticalCloudSpeedMultiplier;
-			////	newCloudElevation = Mathf.Clamp(newCloudElevation, elevationOrSeaLevel+1, Data.stratosphereElevation);
-		}
-
-
-		static private float UpdateRainfall(World world, World.State state, bool isOcean, float elevationOrSeaLevel, float cloudCover, float lowerAirTemp, float upperAirTemp, float cloudElevation, ref float newSurfaceWater, ref float newCloudCover)
-		{
-			float temperatureAtCloudElevation = (upperAirTemp - lowerAirTemp) * (cloudElevation - elevationOrSeaLevel) + lowerAirTemp;
-			float rainPoint = Math.Max(0, (temperatureAtCloudElevation - world.Data.DewPointZero) * world.Data.rainPointTemperatureMultiplier);
-			if (cloudCover > rainPoint)
+			float humidityEnergyTransfer = lowerAtmosphereEnergy * humidityTransfer / (lowerAtmosphereMass + humidity);
+			float netEnergyTransfer = humidityEnergyTransfer;
+			if (cloudMass > 0)
 			{
-				float rainfall = (cloudCover - rainPoint) * world.Data.RainfallRate;
-				newCloudCover -= rainfall;
+				netEnergyTransfer -= cloudTransfer / cloudMass * cloudEnergy;
+			}
+			newCloudEnergy += netEnergyTransfer;
+			newLowerAtmosphereEnergy -= netEnergyTransfer;
+
+			////////////////////////////////
+			/// INTERMITTENT CLOUD INJECTION
+			////////////////////////////////
+
+			//float humidityTransferTime = windAtSurface.z * relativeHumidity * world.Data.HumidityToCloudSpeed;
+			//float humidityTransfer = 0;
+			//if (humidityTransferTime >= 1)
+			//{
+			//	humidityTransfer = humidity * Mathf.Clamp01(windAtSurface.z * relativeHumidity * world.Data.HumidityToCloudSpeed);
+			//}
+			//float cloudTransfer = cloudCover * world.Data.CloudToHumiditySpeed;
+			//float netTransfer = humidityTransfer - cloudTransfer;
+			//newHumidity -= netTransfer;
+			//newCloudCover += netTransfer;
+
+
+
+		}
+
+		static private void UpdateCloudElevation(World world, float elevationOrSeaLevel, float lowerTemperature, float upperTemperature, float cloudMass, float cloudEnergy, ref float newCloudElevation)
+		{
+
+			// cloudContent = world.Data.WaterVaporMassToAirMassAtDewPoint * Mathf.Pow(Mathf.Max(0, (temperature - world.Data.DewPointZero) / world.Data.DewPointTemperatureRange), 2) * upperAirMass;
+			// Mathf.Pow(Mathf.Max(0, (temperature - world.Data.DewPointZero) / world.Data.DewPointTemperatureRange), 2) = cloudContent / (upperAirMass * world.Data.WaterVaporMassToAirMassAtDewPoint);
+			// temperature = world.Data.DewPointZero + world.Data.DewPointTemperatureRange * Math.Pow(cloudContent / (upperAirMass * world.Data.WaterVaporMassToAirMassAtDewPoint), 0.5f);
+
+
+			float cloudTemperature = cloudEnergy * cloudMass * world.Data.MassFreshWater / world.Data.SpecificHeatSeaWater;
+
+			float temperatureLapseRate = (upperTemperature - lowerTemperature) / (world.Data.troposphereElevation - elevationOrSeaLevel);
+			float dewPointElevation = Math.Max(0, (cloudTemperature - lowerTemperature) / temperatureLapseRate) + elevationOrSeaLevel;
+
+			newCloudElevation = dewPointElevation;
+		}
+
+
+		static private float UpdateRainfall(World world, World.State state, bool isOcean, float elevationOrSeaLevel, float cloudMass, float cloudEnergy, float lowerTemperature, float upperTemperature, float upperAirMass, float cloudElevation, ref float newSurfaceWater, ref float newCloudMass, ref float newCloudEnergy)
+		{
+			float nightlyLowerTemperatureDelta = 20;
+			float nightlyUpperTemperatureDelta = 7;
+			float temperatureAtCloudElevation = GetTemperatureAtElevation(world, cloudElevation, lowerTemperature - nightlyLowerTemperatureDelta, upperTemperature - nightlyUpperTemperatureDelta, elevationOrSeaLevel);
+			float relativeHumidity = GetRelativeHumidity(world, temperatureAtCloudElevation, cloudMass, upperAirMass);
+			if (relativeHumidity > 1.0f)
+			{
+				float rainfall = cloudMass * (relativeHumidity - 1) / relativeHumidity * world.Data.RainfallRate;
+				newCloudMass -= rainfall;
+				newCloudEnergy -= cloudEnergy * (rainfall / newCloudMass);
 				float rainVolume = rainfall / world.Data.MassFreshWater;
 				if (!isOcean)
 				{
@@ -524,16 +613,20 @@ namespace Sim {
 		static private float GetEvaporationRate(World world, float iceCoverage, float temperature, float relativeHumidity, float airPressureInverse)
 		{
 			float evapTemperature = Mathf.Clamp01((temperature - world.Data.EvapMinTemperature) / world.Data.evapTemperatureRange);
-			float evapRate = Mathf.Clamp01(evapTemperature / airPressureInverse);
-			evapRate *= evapRate;
 
-			return Mathf.Clamp01(iceCoverage * (1.0f - relativeHumidity) * evapRate) * world.Data.EvaporationRate;
+			return Mathf.Clamp01((1.0f - iceCoverage) * (1.0f - relativeHumidity) * Mathf.Pow(evapTemperature, 2)) * world.Data.EvaporationRate;
 		}
 
-		static public float GetRelativeHumidity(World world, float temperature, float humidity, float lowerAirMass)
+		static public float GetTemperatureAtElevation(World world, float elevation, float lowerTemperature, float upperTemperature, float elevationOrSeaLevel)
+		{
+			float temperatureLapseRate = (upperTemperature - lowerTemperature) / (world.Data.troposphereElevation - elevationOrSeaLevel);
+			return (elevation - elevationOrSeaLevel) * temperatureLapseRate + lowerTemperature;
+		}
+
+		static public float GetRelativeHumidity(World world, float temperature, float humidity, float airMass)
 		{
 			float maxWaterVaporPerKilogramAir = world.Data.WaterVaporMassToAirMassAtDewPoint * Mathf.Pow(Mathf.Max(0, (temperature - world.Data.DewPointZero) / world.Data.DewPointTemperatureRange), 2);
-			float maxHumidity = maxWaterVaporPerKilogramAir * lowerAirMass;
+			float maxHumidity = maxWaterVaporPerKilogramAir * airMass;
 			if (maxHumidity <= 0)
 			{
 				return humidity > 0 ? 10000 : 0;
@@ -621,7 +714,7 @@ namespace Sim {
 				float nLowerEnergy = state.LowerAirEnergy[nIndex];
 				float nLowerMass = state.LowerAirMass[nIndex];
 				float nHumidity = state.Humidity[nIndex];
-				float nCloudContent = state.CloudCover[nIndex];
+				float nCloudContent = state.CloudMass[nIndex];
 				float nElevationOrSeaLevel = Math.Max(0, state.Elevation[nIndex]);
 				float nUpperAtmosphereVolume = world.Data.troposphereElevation - (nElevationOrSeaLevel + world.Data.BoundaryZoneElevation);
 				float nLowerWindSpeed = Mathf.Abs(nLowerWind.x) + Mathf.Abs(nLowerWind.y);
@@ -957,6 +1050,19 @@ namespace Sim {
 			}
 			return -plantaryTilt * Mathf.Sin(timeSinceVernalEquinox * Mathf.PI * 2);
 		}
+		static public void GetSunVector(World world, float planetTiltAngle, int ticks, float latitude, out float elevationAngle, out Vector3 sunVec)
+		{
+			float latitudeRadians = latitude * Mathf.PI / 2;
+			float angleOfInclination = planetTiltAngle * (float)Math.Sin(Math.PI * 2 * (world.GetTimeOfYear(ticks) - 0.25f));
+
+			//float timeOfDay = (-sunPhase + 0.5f) * Math.PI * 2;
+			float timeOfDay = (float)0.0f;
+			float azimuth = (float)Math.Atan2(Math.Sin(timeOfDay), Math.Cos(timeOfDay) * Math.Sin(latitudeRadians) - Math.Tan(angleOfInclination) * Math.Cos(latitudeRadians));
+			elevationAngle = (float)Math.Asin((Math.Sin(latitudeRadians) * Math.Sin(angleOfInclination) + Math.Cos(latitudeRadians) * Math.Cos(angleOfInclination) * Math.Cos(timeOfDay)));
+
+			float cosOfElevation = (float)Math.Cos(elevationAngle);
+			sunVec = new Vector3((float)Math.Sin(azimuth) * cosOfElevation, (float)Math.Cos(azimuth) * cosOfElevation, (float)Math.Sin(elevationAngle));
+		}
 		static public float GetLengthOfDay(float latitude, float timeOfYear, float declinationOfSun)
 		{
 			float latitudeAngle = latitude * Mathf.PI / 2;
@@ -1003,6 +1109,10 @@ namespace Sim {
 		static public float GetAirMass(World world, float elevationOrSeaLevel)
 		{
 			return world.Data.stratosphereElevation - elevationOrSeaLevel; 
+		}
+		static public float GetAlbedo(float surfaceAlbedo, float slope)
+		{
+			return surfaceAlbedo + (1.0f - surfaceAlbedo) * slope;
 		}
 	}
 }

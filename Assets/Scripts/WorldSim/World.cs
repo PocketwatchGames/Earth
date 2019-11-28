@@ -80,6 +80,7 @@ public partial class World {
 		public float CarbonDioxide;
 		public float PlanetTiltAngle;
 		public float SolarRadiation;
+		public float PlanetRadius;
 
 		public SpeciesType[] Species;
 		public SpeciesStat[] SpeciesStats;
@@ -96,7 +97,8 @@ public partial class World {
 		public float[] UpperAirPressure;
 		public float[] UpperAirMass;
 		public float[] Humidity;
-		public float[] CloudCover;
+		public float[] CloudMass;
+		public float[] CloudEnergy;
 		public float[] CloudElevation;
 		public float[] WaterTableDepth;
 		public float[] GroundWater;
@@ -124,10 +126,12 @@ public partial class World {
 		public float[] Evaporation;
 		public float[] EnergyAbsorbed;
 		public float GlobalEnergyIncoming;
+		public float GlobalEnergyReflectedCloud;
 		public float GlobalEnergyReflectedAtmosphere;
 		public float GlobalEnergyReflectedSurface;
 		public float GlobalEnergyLost;
 		public float GlobalEnergyGained;
+		public float GlobalEnergyAbsorbedCloud;
 		public float GlobalEnergyAbsorbedUpperAtmosphere;
 		public float GlobalEnergyAbsorbedLowerAtmosphere;
 		public float GlobalEnergyAbsorbedSurface;
@@ -147,6 +151,7 @@ public partial class World {
 			o.SeaLevel = SeaLevel;
 			o.StratosphereMass = StratosphereMass;
 			o.CarbonDioxide = CarbonDioxide;
+			o.PlanetRadius = PlanetRadius;
 			o.PlanetTiltAngle = PlanetTiltAngle;
 			o.SolarRadiation = SolarRadiation;
 			o.GlobalEnergyIncoming = GlobalEnergyIncoming;
@@ -154,6 +159,7 @@ public partial class World {
 			o.GlobalEnergyReflectedSurface = GlobalEnergyReflectedSurface;
 			o.GlobalEnergyLost = GlobalEnergyLost;
 			o.GlobalEnergyGained = GlobalEnergyGained;
+			o.GlobalEnergyAbsorbedCloud = GlobalEnergyAbsorbedCloud;
 			o.GlobalEnergyAbsorbedUpperAtmosphere = GlobalEnergyAbsorbedUpperAtmosphere;
 			o.GlobalEnergyAbsorbedLowerAtmosphere = GlobalEnergyAbsorbedLowerAtmosphere;
 			o.GlobalEnergyAbsorbedSurface = GlobalEnergyAbsorbedSurface;
@@ -176,7 +182,8 @@ public partial class World {
 			o.LowerAirPressure = (float[])LowerAirPressure.Clone();
 			o.LowerAirMass = (float[])LowerAirMass.Clone();
 			o.Humidity = (float[])Humidity.Clone();
-			o.CloudCover = (float[])CloudCover.Clone();
+			o.CloudMass = (float[])CloudMass.Clone();
+			o.CloudEnergy = (float[])CloudEnergy.Clone();
 			o.CloudElevation = (float[])CloudElevation.Clone();
 			o.WaterTableDepth = (float[])WaterTableDepth.Clone();
 			o.GroundWater = (float[])GroundWater.Clone();
@@ -244,7 +251,8 @@ public partial class World {
 			States[i].LowerAirPressure = new float[s];
 			States[i].LowerAirMass = new float[s];
 			States[i].Humidity = new float[s];
-			States[i].CloudCover = new float[s];
+			States[i].CloudMass = new float[s];
+			States[i].CloudEnergy = new float[s];
 			States[i].WaterTableDepth = new float[s];
 			States[i].GroundWater = new float[s];
 			States[i].SurfaceWater = new float[s];

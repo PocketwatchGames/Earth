@@ -141,6 +141,7 @@ public static class WorldGen {
 				(state.LowerAirTemperature[index] / (lowerDensity * lowerAirVolume)) /
 				(state.UpperAirTemperature[index] / (upperDensity * upperAirVolume)));
 
+				state.PlanetRadius = worldGenData.PlanetRadius;
 				state.SolarRadiation = worldGenData.SolarRadiation;
 				state.StratosphereMass = worldGenData.StratosphereMass;
 				state.CarbonDioxide = worldGenData.CarbonDioxide;
@@ -154,7 +155,7 @@ public static class WorldGen {
 				state.UpperAirPressure[index] = Atmosphere.GetAirPressure(world, state.UpperAirMass[index], state.UpperAirTemperature[index], data.troposphereElevation, upperAirVolume);
 				state.LowerAirPressure[index] = Atmosphere.GetAirPressure(world, state.LowerAirMass[index], state.LowerAirTemperature[index], elevationOrSeaLevel, lowerAirVolume);
 
-				state.CloudCover[index] = GetPerlinMinMax(world, noise, x, y, 3.0f, 2000, 0, 300);
+				state.CloudMass[index] = Mathf.Pow(GetPerlinMinMax(world, noise, x, y, 3.0f, 2000, 0, 1), 3) * 300;
 				state.Humidity[index] = GetPerlinMinMax(world, noise, x, y, 3.0f, 3000, 0, 300) * Mathf.Cos(Mathf.PI / 2 * latitude);
 				state.CloudElevation[index] = state.Elevation[index] + 1000;
 				state.WaterTableDepth[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 200, data.MinWaterTableDepth, data.MaxWaterTableDepth);
