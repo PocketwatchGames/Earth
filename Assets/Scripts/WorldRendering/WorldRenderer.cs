@@ -274,19 +274,33 @@ public partial class WorldComponent {
 				{
 					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.blue, 10),
-											new CVP(Color.yellow, 20),
-											new CVP(Color.red, 30),
-											new CVP(Color.white, 40) },
+											new CVP(Color.blue, 20),
+											new CVP(Color.yellow, 40),
+											new CVP(Color.red, 60),
+											new CVP(Color.white, 80) },
 						state.EnergyAbsorbed[index]);
 				}
 				else if (showLayers.HasFlag(Layers.LowerAirPressure))
 				{
-					oceanColor = color = Lerp(new List<CVP> { new CVP(Color.blue, minPressure), new CVP(Color.white, (maxPressure + minPressure) / 2), new CVP(Color.red, maxPressure) }, state.LowerAirPressure[index]);
+					float p = (state.LowerAirPressure[index] - minPressure) / (maxPressure - minPressure);
+					oceanColor = color = Lerp(new List<CVP> {
+											new CVP(Color.black, 0),
+											new CVP(Color.blue, 0.25f),
+											new CVP(Color.yellow, 0.5f),
+											new CVP(Color.red, 0.75f),
+											new CVP(Color.white, 1.0f) },
+						p);
 				}
 				else if (showLayers.HasFlag(Layers.UpperAirPressure))
 				{
-					oceanColor = color = Lerp(new List<CVP> { new CVP(Color.blue, minPressure), new CVP(Color.white, (maxPressure + minPressure) / 2), new CVP(Color.red, maxPressure) }, state.UpperAirPressure[index]);
+					float p = (state.UpperAirPressure[index] - minPressure) / (maxPressure - minPressure);
+					oceanColor = color = Lerp(new List<CVP> {
+											new CVP(Color.black, 0),
+											new CVP(Color.blue, 0.25f),
+											new CVP(Color.yellow, 0.5f),
+											new CVP(Color.red, 0.75f),
+											new CVP(Color.white, 1.0f) },
+						p);
 				}
 				else if (showLayers.HasFlag(Layers.WaterVapor))
 				{
@@ -403,7 +417,7 @@ public partial class WorldComponent {
 					cloudCols[index].a = 0;
 				}
 				cloudVerts[index].z = -Mathf.Max(Math.Max(elevation, state.SeaLevel)+1, state.CloudElevation[index]) * ElevationScale;
-				if (showLayers.HasFlag(Layers.LowerAirWind))
+				if (showLayers.HasFlag(Layers.SurfaceAirWind))
 				{
 					var wind = state.LowerWind[index];
 					UpdateWindArrow(state, x, y, index, wind, 50);

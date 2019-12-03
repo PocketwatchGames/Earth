@@ -22,7 +22,7 @@ public partial class WorldComponent : MonoBehaviour
 		CloudHeight = 1 << 11,
 		LowerAirTemperature = 1 << 12,
 		TemperatureSubtle = 1 << 13,
-		LowerAirWind = 1 << 14,
+		SurfaceAirWind = 1 << 14,
 		LowerAirPressure = 1 << 15,
 		RelativeHumidity = 1 << 16,
 		Rainfall = 1 << 17,

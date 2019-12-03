@@ -18,7 +18,7 @@ namespace Sim {
 					float elevation = state.Elevation[index];
 					Vector2 newFlowDirection;
 					Vector3 newNormal;
-					UpdateFlowDirectionAndNormal(world, state, nextState, x, y, index, elevation, out newFlowDirection, out newNormal);
+					GetFlowDirectionAndNormal(world, state, x, y, index, elevation, out newFlowDirection, out newNormal);
 					nextState.FlowDirection[index] = newFlowDirection;
 					nextState.Normal[index] = newNormal;
 				}
@@ -99,7 +99,7 @@ namespace Sim {
 					float elevation = state.Elevation[index];
 					Vector2 newFlowDirection;
 					Vector3 newNormal;
-					UpdateFlowDirectionAndNormal(world, nextState, nextState, x, y, index, elevation, out newFlowDirection, out newNormal);
+					GetFlowDirectionAndNormal(world, nextState, x, y, index, elevation, out newFlowDirection, out newNormal);
 					nextState.FlowDirection[index] = newFlowDirection;
 					nextState.Normal[index] = newNormal;
 
@@ -131,7 +131,7 @@ namespace Sim {
 		}
 
 
-		static private void UpdateFlowDirectionAndNormal(World world, World.State state, World.State nextState, int x, int y, int index, float elevation, out Vector2 flowDirection, out Vector3 normal)
+		static public void GetFlowDirectionAndNormal(World world, World.State state, int x, int y, int index, float elevation, out Vector2 flowDirection, out Vector3 normal)
 		{
 			if (world.IsOcean(elevation, state.SeaLevel))
 			{

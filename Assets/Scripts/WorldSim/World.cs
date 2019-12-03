@@ -81,6 +81,7 @@ public partial class World {
 		public float PlanetTiltAngle;
 		public float SolarRadiation;
 		public float PlanetRadius;
+		public float PlanetRotationSpeed;
 
 		public SpeciesType[] Species;
 		public SpeciesStat[] SpeciesStats;
@@ -116,8 +117,8 @@ public partial class World {
 		public float[] Canopy;
 		public float[] Radiation;
 		public int[] AnimalsPerTile;
-		public Vector3[] LowerWind;
 		public Vector3[] UpperWind;
+		public Vector3[] LowerWind;
 		public Vector2[] FlowDirection;
 		public Vector3[] Normal;
 
@@ -152,6 +153,7 @@ public partial class World {
 			o.StratosphereMass = StratosphereMass;
 			o.CarbonDioxide = CarbonDioxide;
 			o.PlanetRadius = PlanetRadius;
+			o.PlanetRotationSpeed = PlanetRotationSpeed;
 			o.PlanetTiltAngle = PlanetTiltAngle;
 			o.SolarRadiation = SolarRadiation;
 			o.GlobalEnergyIncoming = GlobalEnergyIncoming;
@@ -400,9 +402,14 @@ public partial class World {
 	{
 		return Mathf.Clamp(y, 0, Size - 1);
 	}
+	public int GetNeighborIndex(int x, int y, int neighborIndex)
+	{
+		var n = GetNeighbor(x, y, neighborIndex);
+		return GetIndex(n.x,n.y);
+	}
 	public Vector2Int GetNeighbor(int x, int y, int neighborIndex)
 	{
-		switch (neighborIndex)
+			switch (neighborIndex)
 		{
 			case 0:
 				x--;

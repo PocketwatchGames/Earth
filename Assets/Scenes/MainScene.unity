@@ -14539,18 +14539,21 @@ MonoBehaviour:
     MinElevation: -11000
     StratosphereMass: 2583
     TroposphereMass: 7749
+    LowerAirDensity: 1.2
+    UpperAirDensity: 0.4
     MinTemperature: 253.15
     MaxTemperature: 323.15
     CarbonDioxide: 0.001
     PlanetTiltAngle: -23.5
     SolarRadiation: 118
     PlanetRadius: 6378000
+    PlanetRotationSpeed: 0.0001458
   Data:
-    PressureToHorizontalWindSpeed: 1
-    PressureToVerticalWindSpeed: 5
-    LowerAirDensity: 1.2
-    UpperAirDensity: 0.4
-    MaxTerrainNormalForFriction: 0.25
+    PressureToVerticalWindSpeed: 0.1
+    TemperatureDifferentialToVerticalWindSpeed: 0.1
+    DestinationTemperatureDifferentialVerticalWindSpeed: 0.1
+    MountainUpdraftWindSpeed: 10
+    MaxTerrainNormalForFriction: 1
     AirDispersalSpeed: 0.1
     HumidityDispersalSpeed: 0.01
     WindLandFrictionMinimum: 0.2
@@ -14644,8 +14647,8 @@ MonoBehaviour:
   CameraMoveSpeed: 3
   CameraZoomSpeed: 2
   TemperatureDisplay: 1
-  minPressure: 300
-  maxPressure: 600
+  minPressure: 80000
+  maxPressure: 120000
   MinElevation: -11000
   MaxElevation: 10000
   maxHumidity: 300

@@ -71,8 +71,8 @@ public class TileInfoPanel : MonoBehaviour
 
 			textUpperAtmosphere += "UPPER ATMOS";
 			textUpperAtmosphere += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(state.UpperAirTemperature[index], WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
-			textUpperAtmosphere += "\nPressure: " + (state.UpperAirPressure[index]).ToString("0.00");
-			textUpperAtmosphere += "\nMass: " + (state.UpperAirMass[index]).ToString("0.00");
+			textUpperAtmosphere += "\nPressure: " + (state.UpperAirPressure[index]).ToString("0");
+			textUpperAtmosphere += "\nMass: " + (state.UpperAirMass[index]).ToString("0");
 			textUpperAtmosphere += "\nWind: " + (state.UpperWind[index]).ToString();
 			textUpperAtmosphere += "\nCloud Mass: " + state.CloudMass[index].ToString("0.00");
 			textUpperAtmosphere += "\nCloud Energy: " + state.CloudEnergy[index].ToString("0.00");
@@ -81,10 +81,10 @@ public class TileInfoPanel : MonoBehaviour
 
 			textLowerAtmosphere += "LOWER ATMOS";
 			textLowerAtmosphere += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(state.LowerAirTemperature[index], WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
-			textLowerAtmosphere += "\nPressure: " + (state.LowerAirPressure[index]).ToString("0.00");
-			textLowerAtmosphere += "\nMass: " + (state.LowerAirMass[index]).ToString("0.00");
-			textLowerAtmosphere += "\nWind: " + (state.LowerWind[index]).ToString();
-			textLowerAtmosphere += "\nHumidity (Abs): " + state.Humidity[index].ToString("0.00");
+			textLowerAtmosphere += "\nPressure: " + (state.LowerAirPressure[index]).ToString("0");
+			textLowerAtmosphere += "\nMass: " + (state.LowerAirMass[index]).ToString("0");
+			textLowerAtmosphere += "\nSurface Wind: " + (state.LowerWind[index]).ToString();
+			textLowerAtmosphere += "\nHumidity (Abs): " + state.Humidity[index].ToString("0");
 			textLowerAtmosphere += "\nHumidity (Rel): " + Sim.Atmosphere.GetRelativeHumidity(WorldComponent.World, state.LowerAirTemperature[index], state.Humidity[index], state.LowerAirMass[index]).ToString("0.00");
 			textLowerAtmosphere += "\nEvaporation: " + (state.Evaporation[index] * WorldComponent.World.Data.TicksPerYear * 1000).ToString("0.00");
 

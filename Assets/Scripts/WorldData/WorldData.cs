@@ -11,7 +11,7 @@ public struct WindInfo
 	public float latitude;
 	public float yaw;
 	public float tropopauseElevationMax;
-	public float coriolisPower;
+	public float coriolisParam;
 }
 
 [Serializable]
@@ -20,10 +20,10 @@ public class WorldData
 	[Header("Pressure and Wind")]
 	//public float tradeWindSpeed = 12.0f; // average wind speeds around trade winds around 12 m/s
 										 //	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
-	public float PressureToHorizontalWindSpeed = 1f;
-	public float PressureToVerticalWindSpeed = 5;
-	public float LowerAirDensity = 1.2f;
-	public float UpperAirDensity = 0.4f;
+	public float PressureToVerticalWindSpeed = 1;
+	public float TemperatureDifferentialToVerticalWindSpeed = 1;
+	public float DestinationTemperatureDifferentialVerticalWindSpeed = 1;
+	public float MountainUpdraftWindSpeed = 10;
 	public float MaxTerrainNormalForFriction = 0.25f;
 	public float AirDispersalSpeed = 0.1f;
 	public float HumidityDispersalSpeed = 0.01f;
@@ -180,7 +180,7 @@ public class WorldData
 				latitude = latitude,
 				yaw = yaw,
 				tropopauseElevationMax = tropopauseElevation,
-				coriolisPower = -Mathf.Sin(latitude*Mathf.PI/2),
+				coriolisParam = Mathf.Sin(latitude*Mathf.PI/2),
 			};
 		}
 
