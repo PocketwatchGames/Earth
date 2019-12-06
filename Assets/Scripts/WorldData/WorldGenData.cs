@@ -21,5 +21,7 @@ public class WorldGenData {
 	public float PlanetTiltAngle = -23.5f;
 	public float SolarRadiation = 118; // extraterrestrial solar radiation // https://en.wikipedia.org/wiki/Sunlight (1367 w/m^2) *seconds per day (86400)
 	public float PlanetRadius = 6378000;
-	public float PlanetRotationSpeed = 0.00118f;
+	public float PlanetRotationSpeed = 0.0001458f;
+	public float MaxSalinity = 40;
+	public float MinSalinity = 30;
 }

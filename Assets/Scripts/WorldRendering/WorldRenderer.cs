@@ -383,23 +383,23 @@ public partial class WorldComponent {
 				else if (showLayers.HasFlag(Layers.OceanSalinityShallow))
 				{
 					color = oceanColor = Lerp(new List<CVP> {
-											new CVP(Color.black, 0),
-											new CVP(Color.blue, 0.5f),
-											new CVP(Color.green, 1),
-											new CVP(Color.yellow, 1.5f),
-											new CVP(Color.red, 2f),
-											new CVP(Color.white, 2.5f) },
-						elevation < state.SeaLevel ? state.OceanSalinityShallow[index] / World.Data.DeepOceanDepth : 0);
+											new CVP(Color.black, 30),
+											new CVP(Color.blue, 32),
+											new CVP(Color.green, 34),
+											new CVP(Color.yellow, 36),
+											new CVP(Color.red, 38),
+											new CVP(Color.white, 40) },
+						elevation < state.SeaLevel ? (state.OceanSalinityShallow[index] / World.Data.DeepOceanDepth) : 0);
 				} 
 				else if (showLayers.HasFlag(Layers.OceanSalinityDeep))
 				{
 					color = oceanColor = Lerp(new List<CVP> {
-											new CVP(Color.black, 0),
-											new CVP(Color.blue, 0.5f),
-											new CVP(Color.green, 1),
-											new CVP(Color.yellow, 1.5f),
-											new CVP(Color.red, 2f),
-											new CVP(Color.white, 2.5f) },
+											new CVP(Color.black, 30),
+											new CVP(Color.blue, 32),
+											new CVP(Color.green, 34),
+											new CVP(Color.yellow, 36),
+											new CVP(Color.red, 38),
+											new CVP(Color.white, 40) },
 						elevation < state.SeaLevel ? state.OceanSalinityDeep[index] / (state.SeaLevel - elevation) : 0);
 				}
 
@@ -425,17 +425,17 @@ public partial class WorldComponent {
 				else if (showLayers.HasFlag(Layers.UpperAirWind))
 				{
 					var wind = state.UpperWind[index];
-					UpdateWindArrow(state, x, y, index, wind, 200);
+					UpdateWindArrow(state, x, y, index, wind, 250);
 				}
 				else if (showLayers.HasFlag(Layers.OceanCurrentShallow))
 				{
 					var current = state.OceanCurrentShallow[index];
-					UpdateWindArrow(state, x, y, index, current, 5);
+					UpdateWindArrow(state, x, y, index, current, 2.5f);
 				}
 				else if (showLayers.HasFlag(Layers.OceanCurrentDeep))
 				{
 					var current = state.OceanCurrentDeep[index];
-					UpdateWindArrow(state, x, y, index, current, 0.2f);
+					UpdateWindArrow(state, x, y, index, current, 0.1f);
 				}
 
 			}

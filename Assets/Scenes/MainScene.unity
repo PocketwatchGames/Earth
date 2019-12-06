@@ -14548,28 +14548,38 @@ MonoBehaviour:
     SolarRadiation: 118
     PlanetRadius: 6378000
     PlanetRotationSpeed: 0.0001458
+    MaxSalinity: 40
+    MinSalinity: 30
   Data:
-    PressureToVerticalWindSpeed: 0.1
-    TemperatureDifferentialToVerticalWindSpeed: 0.1
-    DestinationTemperatureDifferentialVerticalWindSpeed: 0.1
-    MountainUpdraftWindSpeed: 10
-    MaxTerrainNormalForFriction: 1
-    AirDispersalSpeed: 0.1
-    HumidityDispersalSpeed: 0.01
-    WindLandFrictionMinimum: 0.2
-    WindAirMovement: 0.00002
-    WindHumidityMovement: 0.00002
+    PressureToVerticalWindSpeed: 0.001
+    TemperatureDifferentialToVerticalWindSpeed: 1
+    DestinationTemperatureDifferentialVerticalWindSpeed: 0
+    MountainUpdraftWindSpeed: 0
+    MaxTerrainNormalForFriction: 0.1
+    AirDispersalSpeed: 0.001
+    HumidityDispersalSpeed: 0.00001
+    WindOceanFriction: 0.2
+    WindIceFriction: 0.1
+    WindLandFriction: 0.5
+    WindAirMovementHorizontal: 0.000001
+    WindAirMovementVertical: 0.0001
+    WindHumidityMovement: 0.00001
     WindCloudMovement: 0.01
+    PressureGradientWindMultiplier: 10000
     AtmosphericHeatAbsorption: 0.297
-    AtmosphericHeatReflection: 0.23
-    CloudIncomingAbsorptionRate: 0.06
+    AtmosphericHeatReflection: 0.07
+    CloudIncomingAbsorptionRate: 0.5
     CloudIncomingReflectionRate: 0.5
     EvaporativeHeatLoss: 0.065
     OceanHeatRadiation: 0.00001021
     OceanAirConduction: 1.3824
     OceanIceConduction: 0.01
+    LengthOfDaySolarRadiationExponent: 0.5
+    SunVectorSolarRadiationExponent: 2
+    AtmosphericDepthExponent: 0.65
     CloudMassFullAbsorption: 300
-    EnergyEmittedByAtmosphere: 0.000001024
+    EnergyEmittedByUpperAtmosphere: 0.00001024
+    EnergyLostThroughAtmosphereWindow: 0.000001024
     CloudOutgoingAbsorptionRate: 0.1
     CloudEnergyDispersalSpeed: 0.01
     EnergyTrappedByGreenhouseGasses: 0.1
@@ -14587,15 +14597,15 @@ MonoBehaviour:
     evapTemperatureRange: 0
     rainPointTemperatureMultiplier: 0.00075
     DeepOceanDepth: 500
-    WindToOceanCurrentFactor: 0.1
-    OceanEnergyCurrentSpeed: 0.001
-    OceanSalinityCurrentSpeed: 0.01
-    OceanHorizontalMixingSpeed: 0.01
-    OceanUpwellingSpeed: 0.0001
-    OceanTemperatureVerticalMixingSpeed: 0.0001
+    WindToOceanCurrentFactor: 0.05
+    OceanEnergyCurrentSpeed: 0.0001
+    OceanSalinityCurrentSpeed: 0.0001
+    OceanHorizontalMixingSpeed: 0.1
+    OceanUpwellingSpeed: 0.00001
+    OceanTemperatureVerticalMixingSpeed: 0.001
     SalinityVerticalMixingSpeed: 0.001
-    OceanDensityPerSalinity: 1
-    OceanDensityPerTemperature: 10
+    OceanDensityPerSalinity: 0.0008
+    OceanDensityPerDegree: 0.0002
     FullIceCoverage: 1
     FlowSpeed: 10
     FlowSpeedExponent: 0.25
@@ -14613,13 +14623,13 @@ MonoBehaviour:
     minPopulationDensityForExpansion: 0.1
     TicksPerYear: 360
     tileSize: 400000
-    troposphereElevation: 10000
+    TropopauseElevation: 10000
     BoundaryZoneElevation: 1000
     stratosphereElevation: 50000
     MaxTropopauseElevation: 17000
     MinTropopauseElevation: 9000
     TropopauseElevationSeason: 1000
-    temperatureLapseRate: -0.0065
+    TemperatureLapseRate: -0.0065
     GravitationalAcceleration: 9.80665
     StaticPressure: 101325
     StdTemp: 288.15

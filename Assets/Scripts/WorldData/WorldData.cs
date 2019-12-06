@@ -20,17 +20,21 @@ public class WorldData
 	[Header("Pressure and Wind")]
 	//public float tradeWindSpeed = 12.0f; // average wind speeds around trade winds around 12 m/s
 										 //	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
-	public float PressureToVerticalWindSpeed = 1;
-	public float TemperatureDifferentialToVerticalWindSpeed = 1;
-	public float DestinationTemperatureDifferentialVerticalWindSpeed = 1;
-	public float MountainUpdraftWindSpeed = 10;
+	public float PressureToVerticalWindSpeed = 0.0001f;
+	public float TemperatureDifferentialToVerticalWindSpeed = 0.01f;
+	public float DestinationTemperatureDifferentialVerticalWindSpeed = 0.1f;
+	public float MountainUpdraftWindSpeed = 0.1f;
 	public float MaxTerrainNormalForFriction = 0.25f;
-	public float AirDispersalSpeed = 0.1f;
-	public float HumidityDispersalSpeed = 0.01f;
-	public float WindLandFrictionMinimum = 0.2f;
-	public float WindAirMovement = 0.00002f;
+	public float AirDiffusionSpeed = 0.1f;
+	public float WindOceanFriction = 0.2f;
+	public float WindIceFriction = 0.1f;
+	public float WindLandFriction = 0.5f;
+	public float WindAirMovementHorizontal = 0.00002f;
+	public float WindAirMovementVertical = 0.0002f;
 	public float WindHumidityMovement = 0.00002f;
 	public float WindCloudMovement = 0.01f;
+	public float PressureGradientWindMultiplier = 4000;
+	public float AdiabaticLapseRate = 0.0098f;
 
 	[Header("Atmospheric Energy Cycle")]
 	// atmospheric heat balance https://energyeducation.ca/encyclopedia/Earth%27s_heat_balance
@@ -43,10 +47,14 @@ public class WorldData
 	public float OceanHeatRadiation = 0.00001021f; // global average = 66 watts
 	public float OceanAirConduction = 1.3824f; // global avg = 16 watts per degree delta between air and ocean
 	public float OceanIceConduction = 0.01f; // small
+	public float LengthOfDaySolarRadiationExponent = 0.5f;
+	public float SunVectorSolarRadiationExponent = 2;
+	public float AtmosphericDepthExponent = 0.5f;
 
 	// TODO: tune these to match the science
 	public float CloudMassFullAbsorption = 300.0f; // how much heat gain/loss is caused by cloud cover
-	public float EnergyEmittedByAtmosphere = 0.000001024f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
+	public float EnergyEmittedByUpperAtmosphere = 0.000001024f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
+	public float EnergyLostThroughAtmosphereWindow = 0.000001024f; // AKA Atmospheric window global average = 40 watts
 	public float CloudOutgoingAbsorptionRate = 0.1f;
 	public float CloudEnergyDispersalSpeed = 0.01f;
 	public float EnergyTrappedByGreenhouseGasses = 0.1f;
@@ -69,14 +77,14 @@ public class WorldData
 	[Header("Ocean")]
 	public float DeepOceanDepth = 500;
 	public float WindToOceanCurrentFactor = 0.1f;
-	public float OceanEnergyCurrentSpeed = 0.001f;
-	public float OceanSalinityCurrentSpeed = 0.01f;
+	public float OceanCurrentSpeed = 0.00001f;
 	public float OceanHorizontalMixingSpeed = 0.01f;
 	public float OceanUpwellingSpeed = 0.0001f;
 	public float OceanTemperatureVerticalMixingSpeed = 0.0001f;
 	public float SalinityVerticalMixingSpeed = 0.001f;
-	public float OceanDensityPerSalinity = 1.0f;
-	public float OceanDensityPerTemperature = 10.0f;
+	public float OceanDensityPerSalinity = 0.0008f;
+	public float OceanDensityPerDegree = 0.0002f;
+	public float OceanDensityCurrentSpeed = 100f;
 	public float FullIceCoverage = 1.0f;
 
 	[Header("Fresh Water")]
@@ -102,13 +110,13 @@ public class WorldData
 	[Header("Planetary")]
 	public int TicksPerYear = 360;
 	public float tileSize = 400000;
-	public float troposphereElevation = 10000;
+	public float TropopauseElevation = 10000;
 	public float BoundaryZoneElevation = 1000;
 	public float stratosphereElevation = 50000;
 	public float MaxTropopauseElevation = 17000f;
 	public float MinTropopauseElevation = 9000f;
 	public float TropopauseElevationSeason = 1000f;
-	public float temperatureLapseRate = -0.0065f;
+	public float TemperatureLapseRate = -0.0065f;
 	public float GravitationalAcceleration = 9.80665f;
 	public float StaticPressure = 101325;
 	public float StdTemp = 288.15f;
@@ -144,6 +152,10 @@ public class WorldData
 	public float SecondsPerTick;
 	[NonSerialized]
 	public float PressureExponent;
+	[NonSerialized]
+	public float SpecificGasConstantDryAir;
+	[NonSerialized]
+	public float DryAirAdiabaticLapseRate;
 
 
 	public void Init(int size)
@@ -162,8 +174,10 @@ public class WorldData
 		GroundWaterFlowSpeed /= TicksPerYear;
 
 		evapTemperatureRange = EvapMaxTemperature - EvapMinTemperature;
-		PressureExponent = GravitationalAcceleration * MolarMassEarthAir / (UniversalGasConstant * temperatureLapseRate);
+		SpecificGasConstantDryAir = UniversalGasConstant / MolarMassEarthAir;
+		PressureExponent = GravitationalAcceleration * MolarMassEarthAir / (UniversalGasConstant * TemperatureLapseRate);
 
+		DryAirAdiabaticLapseRate = AdiabaticLapseRate / SpecificHeatAtmosphere;
 
 		for (int y = 0; y < size; y++)
 		{

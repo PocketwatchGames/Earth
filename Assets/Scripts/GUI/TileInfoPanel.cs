@@ -68,6 +68,7 @@ public class TileInfoPanel : MonoBehaviour
 			textGeo += "\nElevation: " + (int)elevation;
 			textGeo += "\nWaterTableDepth: " + (int)state.WaterTableDepth[index];
 			textGeo += "\nSurfaceIce: " + state.Ice[index].ToString("0.00");
+			textGeo += "\nSurface Heat: " + ConvertTileEnergyToWatts(state.EnergyAbsorbed[index]).ToString("0.0");
 
 			textUpperAtmosphere += "UPPER ATMOS";
 			textUpperAtmosphere += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(state.UpperAirTemperature[index], WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
@@ -83,7 +84,7 @@ public class TileInfoPanel : MonoBehaviour
 			textLowerAtmosphere += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(state.LowerAirTemperature[index], WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 			textLowerAtmosphere += "\nPressure: " + (state.LowerAirPressure[index]).ToString("0");
 			textLowerAtmosphere += "\nMass: " + (state.LowerAirMass[index]).ToString("0");
-			textLowerAtmosphere += "\nSurface Wind: " + (state.LowerWind[index]).ToString();
+			textLowerAtmosphere += "\nWind: " + (state.LowerWind[index]).ToString();
 			textLowerAtmosphere += "\nHumidity (Abs): " + state.Humidity[index].ToString("0");
 			textLowerAtmosphere += "\nHumidity (Rel): " + Sim.Atmosphere.GetRelativeHumidity(WorldComponent.World, state.LowerAirTemperature[index], state.Humidity[index], state.LowerAirMass[index]).ToString("0.00");
 			textLowerAtmosphere += "\nEvaporation: " + (state.Evaporation[index] * WorldComponent.World.Data.TicksPerYear * 1000).ToString("0.00");
