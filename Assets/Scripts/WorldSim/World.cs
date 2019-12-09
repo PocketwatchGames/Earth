@@ -69,6 +69,7 @@ public partial class World {
 	public object InputLock = new object();
 	public SpeciesDisplayData[] SpeciesDisplay;
 	private Task _simTask;
+	bool threaded = false;
 
 	public class State : ICloneable {
 		public int Ticks;
@@ -183,8 +184,8 @@ public partial class World {
 			o.LowerAirPressure = (float[])LowerAirPressure.Clone();
 			o.LowerAirMass = (float[])LowerAirMass.Clone();
 			o.Humidity = (float[])Humidity.Clone();
-			o.CloudMass = (float[])CloudMass.Clone();
-			o.RainDropMass = (float[])RainDropMass.Clone();
+			o.CloudMass = new float[CloudMass.Length];
+			o.RainDropMass = new float[RainDropMass.Length];
 			o.WaterTableDepth = (float[])WaterTableDepth.Clone();
 			o.GroundWater = (float[])GroundWater.Clone();
 			o.SurfaceWater = (float[])SurfaceWater.Clone();
@@ -291,47 +292,56 @@ public partial class World {
 		}
 	}
 
-	public void Start() { 
+	public void Start() {
 
-		_simTask = Task.Run(() =>
+		if (threaded)
 		{
-			while (true)
+			_simTask = Task.Run(() =>
 			{
-				try
+				while (true)
 				{
-					if (TimeTillTick <= 0)
+					try
 					{
-						TimeTillTick += TicksPerSecond;
-
-						lock (InputLock)
+						DoSimTick(threaded);
+					}
+					catch (AggregateException e)
+					{
+						foreach (var i in e.InnerExceptions)
 						{
-							int nextStateIndex = (CurStateIndex + 1) % StateCount;
-							lock (DrawLock)
-							{
-								while (nextStateIndex == LastRenderStateIndex || nextStateIndex == CurRenderStateIndex)
-								{
-									nextStateIndex = (nextStateIndex + 1) % StateCount;
-								}
-							}
-
-							States[nextStateIndex] = (State)States[CurStateIndex].Clone();
-							Tick(States[CurStateIndex], States[nextStateIndex]);
-
-							// TODO: why can't i edit this in the tick call?  it's a class, so it should be pass by reference?
-							States[nextStateIndex].Ticks = States[CurStateIndex].Ticks + 1;
-							CurStateIndex = nextStateIndex;
+							Debug.Log(i);
 						}
 					}
-				} catch (AggregateException e)
+				}
+
+			});
+		}
+	}
+
+	private void DoSimTick(bool threaded)
+	{
+		if (TimeTillTick <= 0)
+		{
+			TimeTillTick += TicksPerSecond;
+
+			lock (InputLock)
+			{
+				int nextStateIndex = (CurStateIndex + 1) % StateCount;
+				lock (DrawLock)
 				{
-					foreach (var i in e.InnerExceptions)
+					while (nextStateIndex == LastRenderStateIndex || nextStateIndex == CurRenderStateIndex)
 					{
-						Debug.Log(i);
+						nextStateIndex = (nextStateIndex + 1) % StateCount;
 					}
 				}
-			}
 
-		});
+				States[nextStateIndex] = (State)States[CurStateIndex].Clone();
+				Tick(States[CurStateIndex], States[nextStateIndex], threaded);
+
+				// TODO: why can't i edit this in the tick call?  it's a class, so it should be pass by reference?
+				States[nextStateIndex].Ticks = States[CurStateIndex].Ticks + 1;
+				CurStateIndex = nextStateIndex;
+			}
+		}
 	}
 
 	public void Update(float dt)
@@ -339,6 +349,11 @@ public partial class World {
 		if (TimeTillTick > -1)
 		{
 			TimeTillTick -= TimeScale * dt;
+		}
+
+		if (!threaded)
+		{
+			DoSimTick(threaded);
 		}
 	}
 
@@ -442,35 +457,45 @@ public partial class World {
 		return new Vector2Int(x, y);
 	}
 
-	private void Tick(State state, State nextState)
+	private void Tick(State state, State nextState, bool threaded)
 	{
 		nextState.SpeciesStats = new SpeciesStat[MaxSpecies];
 
-		List<Task> simTasks = new List<Task>();
-		simTasks.Add(Task.Run(() =>
+		if (threaded)
+		{
+			List<Task> simTasks = new List<Task>();
+			simTasks.Add(Task.Run(() =>
+			{
+				Sim.Geology.Tick(this, state, nextState);
+			}));
+			simTasks.Add(Task.Run(() =>
+			{
+				Sim.Wind.Tick(this, state, nextState);
+			}));
+			simTasks.Add(Task.Run(() =>
+			{
+				Sim.Atmosphere.Tick(this, state, nextState);
+			}));
+			simTasks.Add(Task.Run(() =>
+			{
+				Sim.Animals.Tick(this, state, nextState);
+			}));
+			//simTasks.Add(Task.Run(() =>
+			//{
+			//	for (int i = 0; i < ProbeCount; i++)
+			//	{
+			//		Probes[i].Update(this, state);
+			//	}
+			//}));
+			Task.WaitAll(simTasks.ToArray());
+		}
+		else
 		{
 			Sim.Geology.Tick(this, state, nextState);
-		}));
-		simTasks.Add(Task.Run(() =>
-		{
 			Sim.Wind.Tick(this, state, nextState);
-		}));
-		simTasks.Add(Task.Run(() =>
-		{
 			Sim.Atmosphere.Tick(this, state, nextState);
-		}));
-		simTasks.Add(Task.Run(() =>
-		{
 			Sim.Animals.Tick(this, state, nextState);
-		}));
-		//simTasks.Add(Task.Run(() =>
-		//{
-		//	for (int i = 0; i < ProbeCount; i++)
-		//	{
-		//		Probes[i].Update(this, state);
-		//	}
-		//}));
-		Task.WaitAll(simTasks.ToArray());
+		}
 	}
 
 
