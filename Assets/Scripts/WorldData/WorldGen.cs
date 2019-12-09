@@ -144,18 +144,16 @@ public static class WorldGen {
 				state.LowerAirEnergy[index] = Atmosphere.GetAirEnergy(world, state.LowerAirTemperature[index], state.LowerAirMass[index]);
 
 
-				state.CloudMass[index] = Mathf.Pow(GetPerlinMinMax(world, noise, x, y, 3.0f, 2000, 0, 1), 3) * 300;
-		//		state.CloudMass[index] = 0;
-				state.CloudElevation[index] = state.Elevation[index] + 1000;
+				state.CloudMass[index] = Mathf.Pow(GetPerlinMinMax(world, noise, x, y, 3.0f, 2000, 0, 1), 5) * 300;
 				state.Humidity[index] = Mathf.Max(0, GetPerlinMinMax(world, noise, x, y, 3.0f, 3000, 0, 300) * Mathf.Cos(Mathf.PI / 2 * latitude));
 				state.WaterTableDepth[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 200, data.MinWaterTableDepth, data.MaxWaterTableDepth);
 				state.SoilFertility[index] = GetPerlinNormalized(world, noise, x, y, 1.0f, 400);
 				state.Ice[index] = 0;
 				if (e >= 0)
 				{
-					state.SurfaceWater[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 100, 0, 10.0f);
-					state.GroundWater[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 300, 0, state.WaterTableDepth[index] * state.SoilFertility[index] * data.MaxSoilPorousness);
-					state.Canopy[index] = GetPerlinNormalized(world, noise, x, y, 2.0f, 1000);
+					state.SurfaceWater[index] = Mathf.Pow(GetPerlinNormalized(world, noise, x, y, 1.0f, 100),3)*10;
+					state.GroundWater[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 300, 0, state.WaterTableDepth[index] * state.SoilFertility[index] / (data.MaxSoilPorousness * data.MaxWaterTableDepth));
+					state.Canopy[index] = Mathf.Pow(GetPerlinNormalized(world, noise, x, y, 2.0f, 1000),2);
 				} else
 				{
 					state.OceanTemperatureShallow[index] = Math.Max(data.FreezingTemperature, state.LowerAirTemperature[index]);

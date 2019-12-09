@@ -10,7 +10,7 @@ public partial class WorldComponent : MonoBehaviour
 	public enum Layers {
 		None = 0,
 		Elevation = 1 << 0,
-		ElevationSubtle = 1 << 1,
+		VerticalWind = 1 << 1,
 		Gradient = 1 << 2,
 		Water = 1 << 3,
 		SoilFertility = 1 << 4,

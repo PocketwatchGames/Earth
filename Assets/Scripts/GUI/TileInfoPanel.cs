@@ -76,8 +76,7 @@ public class TileInfoPanel : MonoBehaviour
 			textUpperAtmosphere += "\nMass: " + (state.UpperAirMass[index]).ToString("0");
 			textUpperAtmosphere += "\nWind: " + (state.UpperWind[index]).ToString();
 			textUpperAtmosphere += "\nCloud Mass: " + state.CloudMass[index].ToString("0.00");
-			textUpperAtmosphere += "\nCloud Energy: " + state.CloudEnergy[index].ToString("0.00");
-			textUpperAtmosphere += "\nCloud Elevation: " + state.CloudElevation[index].ToString("0.00");
+			textUpperAtmosphere += "\nRaindrop Mass: " + state.RainDropMass[index].ToString("0.00");
 			textUpperAtmosphere += "\nRainfall: " + (state.Rainfall[index] * WorldComponent.World.Data.TicksPerYear).ToString("0.00");
 
 			textLowerAtmosphere += "LOWER ATMOS";
@@ -94,12 +93,12 @@ public class TileInfoPanel : MonoBehaviour
 			{
 				textSurfaceOcean += "SURFACE OCEAN";
 				textSurfaceOcean += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(state.OceanTemperatureShallow[index], WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
-				textSurfaceOcean += "\nSalinity: " + state.OceanSalinityShallow[index].ToString("0.00");
+				textSurfaceOcean += "\nSalinity: " + (state.OceanSalinityShallow[index] / WorldComponent.World.Data.DeepOceanDepth).ToString("0.00");
 				textSurfaceOcean += "\nCurrent: " + state.OceanCurrentShallow[index].ToString();
 
 				textDeepOcean += "DEEP OCEAN";
 				textDeepOcean += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(Sim.Atmosphere.GetWaterTemperature(WorldComponent.World, state.OceanEnergyDeep[index], state.SeaLevel - elevation), WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
-				textDeepOcean += "\nSalinity: " + state.OceanSalinityDeep[index].ToString("0.00");
+				textDeepOcean += "\nSalinity: " + (state.OceanSalinityDeep[index] / (state.SeaLevel - elevation)).ToString("0.00");
 				textDeepOcean += "\nDensity: " + state.OceanDensityDeep[index].ToString("0.00");
 				textDeepOcean += "\nCurrent: " + state.OceanCurrentDeep[index].ToString();
 				OceanPanel.SetActive(true);

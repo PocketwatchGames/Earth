@@ -14551,13 +14551,12 @@ MonoBehaviour:
     MaxSalinity: 40
     MinSalinity: 30
   Data:
-    PressureToVerticalWindSpeed: 0.001
-    TemperatureDifferentialToVerticalWindSpeed: 1
+    PressureToVerticalWindSpeed: 0.0001
+    TemperatureDifferentialToVerticalWindSpeed: 10
     DestinationTemperatureDifferentialVerticalWindSpeed: 0
     MountainUpdraftWindSpeed: 0
     MaxTerrainNormalForFriction: 0.1
-    AirDispersalSpeed: 0.001
-    HumidityDispersalSpeed: 0.00001
+    AirDiffusionSpeed: 0.1
     WindOceanFriction: 0.2
     WindIceFriction: 0.1
     WindLandFriction: 0.5
@@ -14565,7 +14564,8 @@ MonoBehaviour:
     WindAirMovementVertical: 0.0001
     WindHumidityMovement: 0.00001
     WindCloudMovement: 0.01
-    PressureGradientWindMultiplier: 10000
+    PressureGradientWindMultiplier: 1000
+    AdiabaticLapseRate: 0.0098
     AtmosphericHeatAbsorption: 0.297
     AtmosphericHeatReflection: 0.07
     CloudIncomingAbsorptionRate: 0.5
@@ -14581,31 +14581,31 @@ MonoBehaviour:
     EnergyEmittedByUpperAtmosphere: 0.00001024
     EnergyLostThroughAtmosphereWindow: 0.000001024
     CloudOutgoingAbsorptionRate: 0.1
-    CloudEnergyDispersalSpeed: 0.01
     EnergyTrappedByGreenhouseGasses: 0.1
     HumidityHeatAbsorption: 1
     HumidityToCloudSpeed: 0.1
     CloudToHumiditySpeed: 0
-    CloudElevationSpeed: 100
     DewPointTemperatureRange: 100
     DewPointZero: 213
     WaterVaporMassToAirMassAtDewPoint: 0.2
-    RainfallRate: 0.1
+    RainfallRate: 0.001
     EvapMinTemperature: 253
     EvapMaxTemperature: 413
     EvaporationRate: 0.0001
     evapTemperatureRange: 0
     rainPointTemperatureMultiplier: 0.00075
+    RainDropFormationSpeedTemperature: 100
+    RainDropDissapationSpeedWind: 0.00001
     DeepOceanDepth: 500
     WindToOceanCurrentFactor: 0.05
-    OceanEnergyCurrentSpeed: 0.0001
-    OceanSalinityCurrentSpeed: 0.0001
-    OceanHorizontalMixingSpeed: 0.1
+    OceanCurrentSpeed: 0.00001
+    OceanHorizontalMixingSpeed: 0.001
     OceanUpwellingSpeed: 0.00001
     OceanTemperatureVerticalMixingSpeed: 0.001
     SalinityVerticalMixingSpeed: 0.001
     OceanDensityPerSalinity: 0.0008
     OceanDensityPerDegree: 0.0002
+    OceanDensityCurrentSpeed: 100
     FullIceCoverage: 1
     FlowSpeed: 10
     FlowSpeedExponent: 0.25
@@ -14659,13 +14659,13 @@ MonoBehaviour:
   TemperatureDisplay: 1
   minPressure: 80000
   maxPressure: 120000
-  MinElevation: -11000
-  MaxElevation: 10000
+  MinElevation: -6000
+  MaxElevation: 5000
   maxHumidity: 300
   maxRainfall: 5
-  minCloudsToDraw: 10
+  minCloudsToDraw: 1
   maxCloudsWidth: 0.5
-  maxCloudAlpha: 100
+  maxCloudAlpha: 200
   maxCloudColor: 300
   MainCamera: {fileID: 963194227}
   WorldIcons: {fileID: 870706485}

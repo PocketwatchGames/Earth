@@ -56,14 +56,12 @@ public class WorldData
 	public float EnergyEmittedByUpperAtmosphere = 0.000001024f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
 	public float EnergyLostThroughAtmosphereWindow = 0.000001024f; // AKA Atmospheric window global average = 40 watts
 	public float CloudOutgoingAbsorptionRate = 0.1f;
-	public float CloudEnergyDispersalSpeed = 0.01f;
 	public float EnergyTrappedByGreenhouseGasses = 0.1f;
 	public float HumidityHeatAbsorption = 1.0f;
 
 	[Header("Evap, Humidity and Clouds")]
 	public float HumidityToCloudSpeed = 0.1f;
 	public float CloudToHumiditySpeed = 0.01f;
-	public float CloudElevationSpeed = 100.0f;
 	public float DewPointTemperatureRange = 100.0f;
 	public float DewPointZero = 213.0f;
 	public float WaterVaporMassToAirMassAtDewPoint = 0.2f;
@@ -73,6 +71,8 @@ public class WorldData
 	public float EvaporationRate = 0.0001f; // TODO: evaporation on earth maxes out around 2.5M per year 
 	public float evapTemperatureRange;
 	public float rainPointTemperatureMultiplier = 0.00075f; // adjustment for temperature
+	public float RainDropFormationSpeedTemperature = 10f;
+	public float RainDropDissapationSpeedWind = 0.00001f;
 
 	[Header("Ocean")]
 	public float DeepOceanDepth = 500;

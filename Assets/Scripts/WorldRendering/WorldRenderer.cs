@@ -174,11 +174,12 @@ public partial class WorldComponent {
 				{
 					color = Color.Lerp(Color.gray, new Color(0.8f,0.5f,0.2f), Mathf.Lerp(lastState.SoilFertility[index], state.SoilFertility[index], stateLerpT));
 				}
-
-				if (showLayers.HasFlag(Layers.ElevationSubtle))
-				{
-					color = Lerp(new List<CVP> { new CVP(Color.black, -2000), new CVP(color, 1000), new CVP(Color.white, 4000) }, elevation);
-				}
+				color = Lerp(new List<CVP> { new CVP(Color.black, -2000), new CVP(color, 1000), new CVP(Color.white, 4000) }, elevation);
+				oceanColor = Lerp(new List<CVP> {
+								new CVP(Color.black, MinElevation),
+								new CVP(Color.blue, state.SeaLevel - 1000),
+								new CVP(new Color(0.4f,0.3f,1.0f), state.SeaLevel), },
+				elevation);
 
 				if (showLayers.HasFlag(Layers.Vegetation))
 				{
@@ -189,6 +190,7 @@ public partial class WorldComponent {
 				if (showLayers.HasFlag(Layers.TemperatureSubtle))
 				{
 					color = Lerp(new List<CVP>() { new CVP(new Color(0.4f, 0.4f, 1.0f), -500 + World.Data.FreezingTemperature), new CVP(color, World.Data.FreezingTemperature), new CVP(Color.red, 500 + World.Data.FreezingTemperature) }, state.LowerAirTemperature[index]);
+					oceanColor = Color.Lerp(oceanColor, Lerp(new List<CVP>() { new CVP(new Color(0.0f, 0.0f, 0.6f), World.Data.FreezingTemperature - 50), new CVP(new Color(0.0f, 1.0f, 1.0f), 60 + World.Data.FreezingTemperature) }, state.OceanTemperatureShallow[index]), 0.25f);
 				}
 
 				//		if (showLayers.HasFlag(Layers.Water))
@@ -208,18 +210,7 @@ public partial class WorldComponent {
 				//			}
 				//		}
 
-				if (showLayers.HasFlag(Layers.ElevationSubtle))
-				{
-					oceanColor = Lerp(new List<CVP> {
-									new CVP(Color.black, MinElevation),
-									new CVP(Color.blue, state.SeaLevel - 500),
-									new CVP(new Color(0.1f,0.2f,1.0f), state.SeaLevel), },
-						elevation);
-				}
-				else
-				{
-					oceanColor = Color.blue;
-				}
+
 				if (ice > 0)
 				{
 					oceanColor = Color.Lerp(oceanColor, new Color(0.4f, 0.6f, 1.0f), 0.25f + 0.75f * Mathf.Clamp01(ice / World.Data.FullIceCoverage));
@@ -409,14 +400,13 @@ public partial class WorldComponent {
 
 				if (state.CloudMass[index] > minCloudsToDraw)
 				{
-					float normalizedCloudCover = (state.CloudMass[index] - minCloudsToDraw) / maxCloudColor;
-					var cloudColor = Color.Lerp(Color.white, Color.black, Mathf.Clamp01((state.CloudMass[index] - minCloudsToDraw) / maxCloudColor)) * (float)Math.Sqrt(Mathf.Clamp01((state.CloudMass[index] - minCloudsToDraw) / maxCloudAlpha)) * 0.9f;
+					var cloudColor = Color.Lerp(Color.white, Color.black, Mathf.Clamp01(state.RainDropMass[index] / maxCloudColor)) * (float)Math.Sqrt(Mathf.Clamp01((state.CloudMass[index] - minCloudsToDraw) / maxCloudAlpha)) * 0.9f;
 					cloudCols[index] = cloudColor;
 				} else
 				{
 					cloudCols[index].a = 0;
 				}
-				cloudVerts[index].z = -Mathf.Max(Math.Max(elevation, state.SeaLevel)+1, state.CloudElevation[index]) * ElevationScale;
+				cloudVerts[index].z = -Mathf.Max(Math.Max(elevation, state.SeaLevel)+1) * ElevationScale;
 				if (showLayers.HasFlag(Layers.SurfaceAirWind))
 				{
 					var wind = state.LowerWind[index];

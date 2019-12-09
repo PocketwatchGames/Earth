@@ -99,8 +99,7 @@ public partial class World {
 		public float[] UpperAirMass;
 		public float[] Humidity;
 		public float[] CloudMass;
-		public float[] CloudEnergy;
-		public float[] CloudElevation;
+		public float[] RainDropMass;
 		public float[] WaterTableDepth;
 		public float[] GroundWater;
 		public float[] SurfaceWater;
@@ -185,8 +184,7 @@ public partial class World {
 			o.LowerAirMass = (float[])LowerAirMass.Clone();
 			o.Humidity = (float[])Humidity.Clone();
 			o.CloudMass = (float[])CloudMass.Clone();
-			o.CloudEnergy = (float[])CloudEnergy.Clone();
-			o.CloudElevation = (float[])CloudElevation.Clone();
+			o.RainDropMass = (float[])RainDropMass.Clone();
 			o.WaterTableDepth = (float[])WaterTableDepth.Clone();
 			o.GroundWater = (float[])GroundWater.Clone();
 			o.SurfaceWater = (float[])SurfaceWater.Clone();
@@ -243,7 +241,6 @@ public partial class World {
 			States[i] = new State();
 			States[i].Plate = new int[s];
 			States[i].Elevation = new float[s];
-			States[i].CloudElevation = new float[s];
 			States[i].UpperAirEnergy = new float[s];
 			States[i].UpperAirTemperature = new float[s];
 			States[i].UpperAirPressure = new float[s];
@@ -254,7 +251,7 @@ public partial class World {
 			States[i].LowerAirMass = new float[s];
 			States[i].Humidity = new float[s];
 			States[i].CloudMass = new float[s];
-			States[i].CloudEnergy = new float[s];
+			States[i].RainDropMass = new float[s];
 			States[i].WaterTableDepth = new float[s];
 			States[i].GroundWater = new float[s];
 			States[i].SurfaceWater = new float[s];

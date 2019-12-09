@@ -32,11 +32,11 @@ namespace Sim {
 						{
 							float t = state.LowerAirTemperature[index];
 							float sf = state.SoilFertility[index];
-							float groundWaterSaturation = GetGroundWaterSaturation(state.GroundWater[index], state.WaterTableDepth[index], sf * world.Data.MaxSoilPorousness);
-							float surfaceWater = state.SurfaceWater[index];
-							freshWaterAvailability = GetFreshWaterAvailability(surfaceWater, groundWaterSaturation);
+							//float groundWaterSaturation = GetGroundWaterSaturation(state.GroundWater[index], state.WaterTableDepth[index], sf * world.Data.MaxSoilPorousness);
+							//float surfaceWater = state.SurfaceWater[index];
+							//freshWaterAvailability = GetFreshWaterAvailability(surfaceWater, groundWaterSaturation);
 
-							float desiredCanopy = sf * Math.Min(groundWaterSaturation + surfaceWater, 1.0f) * Math.Max(0, (t - world.Data.MinTemperatureCanopy) / (world.Data.MaxTemperatureCanopy - world.Data.MinTemperatureCanopy));
+							float desiredCanopy = sf * (state.Rainfall[index] + state.SurfaceWater[index]) * (1.0f - Mathf.Clamp01(state.Ice[index] / world.Data.FullIceCoverage)) * Math.Max(0, (t - world.Data.MinTemperatureCanopy) / (world.Data.MaxTemperatureCanopy - world.Data.MinTemperatureCanopy));
 							float canopyGrowth = (desiredCanopy - canopy) * world.Data.canopyGrowthRate;
 							newCanopy += canopyGrowth;
 
