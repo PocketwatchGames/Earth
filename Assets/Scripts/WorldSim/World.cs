@@ -71,7 +71,7 @@ public partial class World {
 	private Task _simTask;
 	bool threaded = false;
 
-	public class State : ICloneable {
+	public class State {
 		public int Ticks;
 		public float AtmosphereCO2;
 		public float AtmosphereO2;
@@ -141,77 +141,76 @@ public partial class World {
 		public float GlobalOceanCoverage;
 		public float AtmosphericMass;
 
-		public object Clone()
+		public void CopyFrom(State from)
 		{
-			State o = new State();
-			o.Ticks = Ticks;
-			o.AtmosphereCO2 = AtmosphereCO2;
-			o.AtmosphereO2 = AtmosphereO2;
-			o.AtmosphereN = AtmosphereN;
-			o.GlobalTemperature = GlobalTemperature;
-			o.SeaLevel = SeaLevel;
-			o.StratosphereMass = StratosphereMass;
-			o.CarbonDioxide = CarbonDioxide;
-			o.PlanetRadius = PlanetRadius;
-			o.PlanetRotationSpeed = PlanetRotationSpeed;
-			o.PlanetTiltAngle = PlanetTiltAngle;
-			o.SolarRadiation = SolarRadiation;
-			o.GlobalEnergyIncoming = GlobalEnergyIncoming;
-			o.GlobalEnergyReflectedAtmosphere = GlobalEnergyReflectedAtmosphere;
-			o.GlobalEnergyReflectedSurface = GlobalEnergyReflectedSurface;
-			o.GlobalEnergyLost = GlobalEnergyLost;
-			o.GlobalEnergyGained = GlobalEnergyGained;
-			o.GlobalEnergyAbsorbedCloud = GlobalEnergyAbsorbedCloud;
-			o.GlobalEnergyAbsorbedUpperAtmosphere = GlobalEnergyAbsorbedUpperAtmosphere;
-			o.GlobalEnergyAbsorbedLowerAtmosphere = GlobalEnergyAbsorbedLowerAtmosphere;
-			o.GlobalEnergyAbsorbedSurface = GlobalEnergyAbsorbedSurface;
-			o.GlobalEnergy = GlobalEnergy;
-			o.GlobalTemperature = GlobalTemperature;
-			o.GlobalOceanCoverage = GlobalOceanCoverage;
-			o.AtmosphericMass = AtmosphericMass;
+			Ticks = from.Ticks;
+			AtmosphereCO2 = from.AtmosphereCO2;
+			AtmosphereO2 = from.AtmosphereO2;
+			AtmosphereN = from.AtmosphereN;
+			GlobalTemperature = from.GlobalTemperature;
+			SeaLevel = from.SeaLevel;
+			StratosphereMass = from.StratosphereMass;
+			CarbonDioxide = from.CarbonDioxide;
+			PlanetRadius = from.PlanetRadius;
+			PlanetRotationSpeed = from.PlanetRotationSpeed;
+			PlanetTiltAngle = from.PlanetTiltAngle;
+			SolarRadiation = from.SolarRadiation;
+			GlobalEnergyIncoming = from.GlobalEnergyIncoming;
+			GlobalEnergyReflectedAtmosphere = from.GlobalEnergyReflectedAtmosphere;
+			GlobalEnergyReflectedSurface = from.GlobalEnergyReflectedSurface;
+			GlobalEnergyLost = from.GlobalEnergyLost;
+			GlobalEnergyGained = from.GlobalEnergyGained;
+			GlobalEnergyAbsorbedCloud = from.GlobalEnergyAbsorbedCloud;
+			GlobalEnergyAbsorbedUpperAtmosphere = from.GlobalEnergyAbsorbedUpperAtmosphere;
+			GlobalEnergyAbsorbedLowerAtmosphere = from.GlobalEnergyAbsorbedLowerAtmosphere;
+			GlobalEnergyAbsorbedSurface = from.GlobalEnergyAbsorbedSurface;
+			GlobalEnergy = from.GlobalEnergy;
+			GlobalTemperature = from.GlobalTemperature;
+			GlobalOceanCoverage = from.GlobalOceanCoverage;
+			AtmosphericMass = from.AtmosphericMass;
 
-		o.Species = (SpeciesType[])Species.Clone();
-			o.SpeciesStats = (SpeciesStat[])SpeciesStats.Clone();
-			o.Herds = (Herd[])Herds.Clone();
-			o.Plate = (int[])Plate.Clone();
-			o.Elevation = (float[])Elevation.Clone();
-			o.UpperAirTemperature = (float[])UpperAirTemperature.Clone();
-			o.UpperAirEnergy = (float[])UpperAirEnergy.Clone();
-			o.UpperAirPressure = (float[])UpperAirPressure.Clone();
-			o.UpperAirMass = (float[])UpperAirMass.Clone();
-			o.LowerAirEnergy = (float[])LowerAirEnergy.Clone();
-			o.LowerAirTemperature = (float[])LowerAirTemperature.Clone();
-			o.LowerAirPressure = (float[])LowerAirPressure.Clone();
-			o.LowerAirMass = (float[])LowerAirMass.Clone();
-			o.Humidity = (float[])Humidity.Clone();
-			o.CloudMass = new float[CloudMass.Length];
-			o.RainDropMass = new float[RainDropMass.Length];
-			o.WaterTableDepth = (float[])WaterTableDepth.Clone();
-			o.GroundWater = (float[])GroundWater.Clone();
-			o.SurfaceWater = (float[])SurfaceWater.Clone();
-			o.OceanSalinityDeep = (float[])OceanSalinityDeep.Clone();
-			o.OceanSalinityShallow = (float[])OceanSalinityShallow.Clone();
-			o.OceanDensityDeep = (float[])OceanDensityDeep.Clone();
-			o.OceanEnergyDeep = (float[])OceanEnergyDeep.Clone();
-			o.OceanEnergyShallow = (float[])OceanEnergyShallow.Clone();
-			o.OceanTemperatureShallow = (float[])OceanTemperatureShallow.Clone();
-			o.Ice = (float[])Ice.Clone();
-			o.SoilFertility = (float[])SoilFertility.Clone();
-			o.Canopy = (float[])Canopy.Clone();
-			o.Radiation = (float[])Radiation.Clone();
-			o.AnimalsPerTile = (int[])AnimalsPerTile.Clone();
-			o.LowerWind = (Vector3[])LowerWind.Clone();
-			o.UpperWind = (Vector3[])UpperWind.Clone();
-			o.OceanCurrentShallow = (Vector3[])OceanCurrentShallow.Clone();
-			o.OceanCurrentDeep = (Vector3[])OceanCurrentDeep.Clone();
-			o.FlowDirection = (Vector2[])FlowDirection.Clone();
-			o.Normal = (Vector3[])Normal.Clone();
+			int numTiles = from.UpperAirTemperature.Length;
+			Array.Copy(from.Species, Species, Species.Length);
+			Array.Copy(from.SpeciesStats, SpeciesStats, SpeciesStats.Length);
+			Array.Copy(from.Herds, Herds, Herds.Length);
+			Array.Copy(from.Plate, Plate, Plate.Length);
+			Array.Copy(from.Elevation, Elevation, numTiles);
+			Array.Copy(from.UpperAirTemperature, UpperAirTemperature, numTiles);
+			Array.Copy(from.UpperAirEnergy, UpperAirEnergy, numTiles);
+			Array.Copy(from.UpperAirPressure, UpperAirPressure, numTiles);
+			Array.Copy(from.UpperAirMass, UpperAirMass, numTiles);
+			Array.Copy(from.LowerAirEnergy, LowerAirEnergy, numTiles);
+			Array.Copy(from.LowerAirTemperature, LowerAirTemperature, numTiles);
+			Array.Copy(from.LowerAirPressure, LowerAirPressure, numTiles);
+			Array.Copy(from.LowerAirMass, LowerAirMass, numTiles);
+			Array.Copy(from.Humidity, Humidity, numTiles);
+			Array.Copy(from.CloudMass, CloudMass, numTiles);
+			Array.Copy(from.RainDropMass, RainDropMass, numTiles);
+			Array.Copy(from.WaterTableDepth, WaterTableDepth, numTiles);
+			Array.Copy(from.GroundWater, GroundWater, numTiles);
+			Array.Copy(from.SurfaceWater, SurfaceWater, numTiles);
+			Array.Copy(from.OceanSalinityDeep, OceanSalinityDeep, numTiles);
+			Array.Copy(from.OceanSalinityShallow, OceanSalinityShallow, numTiles);
+			Array.Copy(from.OceanDensityDeep, OceanDensityDeep, numTiles);
+			Array.Copy(from.OceanEnergyDeep, OceanEnergyDeep, numTiles);
+			Array.Copy(from.OceanEnergyShallow, OceanEnergyShallow, numTiles);
+			Array.Copy(from.OceanTemperatureShallow, OceanTemperatureShallow, numTiles);
+			Array.Copy(from.Ice, Ice, numTiles);
+			Array.Copy(from.SoilFertility, SoilFertility, numTiles);
+			Array.Copy(from.Canopy, Canopy, numTiles);
+			Array.Copy(from.Radiation, Radiation, numTiles);
+			Array.Copy(from.AnimalsPerTile, AnimalsPerTile, numTiles);
+			Array.Copy(from.LowerWind, LowerWind, numTiles);
+			Array.Copy(from.UpperWind, UpperWind, numTiles);
+			Array.Copy(from.OceanCurrentShallow, OceanCurrentShallow, numTiles);
+			Array.Copy(from.OceanCurrentDeep, OceanCurrentDeep, numTiles);
+			Array.Copy(from.FlowDirection, FlowDirection, numTiles);
+			Array.Copy(from.Normal, Normal, numTiles);
 
-			o.EnergyAbsorbed = (float[])EnergyAbsorbed.Clone();
-			o.Rainfall = (float[])Rainfall.Clone();
-			o.Evaporation = (float[])Evaporation.Clone();
+			Array.Copy(from.EnergyAbsorbed, EnergyAbsorbed, numTiles);
+			Array.Copy(from.Rainfall, Rainfall, numTiles);
+			Array.Copy(from.Evaporation, Evaporation, numTiles);
 
-			return o;
 		}
 	}
 
@@ -334,7 +333,7 @@ public partial class World {
 					}
 				}
 
-				States[nextStateIndex] = (State)States[CurStateIndex].Clone();
+				States[nextStateIndex].CopyFrom(States[CurStateIndex]);
 				Tick(States[CurStateIndex], States[nextStateIndex], threaded);
 
 				// TODO: why can't i edit this in the tick call?  it's a class, so it should be pass by reference?
@@ -353,7 +352,10 @@ public partial class World {
 
 		if (!threaded)
 		{
-			DoSimTick(threaded);
+			while (TimeTillTick <= 0)
+			{
+				DoSimTick(threaded);
+			}
 		}
 	}
 
@@ -388,7 +390,7 @@ public partial class World {
 				nextStateIndex = (nextStateIndex + 1) % World.StateCount;
 			}
 		}
-		States[nextStateIndex] = (State)States[CurStateIndex].Clone();
+		States[nextStateIndex].CopyFrom(States[CurStateIndex]);
 		return nextStateIndex;
 	}
 

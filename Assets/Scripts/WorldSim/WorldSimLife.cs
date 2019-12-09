@@ -5,11 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity;
 using UnityEngine;
+using Unity.Profiling;
 
 namespace Sim {
 	static public class Animals {
+		static ProfilerMarker _ProfileEarthTick = new ProfilerMarker("Animals Tick");
 		static public void Tick(World world, World.State state, World.State nextState)
 		{
+			_ProfileEarthTick.Begin();
 			for (int y = 0; y < world.Size; y++)
 			{
 				for (int x = 0; x < world.Size; x++)
@@ -300,6 +303,8 @@ namespace Sim {
 
 			//	}
 			//}
+
+			_ProfileEarthTick.End();
 		}
 
 		static public float GetGroundWaterSaturation(float groundWater, float waterTableDepth, float soilPorousness)

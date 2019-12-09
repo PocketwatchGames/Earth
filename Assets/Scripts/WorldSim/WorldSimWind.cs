@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity;
 using UnityEngine;
+using Unity.Profiling;
 
 namespace Sim {
 	static public class Wind {
 
+		static ProfilerMarker _ProfileWindTick = new ProfilerMarker("Wind Tick");
 		static public Vector3 GetWind(World world, World.State state, int x, int y, Vector3 curWind, float latitude, float planetRotationSpeed, float coriolisParam, float[] worldPressure, float[] worldTemperature, bool isUpper, float thisPressure, float landElevation, float windElevation, float friction, float density)
 		{
 			float altitude = Mathf.Max(0, windElevation - landElevation);
@@ -85,6 +87,8 @@ namespace Sim {
 		}
 		static public void Tick(World world, World.State state, World.State nextState)
 		{
+			_ProfileWindTick.Begin();
+
 			for (int y = 0; y < world.Size; y++)
 			{
 				float latitude = world.Data.windInfo[y].latitude;
@@ -244,6 +248,8 @@ namespace Sim {
 					}
 				}
 			}
+
+			_ProfileWindTick.End();
 
 		}
 

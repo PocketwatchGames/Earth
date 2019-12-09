@@ -5,11 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity;
 using UnityEngine;
+using Unity.Profiling;
 
 namespace Sim {
 	static public class Geology {
+
+		static ProfilerMarker _ProfileEarthTick = new ProfilerMarker("Earth Tick");
+
 		static public void Tick(World world, World.State state, World.State nextState)
 		{
+			_ProfileEarthTick.Begin();
 			for (int y = 0; y < world.Size; y++)
 			{
 				for (int x = 0; x < world.Size; x++)
@@ -23,6 +28,7 @@ namespace Sim {
 					nextState.Normal[index] = newNormal;
 				}
 			}
+			_ProfileEarthTick.End();
 		}
 
 		static public void MovePlate(World world, World.State state, World.State nextState, int plateIndex, Vector2Int direction)

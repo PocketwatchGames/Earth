@@ -233,7 +233,7 @@ public static class WorldGen {
 
 		for (int i = 1; i < World.StateCount; i++)
 		{
-			world.States[i] = (World.State)world.States[0].Clone();
+			world.States[i].CopyFrom(world.States[0]);
 		}
 	}
 
