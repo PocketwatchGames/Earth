@@ -229,10 +229,11 @@ namespace Sim {
 							globalEnergyAbsorbedSurface += radiationAbsorbedByIce;
 
 							// world.Data.SpecificHeatIce * world.Data.MassIce == KJ required to raise one cubic meter by 1 degree
-							float iceTemp = lowerAirTemperature + radiationAbsorbedByIce / (world.Data.SpecificHeatIce * world.Data.MassIce);
+							float meltRate = 1.0f / (world.Data.SpecificHeatIce * world.Data.MassIce);
+							float iceTemp = lowerAirTemperature + radiationAbsorbedByIce * meltRate;
 							if (iceTemp > world.Data.FreezingTemperature)
 							{
-								iceMelted += (iceTemp - world.Data.FreezingTemperature) / (world.Data.SpecificHeatIce * world.Data.MassIce);
+								iceMelted += (iceTemp - world.Data.FreezingTemperature) * meltRate;
 							}
 						}
 
@@ -371,7 +372,7 @@ namespace Sim {
 					_ProfileAtmosphereMoveV.End();
 
 					_ProfileAtmosphereMoveH.Begin();
-					MoveAtmosphereOnWind(world, state, x, y, elevationOrSeaLevel, lowerAirEnergy, upperAirEnergy, lowerAirMass, upperAirMass, lowerWind, upperWind, humidity, rainDropMass, ref newLowerAirEnergy, ref newUpperAirEnergy, ref newLowerAirMass, ref newUpperAirMass, ref newHumidity, ref newRainDropMass);
+					MoveAtmosphereOnWind(world, state, index, elevationOrSeaLevel, lowerAirEnergy, upperAirEnergy, lowerAirMass, upperAirMass, lowerWind, upperWind, humidity, rainDropMass, lowerAirPressure, upperAirPressure, ref newLowerAirEnergy, ref newUpperAirEnergy, ref newLowerAirMass, ref newUpperAirMass, ref newHumidity, ref newRainDropMass);
 					_ProfileAtmosphereMoveH.End();
 
 					_ProfileAtmosphereCloudMove.Begin();
@@ -807,7 +808,7 @@ namespace Sim {
 
 		}
 
-		static private void MoveAtmosphereOnWind(World world, World.State state, int x, int y, float elevationOrSeaLevel, float lowerEnergy, float upperEnergy, float lowerMass, float upperMass, Vector3 lowerWind, Vector3 upperWind, float humidity, float rainDropMass, ref float newLowerEnergy, ref float newUpperEnergy, ref float newLowerMass, ref float newUpperMass, ref float newHumidity, ref float newRainDropMass)
+		static private void MoveAtmosphereOnWind(World world, World.State state, int index, float elevationOrSeaLevel, float lowerEnergy, float upperEnergy, float lowerMass, float upperMass, Vector3 lowerWind, Vector3 upperWind, float humidity, float rainDropMass, float lowerAirPressure, float upperAirPressure, ref float newLowerEnergy, ref float newUpperEnergy, ref float newLowerMass, ref float newUpperMass, ref float newHumidity, ref float newRainDropMass)
 		{
 			float maxLostToVertical = 0.1f;
 			float maxLostToDiffusion = 0.5f;
@@ -843,7 +844,7 @@ namespace Sim {
 
 			for (int i = 0; i < 4; i++)
 			{
-				var nIndex = world.GetNeighborIndex(x, y, i);
+				var nIndex = world.GetNeighborIndex(index, i);
 				var nUpperWind = state.UpperWind[nIndex];
 				var nLowerWind = state.LowerWind[nIndex];
 				float nUpperEnergy = state.UpperAirEnergy[nIndex];
@@ -860,13 +861,13 @@ namespace Sim {
 				// TODO: make air diffuse faster at low density
 				// Mixing Upper atmosphere
 				{
-					float massDiffusionSpeed = Mathf.Clamp(world.Data.AirDiffusionSpeed * (state.UpperAirPressure[nIndex] - state.UpperAirPressure[world.GetIndex(x, y)]) / world.Data.StaticPressure, -maxLostToDiffusion, maxLostToDiffusion);
+					float massDiffusionSpeed = Mathf.Clamp(world.Data.AirDiffusionSpeed * (state.UpperAirPressure[nIndex] - upperAirPressure) / world.Data.StaticPressure, -maxLostToDiffusion, maxLostToDiffusion);
 					upperMassTransfer = massDiffusionSpeed * Mathf.Min(upperMass, nUpperMass);
 				}
 
 				// mixing lower atmosphere
 				{
-					float massDiffusionSpeed = Mathf.Clamp(world.Data.AirDiffusionSpeed * (state.LowerAirPressure[nIndex] - state.LowerAirPressure[world.GetIndex(x, y)]) / world.Data.StaticPressure, -maxLostToDiffusion, maxLostToDiffusion);
+					float massDiffusionSpeed = Mathf.Clamp(world.Data.AirDiffusionSpeed * (state.LowerAirPressure[nIndex] - lowerAirPressure) / world.Data.StaticPressure, -maxLostToDiffusion, maxLostToDiffusion);
 					lowerMassTransfer = massDiffusionSpeed * Mathf.Min(lowerMass, nLowerMass);
 				}
 

@@ -59,6 +59,7 @@ public partial class World {
 	public float TicksPerSecond = 1.0f;
 	public const int StateCount = 4;
 	public const int MaxGroupsPerTile = 16;
+	public int[] Neighbors;
 	public State[] States = new State[StateCount];
 	const int ProbeCount = 3;
 	public Probe[] Probes = new Probe[ProbeCount];
@@ -289,6 +290,18 @@ public partial class World {
 		{
 			Probes[i] = new Probe();
 		}
+
+		Neighbors = new int[Size * Size * 4];
+		for (int x=0;x<Size;x++)
+		{
+			for (int y = 0; y < Size; y++) {
+				int index = (x + y * Size)*4;
+				Neighbors[index + 0] = GetNeighborIndex(x, y, 0);
+				Neighbors[index + 1] = GetNeighborIndex(x, y, 1);
+				Neighbors[index + 2] = GetNeighborIndex(x, y, 2);
+				Neighbors[index + 3] = GetNeighborIndex(x, y, 3);
+			}
+		}
 	}
 
 	public void Start() {
@@ -418,12 +431,15 @@ public partial class World {
 	}
 	public int GetNeighborIndex(int x, int y, int neighborIndex)
 	{
-		var n = GetNeighbor(x, y, neighborIndex);
-		return GetIndex(n.x,n.y);
+		return Neighbors[(x + y * Size) * 4 + neighborIndex];
+	}
+	public int GetNeighborIndex(int index, int neighborIndex)
+	{
+		return Neighbors[index * 4 + neighborIndex];
 	}
 	public Vector2Int GetNeighbor(int x, int y, int neighborIndex)
 	{
-			switch (neighborIndex)
+		switch (neighborIndex)
 		{
 			case 0:
 				x--;

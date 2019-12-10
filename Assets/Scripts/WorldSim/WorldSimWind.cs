@@ -13,12 +13,13 @@ namespace Sim {
 		static ProfilerMarker _ProfileWindTick = new ProfilerMarker("Wind Tick");
 		static public Vector3 GetWind(World world, World.State state, int x, int y, Vector3 curWind, float latitude, float planetRotationSpeed, float coriolisParam, float[] worldPressure, float[] worldTemperature, bool isUpper, float thisPressure, float landElevation, float windElevation, float friction, float density)
 		{
+			float inverseDensity = 1.0f / density;
+			float inverseTileSize = 1.0f / world.Data.tileSize;
 			float altitude = Mathf.Max(0, windElevation - landElevation);
 			float complementFrictionAtElevation = 1.0f - friction * Mathf.Max(0, (world.Data.BoundaryZoneElevation - altitude) / world.Data.BoundaryZoneElevation);
-			float inverseDensity = 1.0f / density;
 			var pressureGradientForce = GetPressureGradient(world, state, x, y, worldPressure, worldTemperature, isUpper, thisPressure, windElevation);
-			pressureGradientForce.x *= world.Data.GravitationalAcceleration / world.Data.tileSize;
-			pressureGradientForce.y *= world.Data.GravitationalAcceleration / world.Data.tileSize;
+			pressureGradientForce.x *= world.Data.GravitationalAcceleration * inverseTileSize;
+			pressureGradientForce.y *= world.Data.GravitationalAcceleration * inverseTileSize;
 			Vector3 wind = Vector3.zero;
 
 			//for (int i = 0; i < 4; i++)
@@ -213,39 +214,34 @@ namespace Sim {
 				}
 			}
 
-			for (int y = 0; y < world.Size; y++)
+			for (int index = 0; index < world.Size * world.Size; index++)
 			{
-				for (int x = 0; x < world.Size; x++)
+				if (world.IsOcean(state.Elevation[index], state.SeaLevel))
 				{
-					int index = world.GetIndex(x, y);
-					if (world.IsOcean(state.Elevation[index], state.SeaLevel))
+					float vertCurrent = 0;
+					for (int i = 0; i < 4; i++)
 					{
-						float vertCurrent = 0;
-						for (int i = 0; i < 4; i++)
+						var nIndex = world.GetNeighborIndex(index, i);
+						if (!world.IsOcean(state.Elevation[nIndex], state.SeaLevel))
 						{
-							var neighbor = world.GetNeighbor(x, y, i);
-							int nIndex = world.GetIndex(neighbor.x, neighbor.y);
-							if (!world.IsOcean(state.Elevation[nIndex], state.SeaLevel))
+							switch (i)
 							{
-								switch (i)
-								{
-									case 0:
-										vertCurrent += nextState.OceanCurrentShallow[index].x;
-										break;
-									case 1:
-										vertCurrent -= nextState.OceanCurrentShallow[index].x;
-										break;
-									case 2:
-										vertCurrent -= nextState.OceanCurrentShallow[index].y;
-										break;
-									case 3:
-										vertCurrent += nextState.OceanCurrentShallow[index].y;
-										break;
-								}
+								case 0:
+									vertCurrent += nextState.OceanCurrentShallow[index].x;
+									break;
+								case 1:
+									vertCurrent -= nextState.OceanCurrentShallow[index].x;
+									break;
+								case 2:
+									vertCurrent -= nextState.OceanCurrentShallow[index].y;
+									break;
+								case 3:
+									vertCurrent += nextState.OceanCurrentShallow[index].y;
+									break;
 							}
 						}
-						nextState.OceanCurrentShallow[index].z = vertCurrent;
 					}
+					nextState.OceanCurrentShallow[index].z = vertCurrent;
 				}
 			}
 
