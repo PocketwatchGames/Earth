@@ -38,7 +38,7 @@ public static class WorldGen {
 		world.SpeciesDisplay[0].Sprite = speciesSprites[0];
 		state.Species[0].Food = SpeciesType.FoodType.Herbivore;
 		state.Species[0].Lifespan = 10 * data.TicksPerYear;
-		state.Species[0].MovementSpeed = 0.1f / data.tileSize * data.SecondsPerTick;
+		state.Species[0].MovementSpeed = 0.1f / data.MetersPerTile * data.SecondsPerTick;
 		state.Species[0].speciesMaxPopulation = 10000;
 		state.Species[0].RestingTemperature = data.FreezingTemperature + 50;
 		state.Species[0].TemperatureRange = 5000;
@@ -53,7 +53,7 @@ public static class WorldGen {
 		state.Species[1].Food = SpeciesType.FoodType.Herbivore;
 		state.Species[1].RestingTemperature = data.FreezingTemperature + 35;
 		state.Species[1].Lifespan = 20 * data.TicksPerYear;
-		state.Species[1].MovementSpeed = 0.1f / data.tileSize * data.SecondsPerTick;
+		state.Species[1].MovementSpeed = 0.1f / data.MetersPerTile * data.SecondsPerTick;
 		state.Species[1].speciesMaxPopulation = 10000;
 		state.Species[1].TemperatureRange = 3000;
 		state.Species[1].speciesGrowthRate = 1.0f / data.TicksPerYear;
@@ -66,7 +66,7 @@ public static class WorldGen {
 		world.SpeciesDisplay[2].Sprite = speciesSprites[0];
 		state.Species[2].Food = SpeciesType.FoodType.Herbivore;
 		state.Species[2].Lifespan = 15 * data.TicksPerYear;
-		state.Species[2].MovementSpeed = 0.1f / data.tileSize * data.SecondsPerTick;
+		state.Species[2].MovementSpeed = 0.1f / data.MetersPerTile * data.SecondsPerTick;
 		state.Species[2].speciesMaxPopulation = 10000;
 		state.Species[2].RestingTemperature = data.FreezingTemperature + 20;
 		state.Species[2].TemperatureRange = 3000;
@@ -81,7 +81,7 @@ public static class WorldGen {
 		state.Species[3].Food = SpeciesType.FoodType.Carnivore;
 		state.Species[3].RestingTemperature = data.FreezingTemperature + 30;
 		state.Species[3].Lifespan = 15 * data.TicksPerYear;
-		state.Species[3].MovementSpeed = 0.1f / data.tileSize * data.SecondsPerTick;
+		state.Species[3].MovementSpeed = 0.1f / data.MetersPerTile * data.SecondsPerTick;
 		state.Species[3].speciesMaxPopulation = 10000;
 		state.Species[3].TemperatureRange = 4000;
 		state.Species[3].speciesGrowthRate = 1.0f / data.TicksPerYear;

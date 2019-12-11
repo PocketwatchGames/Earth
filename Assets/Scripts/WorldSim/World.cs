@@ -70,7 +70,7 @@ public partial class World {
 	public object InputLock = new object();
 	public SpeciesDisplayData[] SpeciesDisplay;
 	private Task _simTask;
-	bool threaded = false;
+	private bool _threaded;
 
 	public class State {
 		public int Ticks;
@@ -201,6 +201,11 @@ public partial class World {
 		}
 	}
 
+	public World(bool threaded)
+	{
+		_threaded = threaded;
+	}
+
 	public void ApplyInput(Action<State> action)
 	{
 		lock (InputLock)
@@ -292,7 +297,7 @@ public partial class World {
 
 	public void Start() {
 
-		if (threaded)
+		if (_threaded)
 		{
 			_simTask = Task.Run(() =>
 			{
@@ -300,7 +305,7 @@ public partial class World {
 				{
 					try
 					{
-						DoSimTick(threaded);
+						DoSimTick();
 					}
 					catch (AggregateException e)
 					{
@@ -315,7 +320,7 @@ public partial class World {
 		}
 	}
 
-	private void DoSimTick(bool threaded)
+	private void DoSimTick()
 	{
 		if (TimeTillTick <= 0)
 		{
@@ -334,7 +339,7 @@ public partial class World {
 
 				States[nextStateIndex].CopyFrom(States[CurStateIndex]);
 
-				Tick(States[CurStateIndex], States[nextStateIndex], threaded);
+				Tick(States[CurStateIndex], States[nextStateIndex]);
 
 				// TODO: why can't i edit this in the tick call?  it's a class, so it should be pass by reference?
 				States[nextStateIndex].Ticks = States[CurStateIndex].Ticks + 1;
@@ -350,11 +355,11 @@ public partial class World {
 			TimeTillTick -= TimeScale * dt;
 		}
 
-		if (!threaded)
+		if (!_threaded)
 		{
 			while (TimeTillTick <= 0)
 			{
-				DoSimTick(threaded);
+				DoSimTick();
 			}
 		}
 	}
@@ -474,11 +479,11 @@ public partial class World {
 		return new Vector2Int(x, y);
 	}
 
-	private void Tick(State state, State nextState, bool threaded)
+	private void Tick(State state, State nextState)
 	{
 		nextState.SpeciesStats = new SpeciesStat[MaxSpecies];
 
-		if (threaded)
+		if (_threaded)
 		{
 			List<Task> simTasks = new List<Task>();
 			simTasks.Add(Task.Run(() =>

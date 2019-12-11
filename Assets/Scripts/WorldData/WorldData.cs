@@ -12,6 +12,7 @@ public struct WindInfo
 	public float yaw;
 	public float tropopauseElevationMax;
 	public float coriolisParam;
+	public float inverseCoriolisParam;
 }
 
 [Serializable]
@@ -33,6 +34,10 @@ public class WorldData
 	public float WindHumidityMovement = 0.00002f;
 	public float PressureGradientWindMultiplier = 4000;
 	public float AdiabaticLapseRate = 0.0098f;
+	// http://tornado.sfsu.edu/geosciences/classes/e260/Coriolis_rdg/GeostrophicApproximation.html
+	// states that geostrophic wind is only realistic at middle altitudes (500M), less so at 10K and at the surface, so we reduce overall coriolis effect by 25% to account
+	public float GlobalCoriolisInfluenceWind = 0.75f;
+	public float GlobalCoriolisInfluenceOcean = 0.5f;
 
 	[Header("Atmospheric Energy Cycle")]
 	// atmospheric heat balance https://energyeducation.ca/encyclopedia/Earth%27s_heat_balance
@@ -50,7 +55,7 @@ public class WorldData
 	public float AtmosphericDepthExponent = 0.5f;
 
 	// TODO: tune these to match the science
-	public float CloudMassFullAbsorption = 300.0f; // how much heat gain/loss is caused by cloud cover
+	public float CloudMassFullAbsorption = 50.0f; // how much heat gain/loss is caused by cloud cover
 	public float EnergyEmittedByUpperAtmosphere = 0.000001024f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
 	public float EnergyLostThroughAtmosphereWindow = 0.000001024f; // AKA Atmospheric window global average = 40 watts
 	public float CloudOutgoingAbsorptionRate = 0.1f;
@@ -109,7 +114,7 @@ public class WorldData
 
 	[Header("Planetary")]
 	public int TicksPerYear = 8640;
-	public float tileSize = 400000;
+	public float MetersPerTile = 400000;
 	public float TropopauseElevation = 10000;
 	public float BoundaryZoneElevation = 1000;
 	public float stratosphereElevation = 50000;
@@ -160,6 +165,8 @@ public class WorldData
 	public float SpecificGasConstantDryAir;
 	[NonSerialized]
 	public float DryAirAdiabaticLapseRate;
+	[NonSerialized]
+	public float InverseMetersPerTile;
 
 
 	public void Init(int size)
@@ -176,6 +183,8 @@ public class WorldData
 
 		GroundWaterReplenishmentSpeed /= TicksPerYear;
 		GroundWaterFlowSpeed /= TicksPerYear;
+
+		InverseMetersPerTile = 1.0f / MetersPerTile;
 
 		evapTemperatureRange = EvapMaxTemperature - EvapMinTemperature;
 		SpecificGasConstantDryAir = UniversalGasConstant / MolarMassEarthAir;
@@ -198,7 +207,8 @@ public class WorldData
 				latitude = latitude,
 				yaw = yaw,
 				tropopauseElevationMax = tropopauseElevation,
-				coriolisParam = Mathf.Sin(latitude*Mathf.PI/2),
+				coriolisParam = Mathf.Sin(latitude * Mathf.PI / 2),
+				inverseCoriolisParam = 1.0f / Mathf.Sin(latitude * Mathf.PI / 2)
 			};
 		}
 

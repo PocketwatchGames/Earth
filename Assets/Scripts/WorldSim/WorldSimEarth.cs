@@ -184,10 +184,10 @@ namespace Sim {
 					g = Vector2.zero;
 				}
 
-				flowDirection = new Vector2(Math.Sign(g.x) * (1.0f + (float)Math.Pow(Math.Abs(g.x) / world.Data.tileSize, world.Data.FlowSpeedExponent)), Math.Sign(g.y) * (1.0f + (float)Math.Pow(Math.Abs(g.x) / world.Data.tileSize, world.Data.FlowSpeedExponent)));
+				flowDirection = new Vector2(Math.Sign(g.x) * (1.0f + (float)Math.Pow(Math.Abs(g.x) / world.Data.MetersPerTile, world.Data.FlowSpeedExponent)), Math.Sign(g.y) * (1.0f + (float)Math.Pow(Math.Abs(g.x) / world.Data.MetersPerTile, world.Data.FlowSpeedExponent)));
 
 				// TODO: this is wong, gradient is just steepest downhill direction
-				normal = Vector3.Normalize(new Vector3(g.x, g.y, world.Data.tileSize));
+				normal = Vector3.Normalize(new Vector3(g.x, g.y, world.Data.MetersPerTile));
 
 			}
 		}

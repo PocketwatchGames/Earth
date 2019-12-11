@@ -14545,7 +14545,7 @@ MonoBehaviour:
     MaxTemperature: 323.15
     CarbonDioxide: 0.001
     PlanetTiltAngle: -23.5
-    SolarRadiation: 118
+    SolarRadiation: 1.367
     PlanetRadius: 6378000
     PlanetRotationSpeed: 0.0001458
     MaxSalinity: 40
@@ -14564,6 +14564,8 @@ MonoBehaviour:
     WindHumidityMovement: 0.00001
     PressureGradientWindMultiplier: 1000
     AdiabaticLapseRate: 0.0098
+    GlobalCoriolisInfluenceWind: 0.75
+    GlobalCoriolisInfluenceOcean: 0.5
     AtmosphericHeatAbsorption: 0.297
     AtmosphericHeatReflection: 0.07
     CloudIncomingAbsorptionRate: 0.5
@@ -14575,7 +14577,7 @@ MonoBehaviour:
     LengthOfDaySolarRadiationExponent: 0.5
     SunVectorSolarRadiationExponent: 2
     AtmosphericDepthExponent: 0.65
-    CloudMassFullAbsorption: 300
+    CloudMassFullAbsorption: 50
     EnergyEmittedByUpperAtmosphere: 0.00001024
     EnergyLostThroughAtmosphereWindow: 0.000001024
     CloudOutgoingAbsorptionRate: 0.1
@@ -14622,7 +14624,7 @@ MonoBehaviour:
     populationExpansionPercent: 0.2
     minPopulationDensityForExpansion: 0.1
     TicksPerYear: 8640
-    tileSize: 400000
+    MetersPerTile: 400000
     TropopauseElevation: 10000
     BoundaryZoneElevation: 1000
     stratosphereElevation: 50000
@@ -14667,8 +14669,9 @@ MonoBehaviour:
   maxRainfall: 5
   minCloudsToDraw: 1
   maxCloudsWidth: 0.5
-  maxCloudAlpha: 200
-  maxCloudColor: 300
+  maxCloudAlpha: 50
+  maxCloudColor: 10000
+  MaxEnergyAbsorbed: 2500
   MainCamera: {fileID: 963194227}
   WorldIcons: {fileID: 870706485}
   LandMesh: {fileID: 1752473170}
@@ -14682,6 +14685,7 @@ MonoBehaviour:
     type: 3}
   SpeciesSprites:
   - {fileID: 21300000, guid: 350e145db0207094e95ab9b0ab7313c4, type: 3}
+  Threaded: 1
 --- !u!114 &3077867981240493798
 MonoBehaviour:
   m_ObjectHideFlags: 0

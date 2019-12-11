@@ -32,6 +32,11 @@ public partial class WorldComponent {
 	static ProfilerMarker _ProfileUpdateMesh2 = new ProfilerMarker("_ProfileUpdateMesh2");
 	static ProfilerMarker _ProfileUpdateMesh3 = new ProfilerMarker("_ProfileUpdateMesh3");
 
+	static ProfilerMarker _ProfileRenderLock = new ProfilerMarker("Render Lock");
+	static ProfilerMarker _ProfileRenderConstruct = new ProfilerMarker("Render Construct");
+	static ProfilerMarker _ProfileRenderUpdateMesh = new ProfilerMarker("Render Update Mesh");
+
+
 	struct CVP {
 		public Color Color;
 		public float Value;
@@ -153,12 +158,15 @@ public partial class WorldComponent {
 
 	public void UpdateMesh(Layers showLayers, float dt)
 	{
+		_ProfileRenderLock.Begin();
 		lock (World.DrawLock)
 		{
 			World.LastRenderStateIndex = World.CurRenderStateIndex;
 			World.CurRenderStateIndex = World.CurStateIndex;
 		}
+		_ProfileRenderLock.End();
 
+		_ProfileRenderConstruct.Begin();
 		ref var state = ref World.States[World.CurRenderStateIndex];
 		ref var lastState = ref World.States[World.LastRenderStateIndex];
 		stateLerpT = Math.Max(1.0f, dt * 10);
@@ -168,22 +176,26 @@ public partial class WorldComponent {
 								new CVP(Color.black, MinElevation),
 								new CVP(Color.blue, state.SeaLevel - 1000),
 								new CVP(new Color(0.4f,0.3f,1.0f), state.SeaLevel), };
-		var landTemperatureColors = new List<CVP>() { new CVP(new Color(0.4f, 0.4f, 1.0f), -500 + World.Data.FreezingTemperature), new CVP(Color.white, World.Data.FreezingTemperature), new CVP(Color.red, 500 + World.Data.FreezingTemperature) };
-		var oceanTemperatureColors = new List<CVP>() { new CVP(new Color(0.0f, 0.0f, 0.6f), World.Data.FreezingTemperature - 50), new CVP(new Color(0.0f, 1.0f, 1.0f), 60 + World.Data.FreezingTemperature) };
+		var landTemperatureColors = new List<CVP>() { new CVP(new Color(0, 0.4f, 1.0f), -30 + World.Data.FreezingTemperature), new CVP(Color.white, World.Data.FreezingTemperature + 20), new CVP(new Color(1.0f, 0.4f, 0), 70 + World.Data.FreezingTemperature) };
+		var oceanTemperatureColors = new List<CVP>() { new CVP(new Color(0.0f, 0.0f, 0.6f), World.Data.FreezingTemperature), new CVP(new Color(0.0f, 1.0f, 1.0f), 60 + World.Data.FreezingTemperature) };
 
 		Color oceanColor;
 		Color color;
 
+		float inverseElevationRange = 1.0f / (MaxElevation - MinElevation);
+		float inverseWorldSize = 1.0f / World.Size;
+		float inverseFullIceCoverage = World.Data.FullIceCoverage;
 		for (int y = 0; y < World.Size; y++)
 		{
+			float latitude = World.GetLatitude(y);
 			for (int x = 0; x < World.Size; x++)
 			{
 				int index = World.GetIndex(x, y);
 
 				float elevation = state.Elevation[index];
 				float ice = state.Ice[index];
-				float normalizedElevation = (elevation - MinElevation) / (MaxElevation - MinElevation);
-				bool drawOcean = elevation < state.SeaLevel && showLayers.IsSet(Layers.Water);
+				float normalizedElevation = (elevation - MinElevation) * inverseElevationRange;
+				bool drawOcean = World.IsOcean(elevation, state.SeaLevel) && showLayers.IsSet(Layers.Water);
 
 				landVerts[index].z = -elevation * ElevationScale;
 				oceanVerts[index].z = -state.SeaLevel * ElevationScale;
@@ -205,8 +217,8 @@ public partial class WorldComponent {
 
 				if (showLayers.IsSet(Layers.TemperatureSubtle))
 				{
-		//			color = Lerp(landTemperatureColors, state.LowerAirTemperature[index]);
-		//			oceanColor = Color.Lerp(oceanColor, Lerp(oceanTemperatureColors, state.OceanTemperatureShallow[index]), 0.25f);
+					color = color * 0.5f + color * Lerp(landTemperatureColors, state.LowerAirTemperature[index]) * 0.5f;
+					oceanColor = oceanColor * 0.5f + oceanColor * Lerp(oceanTemperatureColors, state.OceanTemperatureShallow[index]) * 0.5f;
 				}
 
 				//		if (showLayers.IsSet(Layers.Water))
@@ -229,8 +241,9 @@ public partial class WorldComponent {
 
 				if (ice > 0)
 				{
-					oceanColor = Color.Lerp(oceanColor, new Color(0.4f, 0.6f, 1.0f), 0.25f + 0.75f * Mathf.Clamp01(ice / World.Data.FullIceCoverage));
-					color = Color.Lerp(color, new Color(0.4f, 0.5f, 1.0f), 0.75f * Mathf.Clamp01(ice / World.Data.FullIceCoverage));
+					float iceCoverage = Mathf.Clamp01(ice * inverseFullIceCoverage);
+					oceanColor = Color.Lerp(oceanColor, new Color(0.4f, 0.6f, 1.0f), 0.25f + 0.75f * iceCoverage);
+					color = Color.Lerp(color, new Color(0.4f, 0.5f, 1.0f), 0.75f * iceCoverage);
 				}
 
 
@@ -411,10 +424,9 @@ public partial class WorldComponent {
 				}
 
 
-				float latitude = World.GetLatitude(y);
 				float sunAngle;
 				Vector3 sunVector;
-				Sim.Atmosphere.GetSunVector(World, state.PlanetTiltAngle, state.Ticks, latitude, (float)x / World.Size, out sunAngle, out sunVector);
+				Sim.Atmosphere.GetSunVector(World, state.PlanetTiltAngle, state.Ticks, latitude, (float)x * inverseWorldSize, out sunAngle, out sunVector);
 				float sunIntensity = Mathf.Pow(Mathf.Max(0, sunAngle), 0.5f);
 				color *= sunIntensity * 0.25f + 0.75f;
 				oceanColor *= sunIntensity * 0.25f + 0.75f;
@@ -459,8 +471,9 @@ public partial class WorldComponent {
 
 			}
 		}
+		_ProfileRenderConstruct.End();
 
-
+		_ProfileRenderUpdateMesh.Begin();
 		LandMesh.mesh.vertices = landVerts;
 		LandMesh.mesh.colors = landCols;
 
@@ -472,7 +485,7 @@ public partial class WorldComponent {
 
 		CloudMesh.gameObject.SetActive(showLayers.IsSet(Layers.CloudCoverage));
 		OceanMesh.gameObject.SetActive(showLayers.IsSet(Layers.Water));
-
+		_ProfileRenderUpdateMesh.End();
 	}
 
 	private void UpdateWindArrow(World.State state, int x, int y, int index, Vector3 wind, float maxSpeed)

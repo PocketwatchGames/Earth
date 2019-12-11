@@ -85,6 +85,7 @@ public partial class WorldComponent : MonoBehaviour
 	public HerdIcon HerdIconPrefab;
 	public GameObject TerritoryMarker;
 	public List<Sprite> SpeciesSprites;
+	public bool Threaded = false;
 
 	// events
 	public event Action WorldStartedEvent;
@@ -104,7 +105,7 @@ public partial class WorldComponent : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
     {
-		World = new World();
+		World = new World(Threaded);
 
 		//ActiveFeatures = SimFeature.All;
 		//ActiveFeatures &= ~(SimFeature.Evaporation);
