@@ -14551,8 +14551,8 @@ MonoBehaviour:
     MaxSalinity: 40
     MinSalinity: 30
   Data:
-    PressureToVerticalWindSpeed: 0.0001
-    TemperatureDifferentialToVerticalWindSpeed: 10
+    PressureToVerticalWindSpeed: 0.00001
+    TemperatureDifferentialToVerticalWindSpeed: 1
     DestinationTemperatureDifferentialVerticalWindSpeed: 0
     MountainUpdraftWindSpeed: 0
     MaxTerrainNormalForFriction: 0.1
@@ -14560,10 +14560,8 @@ MonoBehaviour:
     WindOceanFriction: 0.2
     WindIceFriction: 0.1
     WindLandFriction: 0.5
-    WindAirMovementHorizontal: 0.000001
-    WindAirMovementVertical: 0.0001
+    WindAirMovement: 0.001
     WindHumidityMovement: 0.00001
-    WindCloudMovement: 0.01
     PressureGradientWindMultiplier: 1000
     AdiabaticLapseRate: 0.0098
     AtmosphericHeatAbsorption: 0.297
@@ -14583,8 +14581,6 @@ MonoBehaviour:
     CloudOutgoingAbsorptionRate: 0.1
     EnergyTrappedByGreenhouseGasses: 0.1
     HumidityHeatAbsorption: 1
-    HumidityToCloudSpeed: 0.1
-    CloudToHumiditySpeed: 0
     DewPointTemperatureRange: 100
     DewPointZero: 213
     WaterVaporMassToAirMassAtDewPoint: 0.2
@@ -14596,6 +14592,10 @@ MonoBehaviour:
     rainPointTemperatureMultiplier: 0.00075
     RainDropFormationSpeedTemperature: 100
     RainDropDissapationSpeedWind: 0.00001
+    rainDropDragCoefficient: 0.5
+    airDensity: 1.21
+    waterDensity: 997
+    rainDropEvapRate: 0.000001
     DeepOceanDepth: 500
     WindToOceanCurrentFactor: 0.05
     OceanCurrentSpeed: 0.00001
@@ -14621,7 +14621,7 @@ MonoBehaviour:
     MaxTemperatureCanopy: 323.15
     populationExpansionPercent: 0.2
     minPopulationDensityForExpansion: 0.1
-    TicksPerYear: 360
+    TicksPerYear: 8640
     tileSize: 400000
     TropopauseElevation: 10000
     BoundaryZoneElevation: 1000
@@ -14636,6 +14636,8 @@ MonoBehaviour:
     MolarMassEarthAir: 0.0289644
     UniversalGasConstant: 8.31446
     FreezingTemperature: 273.15
+    DewPointElevationPerDegree: 67.73
+    DewPointTemperaturePerRelativeHumidity: 20
     AlbedoWater: 0.06
     AlbedoIce: 0.5
     AlbedoLand: 0.4
@@ -15151,6 +15153,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3930111054318552403, guid: 2d14138c0ebc5ab4eb2d4ced7e5ea7fc,
+        type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 3930111054318552403, guid: 2d14138c0ebc5ab4eb2d4ced7e5ea7fc,
+        type: 3}
+      propertyPath: m_FontData.m_MinSize
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 0}

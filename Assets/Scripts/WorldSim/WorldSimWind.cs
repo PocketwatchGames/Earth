@@ -160,6 +160,7 @@ namespace Sim {
 					lowerWind.z += (lowerPressure - upperPressure) * world.Data.PressureToVerticalWindSpeed; // convection
 					lowerWind.z += verticalTemperatureDifferential * world.Data.TemperatureDifferentialToVerticalWindSpeed; // thermal
 
+
 					nextState.LowerWind[index] = lowerWind;
 					nextState.UpperWind[index] = upperWind;
 

@@ -176,41 +176,27 @@ public partial class World {
 			Array.Copy(from.Herds, Herds, Herds.Length);
 			Array.Copy(from.Plate, Plate, Plate.Length);
 			Array.Copy(from.Elevation, Elevation, numTiles);
-			Array.Copy(from.UpperAirTemperature, UpperAirTemperature, numTiles);
-			Array.Copy(from.UpperAirEnergy, UpperAirEnergy, numTiles);
-			Array.Copy(from.UpperAirPressure, UpperAirPressure, numTiles);
-			Array.Copy(from.UpperAirMass, UpperAirMass, numTiles);
-			Array.Copy(from.LowerAirEnergy, LowerAirEnergy, numTiles);
-			Array.Copy(from.LowerAirTemperature, LowerAirTemperature, numTiles);
-			Array.Copy(from.LowerAirPressure, LowerAirPressure, numTiles);
-			Array.Copy(from.LowerAirMass, LowerAirMass, numTiles);
-			Array.Copy(from.Humidity, Humidity, numTiles);
-			Array.Copy(from.CloudMass, CloudMass, numTiles);
-			Array.Copy(from.RainDropMass, RainDropMass, numTiles);
 			Array.Copy(from.WaterTableDepth, WaterTableDepth, numTiles);
 			Array.Copy(from.GroundWater, GroundWater, numTiles);
 			Array.Copy(from.SurfaceWater, SurfaceWater, numTiles);
-			Array.Copy(from.OceanSalinityDeep, OceanSalinityDeep, numTiles);
-			Array.Copy(from.OceanSalinityShallow, OceanSalinityShallow, numTiles);
-			Array.Copy(from.OceanDensityDeep, OceanDensityDeep, numTiles);
-			Array.Copy(from.OceanEnergyDeep, OceanEnergyDeep, numTiles);
-			Array.Copy(from.OceanEnergyShallow, OceanEnergyShallow, numTiles);
-			Array.Copy(from.OceanTemperatureShallow, OceanTemperatureShallow, numTiles);
 			Array.Copy(from.Ice, Ice, numTiles);
 			Array.Copy(from.SoilFertility, SoilFertility, numTiles);
 			Array.Copy(from.Canopy, Canopy, numTiles);
 			Array.Copy(from.Radiation, Radiation, numTiles);
 			Array.Copy(from.AnimalsPerTile, AnimalsPerTile, numTiles);
-			Array.Copy(from.LowerWind, LowerWind, numTiles);
-			Array.Copy(from.UpperWind, UpperWind, numTiles);
-			Array.Copy(from.OceanCurrentShallow, OceanCurrentShallow, numTiles);
-			Array.Copy(from.OceanCurrentDeep, OceanCurrentDeep, numTiles);
 			Array.Copy(from.FlowDirection, FlowDirection, numTiles);
 			Array.Copy(from.Normal, Normal, numTiles);
-
-			Array.Copy(from.EnergyAbsorbed, EnergyAbsorbed, numTiles);
-			Array.Copy(from.Rainfall, Rainfall, numTiles);
-			Array.Copy(from.Evaporation, Evaporation, numTiles);
+			Array.Clear(UpperAirMass, 0, numTiles);
+			Array.Clear(UpperAirEnergy, 0, numTiles);
+			Array.Clear(LowerAirMass, 0, numTiles);
+			Array.Clear(LowerAirEnergy, 0, numTiles);
+			Array.Clear(Humidity, 0, numTiles);
+			Array.Clear(CloudMass, 0, numTiles);
+			Array.Clear(RainDropMass, 0, numTiles);
+			Array.Clear(OceanSalinityDeep, 0, numTiles);
+			Array.Clear(OceanSalinityShallow, 0, numTiles);
+			Array.Clear(OceanEnergyDeep, 0, numTiles);
+			Array.Clear(OceanEnergyShallow, 0, numTiles);
 
 		}
 	}
@@ -296,10 +282,10 @@ public partial class World {
 		{
 			for (int y = 0; y < Size; y++) {
 				int index = (x + y * Size)*4;
-				Neighbors[index + 0] = GetNeighborIndex(x, y, 0);
-				Neighbors[index + 1] = GetNeighborIndex(x, y, 1);
-				Neighbors[index + 2] = GetNeighborIndex(x, y, 2);
-				Neighbors[index + 3] = GetNeighborIndex(x, y, 3);
+				Neighbors[index + 0] = GetIndex(GetNeighbor(x, y, 0));
+				Neighbors[index + 1] = GetIndex(GetNeighbor(x, y, 1));
+				Neighbors[index + 2] = GetIndex(GetNeighbor(x, y, 2));
+				Neighbors[index + 3] = GetIndex(GetNeighbor(x, y, 3));
 			}
 		}
 	}
@@ -347,6 +333,7 @@ public partial class World {
 				}
 
 				States[nextStateIndex].CopyFrom(States[CurStateIndex]);
+
 				Tick(States[CurStateIndex], States[nextStateIndex], threaded);
 
 				// TODO: why can't i edit this in the tick call?  it's a class, so it should be pass by reference?
@@ -377,11 +364,23 @@ public partial class World {
 		return y * Size + x;
 	}
 
+	public int GetIndex(Vector2Int p)
+	{
+		return p.y * Size + p.x;
+	}
+
 	public float GetTimeOfYear(int ticks)
 	{
 		float t = (float)ticks / Data.TicksPerYear;
 		return t - (int)t;
 	}
+
+	public float GetTimeOfDay(int ticks, float longitude)
+	{
+		float t = (float)ticks / (Data.TicksPerHour * 24) + longitude;
+		return Mathf.Repeat(t, 1);
+	}
+
 
 	public int GetYear(int ticks)
 	{

@@ -71,6 +71,7 @@ public partial class WorldComponent : MonoBehaviour
 	public float maxCloudsWidth = 0.5f;
 	public float maxCloudAlpha = 50.0f;
 	public float maxCloudColor = 300.0f;
+	public float MaxEnergyAbsorbed = 300;
 
 
 	[Header("Internal")]

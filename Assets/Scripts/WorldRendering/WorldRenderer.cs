@@ -271,21 +271,21 @@ public partial class WorldComponent {
 				{
 					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.blue, 0.01f),
-											new CVP(Color.yellow, 0.02f),
-											new CVP(Color.red, 0.03f),
-											new CVP(Color.white, 0.05f) },
-						state.Rainfall[index]);
+											new CVP(Color.blue, 0.25f),
+											new CVP(Color.yellow, 0.5f),
+											new CVP(Color.red, 0.75f),
+											new CVP(Color.white, 1.0f) },
+						state.Rainfall[index] * World.Data.TicksPerYear / maxRainfall);
 				}
 				else if (showLayers.IsSet(Layers.HeatAbsorbed))
 				{
 					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.blue, 20),
-											new CVP(Color.yellow, 40),
-											new CVP(Color.red, 60),
-											new CVP(Color.white, 80) },
-						state.EnergyAbsorbed[index]);
+											new CVP(Color.blue, 0.25f),
+											new CVP(Color.yellow, 0.5f),
+											new CVP(Color.red, 0.75f),
+											new CVP(Color.white, 1.0f) },
+						state.EnergyAbsorbed[index]/MaxEnergyAbsorbed);
 				}
 				else if (showLayers.IsSet(Layers.LowerAirPressure))
 				{
@@ -410,6 +410,14 @@ public partial class WorldComponent {
 						elevation < state.SeaLevel ? state.OceanSalinityDeep[index] / (state.SeaLevel - elevation) : 0);
 				}
 
+
+				float latitude = World.GetLatitude(y);
+				float sunAngle;
+				Vector3 sunVector;
+				Sim.Atmosphere.GetSunVector(World, state.PlanetTiltAngle, state.Ticks, latitude, (float)x / World.Size, out sunAngle, out sunVector);
+				float sunIntensity = Mathf.Pow(Mathf.Max(0, sunAngle), 0.5f);
+				color *= sunIntensity * 0.25f + 0.75f;
+				oceanColor *= sunIntensity * 0.25f + 0.75f;
 
 				landCols[index] = color;
 				oceanCols[index] = oceanColor;

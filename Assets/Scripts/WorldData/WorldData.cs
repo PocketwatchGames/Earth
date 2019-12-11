@@ -29,10 +29,8 @@ public class WorldData
 	public float WindOceanFriction = 0.2f;
 	public float WindIceFriction = 0.1f;
 	public float WindLandFriction = 0.5f;
-	public float WindAirMovementHorizontal = 0.00002f;
-	public float WindAirMovementVertical = 0.0002f;
+	public float WindAirMovement = 0.001f;
 	public float WindHumidityMovement = 0.00002f;
-	public float WindCloudMovement = 0.01f;
 	public float PressureGradientWindMultiplier = 4000;
 	public float AdiabaticLapseRate = 0.0098f;
 
@@ -60,8 +58,6 @@ public class WorldData
 	public float HumidityHeatAbsorption = 1.0f;
 
 	[Header("Evap, Humidity and Clouds")]
-	public float HumidityToCloudSpeed = 0.1f;
-	public float CloudToHumiditySpeed = 0.01f;
 	public float DewPointTemperatureRange = 100.0f;
 	public float DewPointZero = 213.0f;
 	public float WaterVaporMassToAirMassAtDewPoint = 0.2f;
@@ -73,6 +69,10 @@ public class WorldData
 	public float rainPointTemperatureMultiplier = 0.00075f; // adjustment for temperature
 	public float RainDropFormationSpeedTemperature = 10f;
 	public float RainDropDissapationSpeedWind = 0.00001f;
+	public float rainDropDragCoefficient = 0.5f;
+	public float airDensity = 1.21f;
+	public float waterDensity = 997;
+	public float rainDropEvapRate = 0.000001f;
 
 	[Header("Ocean")]
 	public float DeepOceanDepth = 500;
@@ -108,7 +108,7 @@ public class WorldData
 	public float minPopulationDensityForExpansion = 0.1f;
 
 	[Header("Planetary")]
-	public int TicksPerYear = 360;
+	public int TicksPerYear = 8640;
 	public float tileSize = 400000;
 	public float TropopauseElevation = 10000;
 	public float BoundaryZoneElevation = 1000;
@@ -123,6 +123,8 @@ public class WorldData
 	public float MolarMassEarthAir = 0.0289644f;
 	public float UniversalGasConstant = 8.3144598f;
 	public float FreezingTemperature = 273.15f;
+	public float DewPointElevationPerDegree = 67.73f;
+	public float DewPointTemperaturePerRelativeHumidity = 20;
 
 	[Header("Albedo")]
 	public float AlbedoWater = 0.06f; // How much heat is reflected back by the water
@@ -149,6 +151,8 @@ public class WorldData
 	[NonSerialized]
 	public float TicksPerHour;
 	[NonSerialized]
+	public float TicksPerSecond;
+	[NonSerialized]
 	public float SecondsPerTick;
 	[NonSerialized]
 	public float PressureExponent;
@@ -160,16 +164,16 @@ public class WorldData
 
 	public void Init(int size)
 	{
-		TicksPerHour = TicksPerYear * (365 * 24);
+		TicksPerHour = (float)TicksPerYear / (365 * 24);
 		int secondsPerYear = 365 * 24 * 60 * 60;
-		SecondsPerTick = (float)secondsPerYear / TicksPerYear;
+		TicksPerSecond = (float)TicksPerYear / secondsPerYear;
+		SecondsPerTick = 1.0f / TicksPerSecond;
 
 		windInfo = new WindInfo[size];
 
 		canopyGrowthRate /= TicksPerYear;
 		canopyDeathRate /= TicksPerYear;
 
-		FlowSpeed /= (tileSize / 1000) * TicksPerHour; // mississippi travels at around 3 km/h
 		GroundWaterReplenishmentSpeed /= TicksPerYear;
 		GroundWaterFlowSpeed /= TicksPerYear;
 

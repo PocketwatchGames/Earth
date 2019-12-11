@@ -19,7 +19,7 @@ public class WorldGenData {
 	public float MaxTemperature = 323.15f;
 	public float CarbonDioxide = 0.001f;
 	public float PlanetTiltAngle = -23.5f;
-	public float SolarRadiation = 118; // extraterrestrial solar radiation // https://en.wikipedia.org/wiki/Sunlight (1367 w/m^2) *seconds per day (86400)
+	public float SolarRadiation = 1.367f; // extraterrestrial solar radiation // https://en.wikipedia.org/wiki/Sunlight (1367 w/m^2)
 	public float PlanetRadius = 6378000;
 	public float PlanetRotationSpeed = 0.0001458f;
 	public float MaxSalinity = 40;
