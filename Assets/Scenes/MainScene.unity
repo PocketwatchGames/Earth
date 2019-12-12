@@ -1923,7 +1923,7 @@ MonoBehaviour:
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: 'GLOBAL
 
@@ -9393,7 +9393,7 @@ MonoBehaviour:
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: 'GEOLOGY
 
@@ -12016,7 +12016,7 @@ MonoBehaviour:
   m_ChildControlWidth: 0
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
+  m_ChildScaleHeight: 1
 --- !u!114 &1931384953
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14560,7 +14560,8 @@ MonoBehaviour:
     WindOceanFriction: 0.2
     WindIceFriction: 0.1
     WindLandFriction: 0.5
-    WindAirMovement: 0.001
+    WindAirMovementHorizontal: 0.001
+    WindAirMovementVertical: 0.001
     WindHumidityMovement: 0.00001
     PressureGradientWindMultiplier: 1000
     AdiabaticLapseRate: 0.0098
@@ -14570,16 +14571,17 @@ MonoBehaviour:
     AtmosphericHeatReflection: 0.07
     CloudIncomingAbsorptionRate: 0.5
     CloudIncomingReflectionRate: 0.5
-    EvaporativeHeatLoss: 0.065
-    OceanHeatRadiation: 0.00001021
-    OceanAirConduction: 1.3824
-    OceanIceConduction: 0.01
+    EvaporativeHeatLoss: 1800000
+    OceanHeatRadiation: 0.000000185
+    OceanAirConductionWarming: 0.0016
+    OceanAirConductionCooling: 0.0008
+    OceanIceConduction: 0.00001
     LengthOfDaySolarRadiationExponent: 0.5
     SunVectorSolarRadiationExponent: 2
     AtmosphericDepthExponent: 0.65
-    CloudMassFullAbsorption: 50
-    EnergyEmittedByUpperAtmosphere: 0.00001024
-    EnergyLostThroughAtmosphereWindow: 0.000001024
+    CloudMassFullAbsorption: 100
+    EnergyEmittedByUpperAtmosphere: 0.000000105
+    EnergyLostThroughAtmosphereWindow: 0.000000015
     CloudOutgoingAbsorptionRate: 0.1
     EnergyTrappedByGreenhouseGasses: 0.1
     HumidityHeatAbsorption: 1
@@ -14589,8 +14591,7 @@ MonoBehaviour:
     RainfallRate: 0.001
     EvapMinTemperature: 253
     EvapMaxTemperature: 413
-    EvaporationRate: 0.0001
-    evapTemperatureRange: 0
+    EvaporationRate: 0.002
     rainPointTemperatureMultiplier: 0.00075
     RainDropFormationSpeedTemperature: 100
     RainDropDissapationSpeedWind: 0.00001

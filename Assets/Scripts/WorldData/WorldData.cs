@@ -30,7 +30,8 @@ public class WorldData
 	public float WindOceanFriction = 0.2f;
 	public float WindIceFriction = 0.1f;
 	public float WindLandFriction = 0.5f;
-	public float WindAirMovement = 0.001f;
+	public float WindAirMovementHorizontal = 0.001f;
+	public float WindAirMovementVertical = 0.01f;
 	public float WindHumidityMovement = 0.00002f;
 	public float PressureGradientWindMultiplier = 4000;
 	public float AdiabaticLapseRate = 0.0098f;
@@ -46,18 +47,21 @@ public class WorldData
 	public float AtmosphericHeatReflection = 0.07f; // 7% is refelcted due to atmospheric scattering 
 	public float CloudIncomingAbsorptionRate = 0.06f; // 6% absorbed by clouds
 	public float CloudIncomingReflectionRate = 0.50f; // 24% incoming  reflected back to space by clouds (avg, globally)
-	public float EvaporativeHeatLoss = 0.065f; // global average = 78 watts
-	public float OceanHeatRadiation = 0.00001021f; // global average = 66 watts
-	public float OceanAirConduction = 1.3824f; // global avg = 16 watts per degree delta between air and ocean
-	public float OceanIceConduction = 0.01f; // small
+	public float EvaporativeHeatLoss = 600f; // global average = 78 watts
+	// Net Back Radiation: The ocean transmits electromagnetic radiation into the atmosphere in proportion to the fourth power of the sea surface temperature(black-body radiation)
+	// https://eesc.columbia.edu/courses/ees/climate/lectures/o_atm.html
+	public float OceanHeatRadiation = 0.000000066f; // global average = 66 watts per m^2 of ocean
+	public float OceanAirConductionWarming = 0.0016f; // global avg = 16 watts per degree delta between air and ocean (global avg = 24 watts per m^2 of ocean)
+	public float OceanAirConductionCooling = 0.0008f; // 
+	public float OceanIceConduction = 0.00001f; // small
 	public float LengthOfDaySolarRadiationExponent = 0.5f;
 	public float SunVectorSolarRadiationExponent = 2;
 	public float AtmosphericDepthExponent = 0.5f;
 
 	// TODO: tune these to match the science
 	public float CloudMassFullAbsorption = 50.0f; // how much heat gain/loss is caused by cloud cover
-	public float EnergyEmittedByUpperAtmosphere = 0.000001024f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
-	public float EnergyLostThroughAtmosphereWindow = 0.000001024f; // AKA Atmospheric window global average = 40 watts
+	public float EnergyEmittedByUpperAtmosphere = 0.000000199f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
+	public float EnergyLostThroughAtmosphereWindow = 0.00000004f; // AKA Atmospheric window global average = 40 watts
 	public float CloudOutgoingAbsorptionRate = 0.1f;
 	public float EnergyTrappedByGreenhouseGasses = 0.1f;
 	public float HumidityHeatAbsorption = 1.0f;
@@ -69,8 +73,7 @@ public class WorldData
 	public float RainfallRate = 0.01f;
 	public float EvapMinTemperature = 243; // -30 celsius
 	public float EvapMaxTemperature = 343; // 70 celsius
-	public float EvaporationRate = 0.0001f; // TODO: evaporation on earth maxes out around 2.5M per year 
-	public float evapTemperatureRange;
+	public float EvaporationRate = 0.002f; // TODO: evaporation on earth maxes out around 2.5M per year 
 	public float rainPointTemperatureMultiplier = 0.00075f; // adjustment for temperature
 	public float RainDropFormationSpeedTemperature = 10f;
 	public float RainDropDissapationSpeedWind = 0.00001f;
@@ -138,7 +141,7 @@ public class WorldData
 	public float AlbedoReductionSoilQuality = 0.15f;
 	public float AlbedoFoliage = 0.1f;
 
-	[Header("Specific Heats")]
+	[Header("Specific Heats")] // in kJ/kgK
 	public float SpecificHeatIce = 2.108f; // specific heat is joules to raise one degree
 	public float SpecificHeatFreshWater = 4.187f; // specific heat is joules to raise one degree
 	public float SpecificHeatSeaWater = 3.85f; // specific heat is joules to raise one degree
@@ -167,6 +170,8 @@ public class WorldData
 	public float DryAirAdiabaticLapseRate;
 	[NonSerialized]
 	public float InverseMetersPerTile;
+	[NonSerialized]
+	public float evapTemperatureRange;
 
 
 	public void Init(int size)

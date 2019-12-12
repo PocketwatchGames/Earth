@@ -26,7 +26,7 @@ public class TileInfoPanel : MonoBehaviour
 
 	float ConvertTileEnergyToWatts(float energy)
 	{
-		return energy * 1000000 / WorldComponent.World.Data.SecondsPerTick;
+		return energy * 1000 / WorldComponent.World.Data.SecondsPerTick;
 	}
 
     // Update is called once per frame
@@ -44,18 +44,26 @@ public class TileInfoPanel : MonoBehaviour
 
 		int totalTiles = WorldComponent.World.Size * WorldComponent.World.Size;
 		textGlobal += "GLOBAL";
+		textGlobal += "\nCloud Coverage: " + (state.GlobalCloudCoverage * 100).ToString("0.0") + "%";
 		textGlobal += "\nOcean Coverage: " + (state.GlobalOceanCoverage * 100).ToString("0.0") + "%";
-		textGlobal += "\nAtmospheric Mass: " + (state.AtmosphericMass).ToString("0") + "";
+//		textGlobal += "\nAtmospheric Mass: " + (state.AtmosphericMass).ToString("0") + "";
 		textGlobal += "\nENERGY";
-		textGlobal += "\nTotal: " + (state.GlobalEnergy).ToString("0");
+//		textGlobal += "\nTotal: " + (state.GlobalEnergy).ToString("0");
 		textGlobal += "\nIncoming: " + ConvertTileEnergyToWatts(state.GlobalEnergyIncoming / totalTiles).ToString("0.0");
-		textGlobal += "\nOutgoing: " + ConvertTileEnergyToWatts(state.GlobalEnergyLost / totalTiles).ToString("0.0");
+		textGlobal += "\nOutgoing: " + ConvertTileEnergyToWatts((state.GlobalEnergyOutAtmosphericWindow + state.GlobalEnergyOutEmittedAtmosphere) / totalTiles).ToString("0.0");
+		textGlobal += "\nOut Atm Window: " + ConvertTileEnergyToWatts(state.GlobalEnergyOutAtmosphericWindow / totalTiles).ToString("0.0");
+		textGlobal += "\nOut Atm Radiation: " + ConvertTileEnergyToWatts(state.GlobalEnergyOutEmittedAtmosphere / totalTiles).ToString("0.0");
+		textGlobal += "\nReflected Total: " + ConvertTileEnergyToWatts((state.GlobalEnergyReflectedCloud + state.GlobalEnergyReflectedAtmosphere + state.GlobalEnergyReflectedSurface) / totalTiles).ToString("0.0");
+		textGlobal += "\nReflected Cloud: " + ConvertTileEnergyToWatts(state.GlobalEnergyReflectedCloud / totalTiles).ToString("0.0");
 		textGlobal += "\nReflected Atmos: " + ConvertTileEnergyToWatts(state.GlobalEnergyReflectedAtmosphere / totalTiles).ToString("0.0");
 		textGlobal += "\nReflected Surf: " + ConvertTileEnergyToWatts(state.GlobalEnergyReflectedSurface / totalTiles).ToString("0.0");
 		textGlobal += "\nAbs Clouds: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedCloud / totalTiles).ToString("0.0");
-		textGlobal += "\nAbs Upper Atm: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedUpperAtmosphere / totalTiles).ToString("0.0");
-		textGlobal += "\nAbs Lower Atm: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedLowerAtmosphere / totalTiles).ToString("0.0");
+		textGlobal += "\nAbs Atm: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedAtmosphere / totalTiles).ToString("0.0");
 		textGlobal += "\nAbs Surface: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedSurface / totalTiles).ToString("0.0");
+		textGlobal += "\nAbs Ocean: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedOcean / totalTiles).ToString("0.0");
+		textGlobal += "\nOcean Radiation: " + ConvertTileEnergyToWatts(state.GlobalEnergyOceanRadiation / (totalTiles * state.GlobalOceanCoverage)).ToString("0.0");
+		textGlobal += "\nOcean Conduction: " + ConvertTileEnergyToWatts(state.GlobalEnergyOceanConduction / (totalTiles * state.GlobalOceanCoverage)).ToString("0.0");
+		textGlobal += "\nOcean Evap Heat: " + ConvertTileEnergyToWatts(state.GlobalEnergyOceanEvapHeat / (totalTiles * state.GlobalOceanCoverage)).ToString("0.0");
 
 		if (TileInfoPoint.x >= 0 && TileInfoPoint.x < WorldComponent.World.Size && TileInfoPoint.y >= 0 && TileInfoPoint.y < WorldComponent.World.Size)
 		{
@@ -86,7 +94,7 @@ public class TileInfoPanel : MonoBehaviour
 			textLowerAtmosphere += "\nWind: " + (state.LowerWind[index]).ToString("0.0");
 			textLowerAtmosphere += "\nHumidity (Abs): " + state.Humidity[index].ToString("0");
 			textLowerAtmosphere += "\nHumidity (Rel): " + Sim.Atmosphere.GetRelativeHumidity(WorldComponent.World, state.LowerAirTemperature[index], state.Humidity[index], state.LowerAirMass[index]).ToString("0.00");
-			textLowerAtmosphere += "\nEvaporation: " + (state.Evaporation[index] * WorldComponent.World.Data.TicksPerYear * 1000).ToString("0.00");
+			textLowerAtmosphere += "\nEvaporation: " + (state.Evaporation[index] * WorldComponent.World.Data.TicksPerYear).ToString("0.00");
 
 
 			if (WorldComponent.World.IsOcean(elevation, state.SeaLevel))

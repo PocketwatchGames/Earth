@@ -131,15 +131,21 @@ public partial class World {
 		public float GlobalEnergyReflectedCloud;
 		public float GlobalEnergyReflectedAtmosphere;
 		public float GlobalEnergyReflectedSurface;
-		public float GlobalEnergyLost;
 		public float GlobalEnergyGained;
 		public float GlobalEnergyAbsorbedCloud;
-		public float GlobalEnergyAbsorbedUpperAtmosphere;
-		public float GlobalEnergyAbsorbedLowerAtmosphere;
+		public float GlobalEnergyAbsorbedAtmosphere;
 		public float GlobalEnergyAbsorbedSurface;
+		public float GlobalEnergyAbsorbedOcean;
+		public float GlobalEnergyOceanRadiation;
+		public float GlobalEnergyOceanConduction;
+		public float GlobalEnergyOceanEvapHeat;
+		public float GlobalEnergyOutAtmosphericWindow;
+		public float GlobalEnergyOutEmittedAtmosphere;
 		public float GlobalEnergy;
 		public float GlobalTemperature;
 		public float GlobalOceanCoverage;
+		public float GlobalCloudCoverage;
+		public float GlobalEvaporation;
 		public float AtmosphericMass;
 
 		public void CopyFrom(State from)
@@ -148,7 +154,6 @@ public partial class World {
 			AtmosphereCO2 = from.AtmosphereCO2;
 			AtmosphereO2 = from.AtmosphereO2;
 			AtmosphereN = from.AtmosphereN;
-			GlobalTemperature = from.GlobalTemperature;
 			SeaLevel = from.SeaLevel;
 			StratosphereMass = from.StratosphereMass;
 			CarbonDioxide = from.CarbonDioxide;
@@ -156,19 +161,6 @@ public partial class World {
 			PlanetRotationSpeed = from.PlanetRotationSpeed;
 			PlanetTiltAngle = from.PlanetTiltAngle;
 			SolarRadiation = from.SolarRadiation;
-			GlobalEnergyIncoming = from.GlobalEnergyIncoming;
-			GlobalEnergyReflectedAtmosphere = from.GlobalEnergyReflectedAtmosphere;
-			GlobalEnergyReflectedSurface = from.GlobalEnergyReflectedSurface;
-			GlobalEnergyLost = from.GlobalEnergyLost;
-			GlobalEnergyGained = from.GlobalEnergyGained;
-			GlobalEnergyAbsorbedCloud = from.GlobalEnergyAbsorbedCloud;
-			GlobalEnergyAbsorbedUpperAtmosphere = from.GlobalEnergyAbsorbedUpperAtmosphere;
-			GlobalEnergyAbsorbedLowerAtmosphere = from.GlobalEnergyAbsorbedLowerAtmosphere;
-			GlobalEnergyAbsorbedSurface = from.GlobalEnergyAbsorbedSurface;
-			GlobalEnergy = from.GlobalEnergy;
-			GlobalTemperature = from.GlobalTemperature;
-			GlobalOceanCoverage = from.GlobalOceanCoverage;
-			AtmosphericMass = from.AtmosphericMass;
 
 			int numTiles = from.UpperAirTemperature.Length;
 			Array.Copy(from.Species, Species, Species.Length);

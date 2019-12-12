@@ -151,7 +151,7 @@ namespace Sim {
 						neighborTemperatureDifferential += lowerWindH.y * (lowerTemperature - state.LowerAirTemperature[neighborIndex]);
 						neighborElevationDifferential += (Mathf.Max(state.SeaLevel, state.Elevation[neighborIndex]) - elevationOrSeaLevel) * lowerWindH.y;
 					}
-					var verticalTemperatureDifferential = upperTemperatureAtSeaLevel - lowerTemperatureAtSeaLevel;
+					var verticalTemperatureDifferential = lowerTemperatureAtSeaLevel - upperTemperatureAtSeaLevel;
 
 					float lowerWindSpeedH = lowerWindH.magnitude;
 					float lowerWindV = neighborElevationDifferential * world.Data.MountainUpdraftWindSpeed;
