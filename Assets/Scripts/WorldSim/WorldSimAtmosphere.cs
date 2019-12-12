@@ -172,6 +172,8 @@ namespace Sim {
 
 					float newLowerAirEnergy = 0;
 					float newUpperAirEnergy = 0;
+					float newLowerAirMass = 0;
+					float newUpperAirMass = 0;
 					float newHumidity = 0;
 					float newCloudMass = 0;
 					float newRainDropMass = 0;
@@ -196,8 +198,6 @@ namespace Sim {
 						int y1 = Mathf.Min(y0 + 1, world.Size - 1);
 						float xT = movePos.x - x0;
 						float yT = movePos.y - y0;
-						float zT = Mathf.Clamp01(-lowerWind.z * world.Data.SecondsPerTick * inverseBoundaryZoneElevation);
-						float zTComplement = 1.0f - zT;
 
 						int i0 = world.GetIndex(x0, y0);
 						int i1 = world.GetIndex(x1, y0);
@@ -219,29 +219,19 @@ namespace Sim {
 						nextState.RainDropMass[i2] += rainDropMass * move2;
 						nextState.RainDropMass[i3] += rainDropMass * move3;
 
-						float contentMove = upperAirMass * world.Data.WindAirMovementHorizontal * zTComplement;
-						nextState.UpperAirMass[index] += upperAirMass * (1.0f - world.Data.WindAirMovementHorizontal) * zTComplement;
+						float contentMove = upperAirMass * world.Data.WindAirMovementHorizontal;
+						nextState.UpperAirMass[index] += upperAirMass * (1.0f - world.Data.WindAirMovementHorizontal);
 						nextState.UpperAirMass[i0] += contentMove * move0;
 						nextState.UpperAirMass[i1] += contentMove * move1;
 						nextState.UpperAirMass[i2] += contentMove * move2;
 						nextState.UpperAirMass[i3] += contentMove * move3;
-						if (zT > 0)
-						{
-							nextState.UpperAirMass[index] += upperAirMass * (1.0f - world.Data.WindAirMovementVertical) * zT;
-							nextState.LowerAirMass[index] += upperAirMass * world.Data.WindAirMovementVertical * zT;
-						}
 
-						contentMove = upperAirEnergy * world.Data.WindAirMovementHorizontal * zTComplement;
-						nextState.UpperAirEnergy[index] += upperAirEnergy * (1.0f - world.Data.WindAirMovementHorizontal) * zTComplement;
+						contentMove = upperAirEnergy * world.Data.WindAirMovementHorizontal;
+						nextState.UpperAirEnergy[index] += upperAirEnergy * (1.0f - world.Data.WindAirMovementHorizontal);
 						nextState.UpperAirEnergy[i0] += contentMove * move0;
 						nextState.UpperAirEnergy[i1] += contentMove * move1;
 						nextState.UpperAirEnergy[i2] += contentMove * move2;
 						nextState.UpperAirEnergy[i3] += contentMove * move3;
-						if (zT > 0)
-						{
-							nextState.UpperAirEnergy[index] += upperAirEnergy * (1.0f - world.Data.WindAirMovementVertical) * zT;
-							nextState.LowerAirEnergy[index] += upperAirEnergy * world.Data.WindAirMovementVertical * zT;
-						}
 
 						// lower atmosphere
 						movePos = new Vector3(x, y, 0) + lowerWind * metersPerSecondToTilesPerTick;
@@ -253,8 +243,6 @@ namespace Sim {
 						y1 = Mathf.Min(y0 + 1, world.Size - 1);
 						xT = movePos.x - x0;
 						yT = movePos.y - y0;
-						zT = Mathf.Clamp01(lowerWind.z * world.Data.SecondsPerTick * inverseBoundaryZoneElevation);
-						zTComplement = 1.0f - zT;
 
 						i0 = world.GetIndex(x0, y0);
 						i1 = world.GetIndex(x1, y0);
@@ -266,29 +254,19 @@ namespace Sim {
 						move2 = xT * (1.0f - yT);
 						move3 = xT * yT;
 
-						contentMove = lowerAirMass * world.Data.WindAirMovementHorizontal * zTComplement;
-						nextState.LowerAirMass[index] += lowerAirMass * (1.0f - world.Data.WindAirMovementHorizontal) * zTComplement;
+						contentMove = lowerAirMass * world.Data.WindAirMovementHorizontal;
+						nextState.LowerAirMass[index] += lowerAirMass * (1.0f - world.Data.WindAirMovementHorizontal);
 						nextState.LowerAirMass[i0] += contentMove * move0;
 						nextState.LowerAirMass[i1] += contentMove * move1;
 						nextState.LowerAirMass[i2] += contentMove * move2;
 						nextState.LowerAirMass[i3] += contentMove * move3;
-						if (zT > 0)
-						{
-							nextState.LowerAirMass[index] += lowerAirMass * (1.0f - world.Data.WindAirMovementVertical) * zT;
-							nextState.UpperAirMass[index] += lowerAirMass * world.Data.WindAirMovementVertical * zT;
-						}
 
-						contentMove = lowerAirEnergy * world.Data.WindAirMovementHorizontal * zTComplement;
-						nextState.LowerAirEnergy[index] += lowerAirEnergy * (1.0f - world.Data.WindAirMovementHorizontal) * zTComplement;
+						contentMove = lowerAirEnergy * world.Data.WindAirMovementHorizontal;
+						nextState.LowerAirEnergy[index] += lowerAirEnergy * (1.0f - world.Data.WindAirMovementHorizontal);
 						nextState.LowerAirEnergy[i0] += contentMove * move0;
 						nextState.LowerAirEnergy[i1] += contentMove * move1;
 						nextState.LowerAirEnergy[i2] += contentMove * move2;
 						nextState.LowerAirEnergy[i3] += contentMove * move3;
-						if (zT > 0)
-						{
-							nextState.LowerAirEnergy[index] += lowerAirEnergy * (1.0f - world.Data.WindAirMovementVertical) * zT;
-							nextState.UpperAirEnergy[index] += lowerAirEnergy * world.Data.WindAirMovementVertical * zT;
-						}
 
 						float humidityZT = Mathf.Clamp01(lowerWind.z / cloudElevation);
 						float humidityZTComplement = 1.0f - humidityZT;
@@ -658,7 +636,26 @@ namespace Sim {
 						ref newRainfall,
 						ref newRainDropMass,
 						ref newLowerAirEnergy,
-						ref newUpperAirEnergy);
+						ref newUpperAirEnergy,
+						ref newOceanEnergyShallow);
+
+					if (lowerWind.z > 0)
+					{
+						float verticalTransfer = lowerWind.z * world.Data.WindAirMovementVertical * inverseBoundaryZoneElevation * world.Data.SecondsPerTick;
+						newUpperAirMass += verticalTransfer * lowerAirMass;
+						newLowerAirMass -= verticalTransfer * lowerAirMass;
+						newUpperAirEnergy += verticalTransfer * lowerAirEnergy;
+						newLowerAirEnergy -= verticalTransfer * lowerAirEnergy;
+					}
+					else
+					{
+						float verticalTransfer = -lowerWind.z * world.Data.WindAirMovementVertical * inverseBoundaryZoneElevation * world.Data.SecondsPerTick;
+						newLowerAirMass += verticalTransfer * upperAirMass;
+						newUpperAirMass -= verticalTransfer * upperAirMass;
+						newLowerAirEnergy += verticalTransfer * upperAirEnergy;
+						newUpperAirEnergy -= verticalTransfer * upperAirEnergy;
+					}
+
 					if (isOcean)
 					{
 						MoveOceanVertically(
@@ -684,9 +681,8 @@ namespace Sim {
 
 
 					_ProfileAtmosphereDiffusion.Begin();
+
 					// Diffusion step
-					float newUpperAirMass = 0;
-					float newLowerAirMass = 0;
 					float airDiffusionSpeedPerPressureDifferential = world.Data.AirDiffusionSpeed / world.Data.StaticPressure;
 					for (int i = 0; i < 4; i++)
 					{
@@ -934,7 +930,8 @@ namespace Sim {
 			ref float newRainfall, 
 			ref float newRainDropMass,
 			ref float newLowerAirEnergy,
-			ref float newUpperAirEnergy)
+			ref float newUpperAirEnergy,
+			ref float newOceanEnergyShallow)
 		{
 
 
@@ -944,7 +941,15 @@ namespace Sim {
 				float condensationMass = humidity * (relativeHumidity - 1.0f) / relativeHumidity;
 				newHumidity -= condensationMass;
 				float condensationVolume = condensationMass / world.Data.MassFreshWater;
-				newLowerAirEnergy += condensationVolume * world.Data.EvaporativeHeatLoss;
+
+				if (isOcean)
+				{
+					newOceanEnergyShallow += condensationVolume * world.Data.EvaporativeHeatLoss;
+				} else
+				{
+					newLowerAirEnergy += condensationVolume * world.Data.EvaporativeHeatLoss;
+				}
+
 				if (lowerAirTemperature <= world.Data.FreezingTemperature)
 				{
 					newIce += condensationVolume;

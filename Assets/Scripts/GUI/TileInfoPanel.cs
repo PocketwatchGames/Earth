@@ -48,7 +48,7 @@ public class TileInfoPanel : MonoBehaviour
 		textGlobal += "\nOcean Coverage: " + (state.GlobalOceanCoverage * 100).ToString("0.0") + "%";
 //		textGlobal += "\nAtmospheric Mass: " + (state.AtmosphericMass).ToString("0") + "";
 		textGlobal += "\nENERGY";
-//		textGlobal += "\nTotal: " + (state.GlobalEnergy).ToString("0");
+		textGlobal += "\nTotal: " + (state.GlobalEnergy).ToString("0");
 		textGlobal += "\nIncoming: " + ConvertTileEnergyToWatts(state.GlobalEnergyIncoming / totalTiles).ToString("0.0");
 		textGlobal += "\nOutgoing: " + ConvertTileEnergyToWatts((state.GlobalEnergyOutAtmosphericWindow + state.GlobalEnergyOutEmittedAtmosphere) / totalTiles).ToString("0.0");
 		textGlobal += "\nOut Atm Window: " + ConvertTileEnergyToWatts(state.GlobalEnergyOutAtmosphericWindow / totalTiles).ToString("0.0");
