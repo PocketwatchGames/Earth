@@ -77,6 +77,7 @@ public class TileInfoPanel : MonoBehaviour
 			textGeo += "\nWaterTableDepth: " + (int)state.WaterTableDepth[index];
 			textGeo += "\nSurfaceIce: " + state.Ice[index].ToString("0.00");
 			textGeo += "\nSurface Heat: " + ConvertTileEnergyToWatts(state.EnergyAbsorbed[index]).ToString("0.0");
+			textGeo += "\nLand Energy: " + state.LandEnergy[index].ToString("0.0");
 
 			textUpperAtmosphere += "UPPER ATMOS";
 			textUpperAtmosphere += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(state.UpperAirTemperature[index], WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");

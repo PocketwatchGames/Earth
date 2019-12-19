@@ -91,6 +91,7 @@ public partial class World {
 
 		public int[] Plate;
 		public float[] Elevation;
+		public float[] LandEnergy;
 		public float[] LowerAirEnergy;
 		public float[] LowerAirTemperature;
 		public float[] LowerAirPressure;
@@ -182,6 +183,7 @@ public partial class World {
 			Array.Clear(UpperAirEnergy, 0, numTiles);
 			Array.Clear(LowerAirMass, 0, numTiles);
 			Array.Clear(LowerAirEnergy, 0, numTiles);
+			Array.Clear(LandEnergy, 0, numTiles);
 			Array.Clear(Humidity, 0, numTiles);
 			Array.Clear(CloudMass, 0, numTiles);
 			Array.Clear(RainDropMass, 0, numTiles);
@@ -225,6 +227,7 @@ public partial class World {
 			States[i] = new State();
 			States[i].Plate = new int[s];
 			States[i].Elevation = new float[s];
+			States[i].LandEnergy = new float[s];
 			States[i].UpperAirEnergy = new float[s];
 			States[i].UpperAirTemperature = new float[s];
 			States[i].UpperAirPressure = new float[s];

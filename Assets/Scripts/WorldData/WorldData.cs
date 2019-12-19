@@ -60,6 +60,7 @@ public class WorldData
 	public float LengthOfDaySolarRadiationExponent = 0.5f;
 	public float SunVectorSolarRadiationExponent = 2;
 	public float AtmosphericDepthExponent = 0.5f;
+	public float LandHeatRadiation = 0.0001f;
 
 	// TODO: tune these to match the science
 	public float CloudMassFullAbsorption = 50.0f; // how much heat gain/loss is caused by cloud cover

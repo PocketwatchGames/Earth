@@ -76,6 +76,7 @@ namespace Sim {
 					float elevation = state.Elevation[index];
 					float elevationOrSeaLevel = Math.Max(state.SeaLevel, elevation);
 					float oceanDepth = Math.Max(0, state.SeaLevel - elevation);
+					float landEnergy = state.LandEnergy[index];
 					float cloudMass = state.CloudMass[index];
 					float rainDropMass = state.RainDropMass[index];
 					float lowerAirTemperature = state.LowerAirTemperature[index];
@@ -170,6 +171,7 @@ namespace Sim {
 
 
 
+					float newLandEnergy = landEnergy;
 					float newLowerAirEnergy = 0;
 					float newUpperAirEnergy = 0;
 					float newLowerAirMass = 0;
@@ -448,7 +450,7 @@ namespace Sim {
 								float waterReflectivity = surfaceWater * world.Data.AlbedoWater;
 								float soilReflectivity = GetAlbedo(world.Data.AlbedoLand - world.Data.AlbedoReductionSoilQuality * soilFertility, slopeAlbedo);
 								float heatReflectedLand = canopy * world.Data.AlbedoFoliage + Math.Max(0, 1.0f - canopy) * (surfaceWater * GetAlbedo(world.Data.AlbedoWater, slopeAlbedo) + Math.Max(0, 1.0f - surfaceWater) * soilReflectivity);
-								energyReflected += incomingRadiation * heatReflectedLand * (1.0f - iceCoverage);
+								energyReflected += incomingRadiation * Mathf.Clamp01(heatReflectedLand) * (1.0f - iceCoverage);
 							}
 							incomingRadiation -= energyReflected;
 
@@ -568,8 +570,16 @@ namespace Sim {
 						}
 						else
 						{
-							newLowerAirEnergy += incomingRadiation;
+							newLandEnergy += incomingRadiation;
 						}
+					}
+
+					// radiate heat from land
+					{
+						float radiationRate = (1.0f - soilFertility) * (1.0f - groundWater / (world.Data.MaxWaterTableDepth * world.Data.MaxSoilPorousness)) * (1.0f / (1.0f + canopy));
+						float heatRadiated = landEnergy * Mathf.Clamp01(world.Data.SecondsPerTick * radiationRate * world.Data.LandHeatRadiation);
+						newLandEnergy -= heatRadiated;
+						newLowerAirEnergy += heatRadiated;
 					}
 
 					// reduce ice
@@ -836,6 +846,7 @@ namespace Sim {
 
 					_ProfileAtmosphereFinal.Begin();
 
+					nextState.LandEnergy[index] += newLandEnergy;
 					nextState.LowerAirMass[index] += newLowerAirMass;
 					nextState.UpperAirMass[index] += newUpperAirMass;
 					nextState.LowerAirEnergy[index] += newLowerAirEnergy;

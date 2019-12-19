@@ -14552,11 +14552,14 @@ MonoBehaviour:
     MinSalinity: 30
   Data:
     PressureToVerticalWindSpeed: 0.00001
-    TemperatureDifferentialToVerticalWindSpeed: 1
+    TemperatureDifferentialToVerticalWindSpeed: 0
     DestinationTemperatureDifferentialVerticalWindSpeed: 0
     MountainUpdraftWindSpeed: 0
     MaxTerrainNormalForFriction: 0.1
-    AirDiffusionSpeed: 0.1
+    AirMassDiffusionSpeedHorizontal: 0.1
+    AirMassDiffusionSpeedVertical: 0.1
+    AirEnergyDiffusionSpeedHorizontal: 0.1
+    AirEnergyDiffusionSpeedVertical: 0.1
     WindOceanFriction: 0.2
     WindIceFriction: 0.1
     WindLandFriction: 0.5
@@ -14572,10 +14575,10 @@ MonoBehaviour:
     CloudIncomingAbsorptionRate: 0.5
     CloudIncomingReflectionRate: 0.5
     EvaporativeHeatLoss: 1800000
-    OceanHeatRadiation: 0.000000185
-    OceanAirConductionWarming: 0.0016
-    OceanAirConductionCooling: 0.0008
-    OceanIceConduction: 0.00001
+    OceanHeatRadiation: 1e-10
+    OceanAirConductionWarming: 0.016
+    OceanAirConductionCooling: 0.008
+    OceanIceConduction: 0.1
     LengthOfDaySolarRadiationExponent: 0.5
     SunVectorSolarRadiationExponent: 2
     AtmosphericDepthExponent: 0.65
@@ -14601,11 +14604,11 @@ MonoBehaviour:
     rainDropEvapRate: 0.000001
     DeepOceanDepth: 500
     WindToOceanCurrentFactor: 0.05
-    OceanCurrentSpeed: 0.00001
-    OceanHorizontalMixingSpeed: 0.001
-    OceanUpwellingSpeed: 0.00001
+    OceanCurrentSpeed: 0.001
+    OceanHorizontalMixingSpeed: 0.1
+    OceanUpwellingSpeed: 0.001
     OceanTemperatureVerticalMixingSpeed: 0.001
-    SalinityVerticalMixingSpeed: 0.001
+    SalinityVerticalMixingSpeed: 0.000000001
     OceanDensityPerSalinity: 0.0008
     OceanDensityPerDegree: 0.0002
     OceanDensityCurrentSpeed: 100
