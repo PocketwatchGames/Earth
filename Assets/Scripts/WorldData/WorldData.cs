@@ -26,7 +26,10 @@ public class WorldData
 	public float DestinationTemperatureDifferentialVerticalWindSpeed = 0.1f;
 	public float MountainUpdraftWindSpeed = 0.1f;
 	public float MaxTerrainNormalForFriction = 0.25f;
-	public float AirDiffusionSpeed = 0.1f;
+	public float AirMassDiffusionSpeedHorizontal = 0.1f;
+	public float AirMassDiffusionSpeedVertical = 0.1f;
+	public float AirEnergyDiffusionSpeedHorizontal = 0.1f;
+	public float AirEnergyDiffusionSpeedVertical = 0.1f;
 	public float WindOceanFriction = 0.2f;
 	public float WindIceFriction = 0.1f;
 	public float WindLandFriction = 0.5f;
@@ -51,8 +54,8 @@ public class WorldData
 	// Net Back Radiation: The ocean transmits electromagnetic radiation into the atmosphere in proportion to the fourth power of the sea surface temperature(black-body radiation)
 	// https://eesc.columbia.edu/courses/ees/climate/lectures/o_atm.html
 	public float OceanHeatRadiation = 0.000000066f; // global average = 66 watts per m^2 of ocean
-	public float OceanAirConductionWarming = 0.0016f; // global avg = 16 watts per degree delta between air and ocean (global avg = 24 watts per m^2 of ocean)
-	public float OceanAirConductionCooling = 0.0008f; // 
+	public float OceanAirConductionWarming = 0.016f; // global avg = 16 watts per degree delta between air and ocean (global avg = 24 watts per m^2 of ocean)
+	public float OceanAirConductionCooling = 0.008f; // 
 	public float OceanIceConduction = 0.00001f; // small
 	public float LengthOfDaySolarRadiationExponent = 0.5f;
 	public float SunVectorSolarRadiationExponent = 2;

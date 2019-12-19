@@ -563,7 +563,7 @@ namespace Sim {
 								float massToAchieveEquilibrium = oceanEnergyShallow / (world.Data.FreezingTemperature * world.Data.SpecificHeatSeaWater);
 								float massFrozen = massOfShallowWaterColumn - massToAchieveEquilibrium;
 								//newOceanEnergyShallow -= energyToAchieveEquilibrium;
-								newIce += massToAchieveEquilibrium / world.Data.MassIce;
+								newIce += massFrozen / world.Data.MassIce;
 							}
 						}
 						else
@@ -656,6 +656,17 @@ namespace Sim {
 						newUpperAirEnergy -= verticalTransfer * upperAirEnergy;
 					}
 
+					{
+						float tempAtSeaLevelUpper = upperAirTemperature - world.Data.TemperatureLapseRate * (world.Data.BoundaryZoneElevation + elevationOrSeaLevel);
+						float tempAtSeaLevelLower = lowerAirTemperature - world.Data.TemperatureLapseRate * elevationOrSeaLevel;
+						if (tempAtSeaLevelLower > tempAtSeaLevelUpper)
+						{
+							float verticalTransfer = (tempAtSeaLevelUpper - tempAtSeaLevelLower) / tempAtSeaLevelLower * lowerAirEnergy * world.Data.AirEnergyDiffusionSpeedVertical;
+							newLowerAirEnergy += verticalTransfer;
+							newUpperAirEnergy -= verticalTransfer;
+						}
+					}
+
 					if (isOcean)
 					{
 						MoveOceanVertically(
@@ -683,7 +694,6 @@ namespace Sim {
 					_ProfileAtmosphereDiffusion.Begin();
 
 					// Diffusion step
-					float airDiffusionSpeedPerPressureDifferential = world.Data.AirDiffusionSpeed / world.Data.StaticPressure;
 					for (int i = 0; i < 4; i++)
 					{
 						int nIndex = world.GetNeighborIndex(index, i);
@@ -692,30 +702,56 @@ namespace Sim {
 						//TODO: make air diffuse faster at low density
 						//Mixing Upper atmosphere
 						{
-							float massDiffusionSpeed = airDiffusionSpeedPerPressureDifferential * (state.UpperAirPressure[nIndex] - upperAirPressure);
-							float massTransfer = massDiffusionSpeed * Mathf.Min(upperAirMass, state.UpperAirMass[nIndex]);
-							newUpperAirMass += massTransfer;
-							if (massTransfer < 0)
+							float pressureDiffusionSpeed = world.Data.AirMassDiffusionSpeedHorizontal * (state.UpperAirPressure[nIndex] - upperAirPressure) / Mathf.Max(state.UpperAirPressure[nIndex], upperAirPressure);
+							float nEnergy = state.UpperAirEnergy[nIndex];
+							float nMass = state.UpperAirMass[nIndex];
+							if (pressureDiffusionSpeed > 0)
 							{
-								newUpperAirEnergy += upperAirEnergy * massTransfer / upperAirMass;
+								newUpperAirMass += pressureDiffusionSpeed * nMass;
+								newUpperAirEnergy += pressureDiffusionSpeed * nEnergy;
 							} else
 							{
-								newUpperAirEnergy += state.UpperAirEnergy[nIndex] * massTransfer / upperAirMass;
+								newUpperAirMass += pressureDiffusionSpeed * upperAirMass;
+								newUpperAirEnergy += pressureDiffusionSpeed * upperAirEnergy;
+							}
+
+							float nTempAtSeaLevel = state.UpperAirTemperature[nIndex] - world.Data.TemperatureLapseRate * (world.Data.BoundaryZoneElevation + Mathf.Max(state.SeaLevel, state.Elevation[nIndex]));
+							float tempAtSeaLevel = upperAirTemperature - world.Data.TemperatureLapseRate * (world.Data.BoundaryZoneElevation + elevationOrSeaLevel);
+							float energyDiffusionSpeed = world.Data.AirEnergyDiffusionSpeedHorizontal * (nTempAtSeaLevel - tempAtSeaLevel);
+							if (energyDiffusionSpeed > 0)
+							{
+								newUpperAirEnergy += energyDiffusionSpeed / nTempAtSeaLevel * nEnergy;
+							} else
+							{
+								newUpperAirEnergy += energyDiffusionSpeed / tempAtSeaLevel * upperAirEnergy;
 							}
 						}
 
 						//mixing lower atmosphere
 						{
-							float massDiffusionSpeed = airDiffusionSpeedPerPressureDifferential * (state.LowerAirPressure[nIndex] - lowerAirPressure);
-							float massTransfer = massDiffusionSpeed * Mathf.Min(lowerAirMass, state.LowerAirMass[nIndex]);
-							newLowerAirMass += massTransfer;
-							if (massTransfer < 0)
+							float pressureDiffusionSpeed = world.Data.AirMassDiffusionSpeedHorizontal * (state.LowerAirPressure[nIndex] - lowerAirPressure) / Mathf.Max(state.LowerAirPressure[nIndex], lowerAirPressure);
+							float nEnergy = state.LowerAirEnergy[nIndex];
+							float nMass = state.LowerAirMass[nIndex];
+							if (pressureDiffusionSpeed > 0)
 							{
-								newLowerAirEnergy += lowerAirEnergy * massTransfer / lowerAirMass;
+								newLowerAirMass += pressureDiffusionSpeed * nMass;
+								newLowerAirEnergy += pressureDiffusionSpeed * nEnergy;
 							}
 							else
 							{
-								newLowerAirEnergy += state.LowerAirEnergy[nIndex] * massTransfer / lowerAirMass;
+								newLowerAirMass += pressureDiffusionSpeed * lowerAirMass;
+								newLowerAirEnergy += pressureDiffusionSpeed * lowerAirEnergy;
+							}
+							float nTempAtSeaLevel = state.LowerAirTemperature[nIndex] - world.Data.TemperatureLapseRate * Mathf.Max(state.SeaLevel, state.Elevation[nIndex]);
+							float tempAtSeaLevel = lowerAirTemperature - world.Data.TemperatureLapseRate * elevationOrSeaLevel;
+							float energyDiffusionSpeed = world.Data.AirEnergyDiffusionSpeedHorizontal * (nTempAtSeaLevel - tempAtSeaLevel);
+							if (energyDiffusionSpeed > 0)
+							{
+								newLowerAirEnergy += energyDiffusionSpeed / nTempAtSeaLevel * nEnergy;
+							}
+							else
+							{
+								newLowerAirEnergy += energyDiffusionSpeed / tempAtSeaLevel * lowerAirEnergy;
 							}
 						}
 
@@ -734,8 +770,8 @@ namespace Sim {
 
 								// Horizontal mixing
 								float mixingDepth = Math.Min(neighborDepth, depth);
-								newOceanEnergyShallow += world.Data.SpecificHeatSeaWater * world.Data.DeepOceanDepth * (nTemperatureShallow - oceanTemperatureShallow) * world.Data.OceanHorizontalMixingSpeed;
-								newOceanEnergyDeep += world.Data.SpecificHeatSeaWater * mixingDepth * (nTemperatureDeep - oceanTemperatureDeep) * world.Data.OceanHorizontalMixingSpeed;
+								newOceanEnergyShallow += world.Data.SpecificHeatSeaWater * world.Data.MassSeaWater * world.Data.DeepOceanDepth * (nTemperatureShallow - oceanTemperatureShallow) * world.Data.OceanHorizontalMixingSpeed;
+								newOceanEnergyDeep += world.Data.SpecificHeatSeaWater * world.Data.MassSeaWater * mixingDepth * (nTemperatureDeep - oceanTemperatureDeep) * world.Data.OceanHorizontalMixingSpeed;
 
 								float nSalinityDeepPercentage = nSalinityDeep / neighborDepth;
 								newOceanSalinityDeep += (nSalinityDeepPercentage - salinityDeepPercentage) * world.Data.OceanHorizontalMixingSpeed * Math.Min(neighborDepth, depth);
@@ -800,46 +836,53 @@ namespace Sim {
 
 					_ProfileAtmosphereFinal.Begin();
 
-					nextState.LowerAirMass[index] += Mathf.Max(0, newLowerAirMass);
-					nextState.UpperAirMass[index] += Mathf.Max(0, newUpperAirMass);
-					nextState.LowerAirEnergy[index] += Mathf.Max(0, newLowerAirEnergy);
-					nextState.UpperAirEnergy[index] += Mathf.Max(0, newUpperAirEnergy);
-					nextState.Humidity[index] += Mathf.Max(0, newHumidity);
-					nextState.CloudMass[index] += Mathf.Max(0, newCloudMass);
-					nextState.RainDropMass[index] += Mathf.Max(0, newRainDropMass);
-					nextState.OceanEnergyShallow[index] += Mathf.Max(0, newOceanEnergyShallow);
-					nextState.OceanEnergyDeep[index] += Mathf.Max(0, newOceanEnergyDeep);
-					nextState.OceanSalinityShallow[index] += Mathf.Max(0, newOceanSalinityShallow);
-					nextState.OceanSalinityDeep[index] += Mathf.Max(0, newOceanSalinityDeep);
+					nextState.LowerAirMass[index] += newLowerAirMass;
+					nextState.UpperAirMass[index] += newUpperAirMass;
+					nextState.LowerAirEnergy[index] += newLowerAirEnergy;
+					nextState.UpperAirEnergy[index] += newUpperAirEnergy;
+					nextState.Humidity[index] += newHumidity;
+					nextState.CloudMass[index] = Mathf.Max(0, nextState.CloudMass[index] + newCloudMass);
+					nextState.RainDropMass[index] += newRainDropMass;
+					nextState.OceanEnergyShallow[index] += newOceanEnergyShallow;
+					nextState.OceanEnergyDeep[index] += newOceanEnergyDeep;
+					nextState.OceanSalinityShallow[index] += newOceanSalinityShallow;
+					nextState.OceanSalinityDeep[index] += newOceanSalinityDeep;
 
 
 					nextState.SurfaceWater[index] = Mathf.Max(0, newSurfaceWater);
 					nextState.Ice[index] = Mathf.Max(0, newIce);
 					nextState.GroundWater[index] = Mathf.Max(0, newGroundWater);
 					nextState.Radiation[index] = Mathf.Max(0, newRadiation);
-					nextState.LowerAirTemperature[index] = GetAirTemperature(world, nextState.LowerAirEnergy[index], nextState.LowerAirMass[index]);
-					nextState.LowerAirPressure[index] = Mathf.Max(0, GetAirPressure(world, nextState.LowerAirMass[index] + nextState.UpperAirMass[index] + state.StratosphereMass, elevationOrSeaLevel, nextState.LowerAirTemperature[index]));
-					nextState.UpperAirTemperature[index] = GetAirTemperature(world, nextState.UpperAirEnergy[index], nextState.UpperAirMass[index]);
-					nextState.UpperAirPressure[index] = Mathf.Max(0, GetAirPressure(world, nextState.UpperAirMass[index] + state.StratosphereMass, elevationOrSeaLevel + world.Data.BoundaryZoneElevation, nextState.UpperAirTemperature[index]));
-					nextState.OceanTemperatureShallow[index] = Mathf.Max(0, GetWaterTemperature(world, nextState.OceanEnergyShallow[index], Math.Max(0, world.Data.DeepOceanDepth - newIce)));
-					nextState.OceanDensityDeep[index] = Mathf.Max(0, GetOceanDensity(world, nextState.OceanEnergyDeep[index], nextState.OceanSalinityDeep[index], state.SeaLevel - elevation));
-
-					if (float.IsInfinity(nextState.LowerAirPressure[index]))
-					{
-						Debug.Break();
-					}
 
 					nextState.Evaporation[index] = evaporation;
 					nextState.Rainfall[index] = newRainfall;
 					nextState.EnergyAbsorbed[index] = energyAbsorbed;
 
 					globalEnergyGained += energyAbsorbed;
-					globalEnergy += nextState.LowerAirEnergy[index] + nextState.UpperAirEnergy[index] + nextState.OceanEnergyDeep[index] + nextState.OceanEnergyShallow[index];
-					atmosphericMass += nextState.LowerAirMass[index] + nextState.UpperAirMass[index];
 
 					_ProfileAtmosphereFinal.End();
 
 				}
+			}
+
+			for (int index = 0; index < world.Size*world.Size; index++)
+			{
+				float elevation = nextState.Elevation[index];
+				float elevationOrSeaLevel = Mathf.Max(elevation, nextState.SeaLevel);
+				nextState.LowerAirTemperature[index] = GetAirTemperature(world, nextState.LowerAirEnergy[index], nextState.LowerAirMass[index]);
+				nextState.LowerAirPressure[index] = Mathf.Max(0, GetAirPressure(world, nextState.LowerAirMass[index] + nextState.UpperAirMass[index] + state.StratosphereMass, elevationOrSeaLevel, nextState.LowerAirTemperature[index]));
+				nextState.UpperAirTemperature[index] = GetAirTemperature(world, nextState.UpperAirEnergy[index], nextState.UpperAirMass[index]);
+				nextState.UpperAirPressure[index] = Mathf.Max(0, GetAirPressure(world, nextState.UpperAirMass[index] + state.StratosphereMass, elevationOrSeaLevel + world.Data.BoundaryZoneElevation, nextState.UpperAirTemperature[index]));
+				nextState.OceanTemperatureShallow[index] = Mathf.Max(0, GetWaterTemperature(world, nextState.OceanEnergyShallow[index], Math.Max(0, world.Data.DeepOceanDepth - nextState.Ice[index])));
+				nextState.OceanDensityDeep[index] = Mathf.Max(0, GetOceanDensity(world, nextState.OceanEnergyDeep[index], nextState.OceanSalinityDeep[index], state.SeaLevel - elevation));
+				globalEnergy += nextState.LowerAirEnergy[index] + nextState.UpperAirEnergy[index] + nextState.OceanEnergyDeep[index] + nextState.OceanEnergyShallow[index];
+				atmosphericMass += nextState.LowerAirMass[index] + nextState.UpperAirMass[index];
+
+				if (float.IsInfinity(nextState.LowerAirPressure[index]))
+				{
+					Debug.Break();
+				}
+
 			}
 
 
@@ -978,8 +1021,8 @@ namespace Sim {
 						float rainfallMass = newRainDropMass * Mathf.Max(0, -rainDropVelocity * world.Data.RainfallRate);
 						float rainDropFallTime = -cloudElevation / rainDropVelocity;
 						float rainDropMassToHumidity = Mathf.Min(rainfallMass, rainDropFallTime * world.Data.rainDropEvapRate);
-						newCloudMass -= rainfallMass;
-						newRainDropMass -= rainfallMass;
+						newCloudMass -= Mathf.Min(cloudMass, rainfallMass);
+						newRainDropMass -= Mathf.Min(newRainDropMass, rainfallMass);
 						newHumidity += rainDropMassToHumidity;
 						if (rainfallMass > rainDropMassToHumidity)
 						{
@@ -1053,12 +1096,24 @@ namespace Sim {
 			return relativeHumidity;
 		}
 
-		static private void EvaporateWater(World world, bool isOcean, float evapRate, float groundWater, float waterTableDepth, ref float humidity, ref float newAirEnergy, ref float newOceanEnergy, ref float newGroundWater, ref float surfaceWater, out float evaporation, out float evapotranspiration)
+		static public float GetAbsoluteHumidity(World world, float temperature, float relativeHumidity, float airMass)
+		{
+			float maxWaterVaporPerKilogramAir = world.Data.WaterVaporMassToAirMassAtDewPoint * Sqr(Mathf.Max(0, (temperature - world.Data.DewPointZero) / world.Data.DewPointTemperatureRange));
+			float maxHumidity = maxWaterVaporPerKilogramAir * airMass;
+			if (maxHumidity <= 0)
+			{
+				return 0;
+			}
+			float humidity = relativeHumidity * maxHumidity;
+			return humidity;
+		}
+
+		static private void EvaporateWater(World world, bool isOcean, float evapRate, float groundWater, float waterTableDepth, ref float newHumidity, ref float newAirEnergy, ref float newOceanEnergy, ref float newGroundWater, ref float surfaceWater, out float evaporation, out float evapotranspiration)
 		{
 			evaporation = 0;
 			if (isOcean)
 			{
-				humidity += evapRate * world.Data.MassFreshWater;
+				newHumidity += evapRate * world.Data.MassFreshWater;
 				evaporation += evapRate;
 			}
 			else
@@ -1068,14 +1123,14 @@ namespace Sim {
 					float waterSurfaceArea = Math.Min(1.0f, (float)Math.Sqrt(surfaceWater));
 					float evap = Math.Max(0, Math.Min(surfaceWater, waterSurfaceArea * evapRate));
 					surfaceWater -= evap;
-					humidity += evap * world.Data.MassFreshWater;
+					newHumidity += evap * world.Data.MassFreshWater;
 					evaporation += evap;
 				}
 				if (waterTableDepth > 0)
 				{
 					var groundWaterEvap = Math.Max(0, Math.Min(newGroundWater, groundWater / waterTableDepth * evapRate));
 					newGroundWater -= groundWaterEvap;
-					humidity += groundWaterEvap * world.Data.MassFreshWater;
+					newHumidity += groundWaterEvap * world.Data.MassFreshWater;
 					evaporation += groundWaterEvap;
 				}
 			}
@@ -1116,7 +1171,7 @@ namespace Sim {
 				}
 				else
 				{
-					float salinityExchange = (oceanSalinityDeep / depth - oceanSalinityShallow / shallowColumnDepth) * world.Data.SalinityVerticalMixingSpeed * (oceanSalinityShallow + oceanSalinityDeep);
+					float salinityExchange = (oceanSalinityDeep / depth - oceanSalinityShallow / shallowColumnDepth) * world.Data.SalinityVerticalMixingSpeed * (oceanSalinityShallow + oceanSalinityDeep) * world.Data.SecondsPerTick;
 					newOceanSalinityDeep -= salinityExchange * depth / (depth + shallowColumnDepth);
 					newOceanSalinityShallow += salinityExchange * world.Data.DeepOceanDepth / (depth + shallowColumnDepth);
 
@@ -1214,11 +1269,11 @@ namespace Sim {
 
 		static public float GetWaterTemperature(World world, float energy, float depth)
 		{
-			return energy / (world.Data.SpecificHeatSeaWater * depth);
+			return energy / (world.Data.SpecificHeatSeaWater * depth * world.Data.MassSeaWater);
 		}
 		static public float GetWaterEnergy(World world, float temperature, float depth)
 		{
-			return temperature * (world.Data.SpecificHeatSeaWater * depth);
+			return temperature * (world.Data.SpecificHeatSeaWater * depth * world.Data.MassSeaWater);
 		}
 		static public float GetAlbedo(float surfaceAlbedo, float slope)
 		{

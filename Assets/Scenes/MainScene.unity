@@ -14565,7 +14565,7 @@ MonoBehaviour:
     WindHumidityMovement: 0.00001
     PressureGradientWindMultiplier: 1000
     AdiabaticLapseRate: 0.0098
-    GlobalCoriolisInfluenceWind: 0.75
+    GlobalCoriolisInfluenceWind: 0.5
     GlobalCoriolisInfluenceOcean: 0.5
     AtmosphericHeatAbsorption: 0.297
     AtmosphericHeatReflection: 0.07

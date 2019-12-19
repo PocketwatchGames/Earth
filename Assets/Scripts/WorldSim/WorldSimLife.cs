@@ -39,7 +39,9 @@ namespace Sim {
 							//float surfaceWater = state.SurfaceWater[index];
 							//freshWaterAvailability = GetFreshWaterAvailability(surfaceWater, groundWaterSaturation);
 
-							float desiredCanopy = sf * (state.Rainfall[index] + state.SurfaceWater[index]) * (1.0f - Mathf.Clamp01(state.Ice[index] / world.Data.FullIceCoverage)) * Math.Max(0, (t - world.Data.MinTemperatureCanopy) / (world.Data.MaxTemperatureCanopy - world.Data.MinTemperatureCanopy));
+							float iceCoverage = Mathf.Clamp01(state.Ice[index] / world.Data.FullIceCoverage);
+
+							float desiredCanopy = sf * (state.Rainfall[index] + state.SurfaceWater[index]) * (1.0f - iceCoverage) * Mathf.Clamp01((t - world.Data.MinTemperatureCanopy) / (world.Data.MaxTemperatureCanopy - world.Data.MinTemperatureCanopy));
 							float canopyGrowth = (desiredCanopy - canopy) * world.Data.canopyGrowthRate;
 							newCanopy += canopyGrowth;
 

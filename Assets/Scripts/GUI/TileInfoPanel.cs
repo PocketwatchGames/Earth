@@ -46,7 +46,7 @@ public class TileInfoPanel : MonoBehaviour
 		textGlobal += "GLOBAL";
 		textGlobal += "\nCloud Coverage: " + (state.GlobalCloudCoverage * 100).ToString("0.0") + "%";
 		textGlobal += "\nOcean Coverage: " + (state.GlobalOceanCoverage * 100).ToString("0.0") + "%";
-//		textGlobal += "\nAtmospheric Mass: " + (state.AtmosphericMass).ToString("0") + "";
+		textGlobal += "\nAtmospheric Mass: " + (state.AtmosphericMass).ToString("0") + "";
 		textGlobal += "\nENERGY";
 		textGlobal += "\nTotal: " + (state.GlobalEnergy).ToString("0");
 		textGlobal += "\nIncoming: " + ConvertTileEnergyToWatts(state.GlobalEnergyIncoming / totalTiles).ToString("0.0");
@@ -102,12 +102,14 @@ public class TileInfoPanel : MonoBehaviour
 				textSurfaceOcean += "SURFACE OCEAN";
 				textSurfaceOcean += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(state.OceanTemperatureShallow[index], WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 				textSurfaceOcean += "\nSalinity: " + (state.OceanSalinityShallow[index] / WorldComponent.World.Data.DeepOceanDepth).ToString("0.00");
+				textSurfaceOcean += "\nEnergy: " + (uint)(state.OceanEnergyShallow[index]/1000) + "K";
 				textSurfaceOcean += "\nCurrent: " + state.OceanCurrentShallow[index].ToString("0.0");
 
 				textDeepOcean += "DEEP OCEAN";
 				textDeepOcean += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(Sim.Atmosphere.GetWaterTemperature(WorldComponent.World, state.OceanEnergyDeep[index], state.SeaLevel - elevation), WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 				textDeepOcean += "\nSalinity: " + (state.OceanSalinityDeep[index] / (state.SeaLevel - elevation)).ToString("0.00");
 				textDeepOcean += "\nDensity: " + state.OceanDensityDeep[index].ToString("0.00");
+				textDeepOcean += "\nEnergy: " + (uint)(state.OceanEnergyDeep[index]/1000) + "K";
 				textDeepOcean += "\nCurrent: " + state.OceanCurrentDeep[index].x.ToString("0.00") + ", " + state.OceanCurrentDeep[index].y.ToString("0.00");
 				OceanPanel.SetActive(true);
 				TerrainPanel.SetActive(false);
