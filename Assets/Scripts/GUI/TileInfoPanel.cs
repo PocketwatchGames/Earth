@@ -32,6 +32,7 @@ public class TileInfoPanel : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+		float inverseDewPointTemperatureRange = 1.0f / WorldComponent.World.Data.DewPointTemperatureRange;
 		int index = WorldComponent.World.GetIndex(TileInfoPoint.x, TileInfoPoint.y);
 		var state = WorldComponent.World.States[WorldComponent.World.CurRenderStateIndex];
 		string textGeo = "";
@@ -81,7 +82,7 @@ public class TileInfoPanel : MonoBehaviour
 			textGeo += "\nIce: " + state.Ice[index].ToString("0.00");
 			textGeo += "\nSurface Abs: " + ConvertTileEnergyToWatts(state.EnergyAbsorbed[index]).ToString("0.0");
 
-			float relativeHumidity = Sim.Atmosphere.GetRelativeHumidity(WorldComponent.World, state.LowerAirTemperature[index], state.Humidity[index], state.LowerAirMass[index]);
+			float relativeHumidity = Sim.Atmosphere.GetRelativeHumidity(WorldComponent.World, state.LowerAirTemperature[index], state.Humidity[index], state.LowerAirMass[index], inverseDewPointTemperatureRange);
 			textUpperAtmosphere += "UPPER ATMOSPHERE";
 			textUpperAtmosphere += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(state.UpperAirTemperature[index], WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 			textUpperAtmosphere += "\nPressure: " + (state.UpperAirPressure[index]).ToString("0");

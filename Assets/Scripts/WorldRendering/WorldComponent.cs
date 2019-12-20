@@ -72,6 +72,7 @@ public partial class WorldComponent : MonoBehaviour
 	public float maxRainfall = 5.0f;
 	public float maxCloudColor = 300.0f;
 	public float MaxEnergyAbsorbed = 300;
+	public float surfaceWaterFullCoverage = 50;
 
 
 	[Header("Internal")]

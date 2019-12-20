@@ -173,7 +173,7 @@ public class WorldData
 	[NonSerialized]
 	public float InverseMetersPerTile;
 	[NonSerialized]
-	public float evapTemperatureRange;
+	public float EvapTemperatureRange;
 
 
 	public void Init(int size)
@@ -193,7 +193,7 @@ public class WorldData
 
 		InverseMetersPerTile = 1.0f / MetersPerTile;
 
-		evapTemperatureRange = EvapMaxTemperature - EvapMinTemperature;
+		EvapTemperatureRange = EvapMaxTemperature - EvapMinTemperature;
 		SpecificGasConstantDryAir = UniversalGasConstant / MolarMassEarthAir;
 		PressureExponent = GravitationalAcceleration * MolarMassEarthAir / (UniversalGasConstant * TemperatureLapseRate);
 

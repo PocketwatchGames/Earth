@@ -88,6 +88,8 @@ public static class WorldGen {
 		state.Species[3].starvationSpeed = 12.0f / data.TicksPerYear;
 		state.Species[3].dehydrationSpeed = 12.0f / data.TicksPerYear;
 
+		float inverseDewPointTemperatureRange = 1.0f / world.Data.DewPointTemperatureRange;
+
 		for (int y = 0; y < world.Size; y++)
 		{
 			for (int x = 0; x < world.Size; x++)
@@ -144,7 +146,7 @@ public static class WorldGen {
 
 				state.CloudMass[index] = GetPerlinMinMax(world, noise, x, y, 3.0f, 2000, 0, 1) * data.CloudMassFullAbsorption;
 				float relativeHumidity = Mathf.Pow(GetPerlinNormalized(world, noise, x, y, 1.0f, 400), 3);
-				state.Humidity[index] = Atmosphere.GetAbsoluteHumidity(world, state.LowerAirTemperature[index], relativeHumidity, state.LowerAirMass[index]);
+				state.Humidity[index] = Atmosphere.GetAbsoluteHumidity(world, state.LowerAirTemperature[index], relativeHumidity, state.LowerAirMass[index], inverseDewPointTemperatureRange);
 				state.WaterTableDepth[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 200, data.MinWaterTableDepth, data.MaxWaterTableDepth);
 				state.SoilFertility[index] = GetPerlinNormalized(world, noise, x, y, 1.0f, 400);
 				state.Ice[index] = 0;

@@ -185,6 +185,7 @@ public partial class WorldComponent {
 		float inverseElevationRange = 1.0f / (MaxElevation - MinElevation);
 		float inverseWorldSize = 1.0f / World.Size;
 		float inverseFullIceCoverage = World.Data.FullIceCoverage;
+		float inverseDewPointTemperatureRange = 1.0f / World.Data.DewPointTemperatureRange;
 		for (int y = 0; y < World.Size; y++)
 		{
 			float latitude = World.GetLatitude(y);
@@ -194,8 +195,8 @@ public partial class WorldComponent {
 
 				float elevation = state.Elevation[index];
 				float ice = state.Ice[index];
+				bool isOcean = World.IsOcean(elevation, state.SeaLevel);
 				float normalizedElevation = (elevation - MinElevation) * inverseElevationRange;
-				bool drawOcean = World.IsOcean(elevation, state.SeaLevel) && showLayers.IsSet(Layers.Water);
 
 				landVerts[index].z = -elevation * ElevationScale;
 				oceanVerts[index].z = -state.SeaLevel * ElevationScale;
@@ -239,6 +240,11 @@ public partial class WorldComponent {
 				//		}
 
 
+				if (!isOcean)
+				{
+					color = Color.Lerp(color, new Color(0.2f, 0.3f, 1.0f), Mathf.Sqrt(Mathf.Clamp01(state.SurfaceWater[index] / surfaceWaterFullCoverage)));
+				}
+
 				if (ice > 0)
 				{
 					float iceCoverage = Mathf.Clamp01(ice * inverseFullIceCoverage);
@@ -274,10 +280,10 @@ public partial class WorldComponent {
 				{
 					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.blue, 0.01f),
-											new CVP(Color.yellow, 0.02f),
-											new CVP(Color.red, 0.03f),
-											new CVP(Color.white, 0.05f) },
+											new CVP(Color.blue, 1f),
+											new CVP(Color.yellow, 2f),
+											new CVP(Color.red, 3f),
+											new CVP(Color.white, 4f) },
 						state.Evaporation[index] * World.Data.TicksPerYear);
 				}
 				else if (showLayers.IsSet(Layers.WindVert))
@@ -344,7 +350,7 @@ public partial class WorldComponent {
 				}
 				else if (showLayers.IsSet(Layers.RelativeHumidity))
 				{
-					float relativeHumidity = Mathf.Clamp01(Atmosphere.GetRelativeHumidity(World, state.LowerAirTemperature[index], state.Humidity[index], state.LowerAirMass[index]));
+					float relativeHumidity = Mathf.Clamp01(Atmosphere.GetRelativeHumidity(World, state.LowerAirTemperature[index], state.Humidity[index], state.LowerAirMass[index], inverseDewPointTemperatureRange));
 					color = oceanColor = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
 											new CVP(Color.blue, 0.2f),

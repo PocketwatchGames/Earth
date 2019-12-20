@@ -62,6 +62,8 @@ namespace Sim {
 			float declinationOfSun = GetDeclinationOfSun(state.PlanetTiltAngle, timeOfYear);
 			float sunHitsAtmosphereBelowHorizonAmount = 0.055f;
 			float inverseSunAtmosphereAmount = 1.0f / (1.0f + sunHitsAtmosphereBelowHorizonAmount);
+			float inverseDewPointTemperatureRange = 1.0f / world.Data.DewPointTemperatureRange;
+			float inverseEvapTemperatureRange = 1.0f / world.Data.EvapTemperatureRange;
 
 			for (int y = 0; y < world.Size; y++)
 			{
@@ -137,7 +139,7 @@ namespace Sim {
 					float newRadiation = radiation;
 					float inverseMassOfAtmosphericColumn = 1.0f / (upperAirMass + lowerAirMass);
 					float iceCoverage = Mathf.Min(1.0f, ice * inverseFullIceCoverage);
-					float relativeHumidity = GetRelativeHumidity(world, lowerAirTemperature, humidity, lowerAirMass);
+					float relativeHumidity = GetRelativeHumidity(world, lowerAirTemperature, humidity, lowerAirMass, inverseDewPointTemperatureRange);
 					float dewPoint = GetDewPoint(world, lowerAirTemperature, relativeHumidity);
 					float cloudElevation = GetCloudElevation(world, upperAirTemperature, dewPoint);
 					bool isOcean = world.IsOcean(elevation, state.SeaLevel);
@@ -499,7 +501,7 @@ namespace Sim {
 								// TODO this should be using absolute pressure not barometric
 								float inverseLowerAirPressure = 1.0f / lowerAirPressure;
 								// evaporation
-								float evapRate = GetEvaporationRate(world, ice, lowerAirTemperature, relativeHumidity, inverseLowerAirPressure);
+								float evapRate = GetEvaporationRate(world, ice, lowerAirTemperature, relativeHumidity, inverseLowerAirPressure, inverseEvapTemperatureRange);
 								if (evapRate > 0)
 								{
 									float evapotranspiration;
@@ -1098,9 +1100,9 @@ namespace Sim {
 			}
 		}
 
-		static private float GetEvaporationRate(World world, float iceCoverage, float temperature, float relativeHumidity, float airPressureInverse)
+		static private float GetEvaporationRate(World world, float iceCoverage, float temperature, float relativeHumidity, float airPressureInverse, float inverseEvapTemperatureRange)
 		{
-			float evapTemperature = Mathf.Clamp01((temperature - world.Data.EvapMinTemperature) / world.Data.evapTemperatureRange);
+			float evapTemperature = Mathf.Clamp01((temperature - world.Data.EvapMinTemperature) * inverseEvapTemperatureRange);
 
 			return Mathf.Clamp01((1.0f - iceCoverage) * (1.0f - relativeHumidity) * Sqr(evapTemperature)) * world.Data.EvaporationRate;
 		}
@@ -1111,9 +1113,9 @@ namespace Sim {
 			return (elevation - elevationOrSeaLevel) * temperatureLapseRate + lowerTemperature;
 		}
 
-		static public float GetRelativeHumidity(World world, float temperature, float humidity, float airMass)
+		static public float GetRelativeHumidity(World world, float temperature, float humidity, float airMass, float inverseDewPointTemperatureRange)
 		{
-			float maxWaterVaporPerKilogramAir = world.Data.WaterVaporMassToAirMassAtDewPoint * Sqr(Mathf.Max(0, (temperature - world.Data.DewPointZero) / world.Data.DewPointTemperatureRange));
+			float maxWaterVaporPerKilogramAir = world.Data.WaterVaporMassToAirMassAtDewPoint * Sqr(Mathf.Max(0, (temperature - world.Data.DewPointZero) * inverseDewPointTemperatureRange));
 			float maxHumidity = maxWaterVaporPerKilogramAir * airMass;
 			if (maxHumidity <= 0)
 			{
@@ -1123,9 +1125,9 @@ namespace Sim {
 			return relativeHumidity;
 		}
 
-		static public float GetAbsoluteHumidity(World world, float temperature, float relativeHumidity, float airMass)
+		static public float GetAbsoluteHumidity(World world, float temperature, float relativeHumidity, float airMass, float inverseDewPointTemperatureRange)
 		{
-			float maxWaterVaporPerKilogramAir = world.Data.WaterVaporMassToAirMassAtDewPoint * Sqr(Mathf.Max(0, (temperature - world.Data.DewPointZero) / world.Data.DewPointTemperatureRange));
+			float maxWaterVaporPerKilogramAir = world.Data.WaterVaporMassToAirMassAtDewPoint * Sqr(Mathf.Max(0, (temperature - world.Data.DewPointZero) * inverseDewPointTemperatureRange));
 			float maxHumidity = maxWaterVaporPerKilogramAir * airMass;
 			if (maxHumidity <= 0)
 			{
