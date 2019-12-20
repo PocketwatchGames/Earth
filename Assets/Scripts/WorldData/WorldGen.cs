@@ -142,7 +142,7 @@ public static class WorldGen {
 				state.LowerAirEnergy[index] = Atmosphere.GetAirEnergy(world, state.LowerAirTemperature[index], state.LowerAirMass[index]);
 
 
-				state.CloudMass[index] = Mathf.Pow(GetPerlinMinMax(world, noise, x, y, 3.0f, 2000, 0, 1), 5) * 300;
+				state.CloudMass[index] = GetPerlinMinMax(world, noise, x, y, 3.0f, 2000, 0, 1) * data.CloudMassFullAbsorption;
 				float relativeHumidity = Mathf.Pow(GetPerlinNormalized(world, noise, x, y, 1.0f, 400), 3);
 				state.Humidity[index] = Atmosphere.GetAbsoluteHumidity(world, state.LowerAirTemperature[index], relativeHumidity, state.LowerAirMass[index]);
 				state.WaterTableDepth[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 200, data.MinWaterTableDepth, data.MaxWaterTableDepth);

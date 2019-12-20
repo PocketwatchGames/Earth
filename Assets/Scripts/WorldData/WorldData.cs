@@ -34,7 +34,7 @@ public class WorldData
 	public float WindLandFriction = 0.5f;
 	public float WindAirMovementHorizontal = 0.001f;
 	public float WindAirMovementVertical = 0.01f;
-	public float WindHumidityMovement = 0.00002f;
+	public float WindHumidityMovement = 0.1f;
 	public float PressureGradientWindMultiplier = 4000;
 	public float AdiabaticLapseRate = 0.0098f;
 	// http://tornado.sfsu.edu/geosciences/classes/e260/Coriolis_rdg/GeostrophicApproximation.html
@@ -77,9 +77,8 @@ public class WorldData
 	public float EvapMinTemperature = 243; // -30 celsius
 	public float EvapMaxTemperature = 343; // 70 celsius
 	public float EvaporationRate = 0.002f; // TODO: evaporation on earth maxes out around 2.5M per year 
-	public float rainPointTemperatureMultiplier = 0.00075f; // adjustment for temperature
 	public float RainDropFormationSpeedTemperature = 10f;
-	public float RainDropDissapationSpeedWind = 0.00001f;
+	public float RainDropCoalescenceWind = 0.00001f;
 	public float rainDropDragCoefficient = 0.5f;
 	public float airDensity = 1.21f;
 	public float waterDensity = 997;

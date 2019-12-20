@@ -444,15 +444,8 @@ public partial class WorldComponent {
 
 				if (showLayers.IsSet(Layers.CloudCoverage))
 				{
-					if (state.CloudMass[index] > minCloudsToDraw)
-					{
-						var cloudColor = Color.Lerp(Color.white, Color.black, Mathf.Clamp01(state.RainDropMass[index] / maxCloudColor)) * (float)Math.Sqrt(Mathf.Clamp01((state.CloudMass[index] - minCloudsToDraw) / maxCloudAlpha)) * 0.9f;
-						cloudCols[index] = cloudColor;
-					}
-					else
-					{
-						cloudCols[index].a = 0;
-					}
+					var cloudColor = Color.Lerp(Color.white, Color.black, Mathf.Clamp01(state.RainDropMass[index] / (state.CloudMass[index] * maxCloudColor))) * (float)Math.Sqrt(Mathf.Clamp01(state.CloudMass[index] / World.Data.CloudMassFullAbsorption)) * 0.9f;
+					cloudCols[index] = cloudColor;
 					cloudVerts[index].z = -Mathf.Max(Math.Max(elevation, state.SeaLevel) + 1) * ElevationScale;
 				}
 

@@ -137,8 +137,8 @@ namespace Sim {
 					float inverseMassOfAtmosphericColumn = 1.0f / (upperAirMass + lowerAirMass);
 					float iceCoverage = Mathf.Min(1.0f, ice * inverseFullIceCoverage);
 					float relativeHumidity = GetRelativeHumidity(world, lowerAirTemperature, humidity, lowerAirMass);
-					float dewPoint = lowerAirTemperature - (1.0f - relativeHumidity) * world.Data.DewPointTemperaturePerRelativeHumidity;
-					float cloudElevation = world.Data.BoundaryZoneElevation + (upperAirTemperature - dewPoint) * world.Data.DewPointElevationPerDegree;
+					float dewPoint = GetDewPoint(world, lowerAirTemperature, relativeHumidity);
+					float cloudElevation = GetCloudElevation(world, upperAirTemperature, dewPoint);
 					bool isOcean = world.IsOcean(elevation, state.SeaLevel);
 					float cloudOpacity = Math.Min(1.0f, Mathf.Pow(cloudMass * inverseCloudMassFullAbsorption, 0.6667f)); // bottom surface of volume
 					//float groundWaterSaturation = Animals.GetGroundWaterSaturation(state.GroundWater[index], state.WaterTableDepth[index], soilFertility * world.Data.MaxSoilPorousness);
@@ -270,8 +270,8 @@ namespace Sim {
 						nextState.LowerAirEnergy[i2] += contentMove * move2;
 						nextState.LowerAirEnergy[i3] += contentMove * move3;
 
-						contentMove = humidity * world.Data.WindAirMovementHorizontal;
-						nextState.Humidity[index] += humidity * (1.0f - world.Data.WindAirMovementHorizontal);
+						contentMove = humidity * world.Data.WindHumidityMovement;
+						nextState.Humidity[index] += humidity * (1.0f - world.Data.WindHumidityMovement);
 						nextState.Humidity[i0] += contentMove * move0;
 						nextState.Humidity[i1] += contentMove * move1;
 						nextState.Humidity[i2] += contentMove * move2;
@@ -1032,23 +1032,23 @@ namespace Sim {
 
 			if (cloudMass > 0)
 			{
-				newRainDropMass = Mathf.Max(0, newRainDropMass + cloudMass * (world.Data.RainDropFormationSpeedTemperature / dewPoint - upperWind.magnitude * world.Data.RainDropDissapationSpeedWind));
+				newRainDropMass = Mathf.Max(0, newRainDropMass + Mathf.Sqrt(cloudMass) * (world.Data.RainDropFormationSpeedTemperature / dewPoint * Mathf.Max(0, lowerWind.z) * world.Data.RainDropCoalescenceWind));
 
 				if (newRainDropMass > 0)
 				{
 					// TODO: airDesntiy and rainDensity should probably be cleaned up (derived from other data?)
-					float rainDropSize = Mathf.Sqrt(newRainDropMass) / 100;
+					float rainDropSize = newRainDropMass / cloudMass;
 					float newRainDropSurfaceArea = Mathf.Pow(rainDropSize / world.Data.waterDensity, 0.667f);
 					float rainDropDrag = 1.0f - newRainDropSurfaceArea * world.Data.rainDropDragCoefficient;
 					float rainDropVelocity = lowerWind.z - Mathf.Sqrt(2 * rainDropSize * world.Data.GravitationalAcceleration / (world.Data.airDensity * newRainDropSurfaceArea * world.Data.rainDropDragCoefficient));
 					if (rainDropVelocity < 0)
 					{
 						// TODO: rainfall mass isnt a true mass, it doesnt cap at cloud mass, so transfer of cloudmass and humidity should be based on a percentage
-						float rainfallMass = newRainDropMass * Mathf.Max(0, -rainDropVelocity * world.Data.RainfallRate);
+						float rainfallMass = cloudMass * Mathf.Clamp01(-rainDropVelocity * world.Data.RainfallRate);
 						float rainDropFallTime = -cloudElevation / rainDropVelocity;
 						float rainDropMassToHumidity = Mathf.Min(rainfallMass, rainDropFallTime * world.Data.rainDropEvapRate);
-						newCloudMass -= Mathf.Min(cloudMass, rainfallMass);
-						newRainDropMass -= Mathf.Min(newRainDropMass, rainfallMass);
+						newCloudMass -= rainfallMass;
+						newRainDropMass *= (1.0f - rainfallMass / cloudMass);
 						newHumidity += rainDropMassToHumidity;
 						if (rainfallMass > rainDropMassToHumidity)
 						{
@@ -1304,6 +1304,14 @@ namespace Sim {
 		static public float GetAlbedo(float surfaceAlbedo, float slope)
 		{
 			return surfaceAlbedo + (1.0f - surfaceAlbedo) * slope;
+		}
+		static public float GetDewPoint(World world, float lowerAirTemperature, float relativeHumidity)
+		{
+			return lowerAirTemperature - (1.0f - relativeHumidity) * world.Data.DewPointTemperaturePerRelativeHumidity;
+		}
+		static public float GetCloudElevation(World world, float upperAirTemperature, float dewPoint)
+		{
+			return world.Data.BoundaryZoneElevation + (upperAirTemperature - dewPoint) * world.Data.DewPointElevationPerDegree;
 		}
 
 		static public float RepeatExclusive(float x, float y)
