@@ -43,17 +43,21 @@ public class TileInfoPanel : MonoBehaviour
 		string textGlobal = "";
 
 		int totalTiles = WorldComponent.World.Size * WorldComponent.World.Size;
+		var totalReflected = state.GlobalEnergyReflectedCloud + state.GlobalEnergyReflectedAtmosphere + state.GlobalEnergyReflectedSurface;
+		var totalOutgoing = state.GlobalEnergyOutAtmosphericWindow + state.GlobalEnergyOutEmittedAtmosphere;
 		textGlobal += "GLOBAL";
 		textGlobal += "\nCloud Coverage: " + (state.GlobalCloudCoverage * 100).ToString("0.0") + "%";
 		textGlobal += "\nOcean Coverage: " + (state.GlobalOceanCoverage * 100).ToString("0.0") + "%";
-		textGlobal += "\nAtmospheric Mass: " + (state.AtmosphericMass).ToString("0") + "";
+		textGlobal += "\nOcean Volume: " + (state.GlobalOceanVolume/1000000000).ToString("0.00") + " B";
+		textGlobal += "\nAtmospheric Mass: " + (state.AtmosphericMass/1000).ToString("0") + " K";
 		textGlobal += "\nENERGY";
-		textGlobal += "\nTotal: " + (state.GlobalEnergy).ToString("0");
+		textGlobal += "\nTotal: " + (state.GlobalEnergy / 1000000).ToString("0") + " MJ";
+		textGlobal += "\nDelta: " + ConvertTileEnergyToWatts((state.GlobalEnergyIncoming - totalReflected - totalOutgoing) / totalTiles).ToString("0.0");
 		textGlobal += "\nIncoming: " + ConvertTileEnergyToWatts(state.GlobalEnergyIncoming / totalTiles).ToString("0.0");
-		textGlobal += "\nOutgoing: " + ConvertTileEnergyToWatts((state.GlobalEnergyOutAtmosphericWindow + state.GlobalEnergyOutEmittedAtmosphere) / totalTiles).ToString("0.0");
+		textGlobal += "\nReflected: " + ConvertTileEnergyToWatts((totalReflected) / totalTiles).ToString("0.0");
+		textGlobal += "\nOutgoing: " + ConvertTileEnergyToWatts(totalOutgoing / totalTiles).ToString("0.0");
 		textGlobal += "\nOut Atm Window: " + ConvertTileEnergyToWatts(state.GlobalEnergyOutAtmosphericWindow / totalTiles).ToString("0.0");
 		textGlobal += "\nOut Atm Radiation: " + ConvertTileEnergyToWatts(state.GlobalEnergyOutEmittedAtmosphere / totalTiles).ToString("0.0");
-		textGlobal += "\nReflected Total: " + ConvertTileEnergyToWatts((state.GlobalEnergyReflectedCloud + state.GlobalEnergyReflectedAtmosphere + state.GlobalEnergyReflectedSurface) / totalTiles).ToString("0.0");
 		textGlobal += "\nReflected Cloud: " + ConvertTileEnergyToWatts(state.GlobalEnergyReflectedCloud / totalTiles).ToString("0.0");
 		textGlobal += "\nReflected Atmos: " + ConvertTileEnergyToWatts(state.GlobalEnergyReflectedAtmosphere / totalTiles).ToString("0.0");
 		textGlobal += "\nReflected Surf: " + ConvertTileEnergyToWatts(state.GlobalEnergyReflectedSurface / totalTiles).ToString("0.0");
@@ -74,13 +78,11 @@ public class TileInfoPanel : MonoBehaviour
 			textGeo += "\nIndex: " + index;
 			textGeo += "\nPlate: " + state.Plate[index];
 			textGeo += "\nElevation: " + (int)elevation;
-			textGeo += "\nWaterTableDepth: " + (int)state.WaterTableDepth[index];
-			textGeo += "\nSurfaceIce: " + state.Ice[index].ToString("0.00");
-			textGeo += "\nSurface Heat: " + ConvertTileEnergyToWatts(state.EnergyAbsorbed[index]).ToString("0.0");
-			textGeo += "\nLand Energy: " + state.LandEnergy[index].ToString("0.0");
+			textGeo += "\nIce: " + state.Ice[index].ToString("0.00");
+			textGeo += "\nSurface Abs: " + ConvertTileEnergyToWatts(state.EnergyAbsorbed[index]).ToString("0.0");
 
 			float relativeHumidity = Sim.Atmosphere.GetRelativeHumidity(WorldComponent.World, state.LowerAirTemperature[index], state.Humidity[index], state.LowerAirMass[index]);
-			textUpperAtmosphere += "UPPER ATMOS";
+			textUpperAtmosphere += "UPPER ATMOSPHERE";
 			textUpperAtmosphere += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(state.UpperAirTemperature[index], WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 			textUpperAtmosphere += "\nPressure: " + (state.UpperAirPressure[index]).ToString("0");
 			textUpperAtmosphere += "\nMass: " + (state.UpperAirMass[index]).ToString("0");
@@ -90,7 +92,7 @@ public class TileInfoPanel : MonoBehaviour
 			textUpperAtmosphere += "\nRaindrop Mass: " + state.RainDropMass[index].ToString("0.00");
 			textUpperAtmosphere += "\nRainfall: " + (state.Rainfall[index] * WorldComponent.World.Data.TicksPerYear).ToString("0.00");
 
-			textLowerAtmosphere += "LOWER ATMOS";
+			textLowerAtmosphere += "LOWER ATMOSPHERE";
 			textLowerAtmosphere += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(state.LowerAirTemperature[index], WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 			textLowerAtmosphere += "\nPressure: " + (state.LowerAirPressure[index]).ToString("0");
 			textLowerAtmosphere += "\nMass: " + (state.LowerAirMass[index]).ToString("0");
@@ -121,9 +123,11 @@ public class TileInfoPanel : MonoBehaviour
 			{
 				textTerrain += "TERRAIN";
 				textTerrain += "\nCanopy: " + (int)(state.Canopy[index] * 100);
-				textTerrain += "\nSoilFertility: " + (int)(state.SoilFertility[index] * 100);
-				textTerrain += "\nGroundWater: " + state.GroundWater[index].ToString("0.00");
-				textTerrain += "\nSurfaceWater: " + state.SurfaceWater[index].ToString("0.00");
+				textTerrain += "\nSoil Fertility: " + (int)(state.SoilFertility[index] * 100);
+				textTerrain += "\nWater Table Depth: " + (int)state.WaterTableDepth[index];
+				textTerrain += "\nGround Water: " + state.GroundWater[index].ToString("0.00");
+				textTerrain += "\nSurface Water: " + state.SurfaceWater[index].ToString("0.00");
+				textTerrain += "\nLand Energy: " + state.LandEnergy[index].ToString("0.0");
 				TerrainPanel.SetActive(true);
 				OceanPanel.SetActive(false);
 			}

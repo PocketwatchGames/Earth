@@ -46,6 +46,7 @@ namespace Sim {
 			float globalEnergyOutEmittedAtmosphere = 0;
 			float globalOceanCoverage = 0;
 			float globalCloudCoverage = 0;
+			float globalOceanVolume = 0;
 			float globalTemperature = 0;
 			float atmosphericMass = 0;
 
@@ -371,6 +372,7 @@ namespace Sim {
 					if (isOcean)
 					{
 						globalOceanCoverage++;
+						globalOceanVolume += (state.SeaLevel - elevation)*world.Data.MetersPerTile*world.Data.MetersPerTile/1000000000;
 					}
 
 					if (incomingRadiation > 0)
@@ -746,20 +748,18 @@ namespace Sim {
 
 						//mixing lower atmosphere
 						{
+							float pressureDiffusionSpeed = world.Data.AirMassDiffusionSpeedHorizontal * (state.LowerAirPressure[nIndex] - lowerAirPressure) / Mathf.Max(state.LowerAirPressure[nIndex], lowerAirPressure);
 							float nEnergy = state.LowerAirEnergy[nIndex];
 							float nMass = state.LowerAirMass[nIndex];
-							float lowerAirDensityAtSeaLevel = lowerAirMass / world.Data.BoundaryZoneElevation;
-							float lowerAirDensityAtSeaLevelNeighbor = nMass / world.Data.BoundaryZoneElevation;
-							float massDiffusionSpeed = world.Data.AirMassDiffusionSpeedHorizontal * (lowerAirDensityAtSeaLevelNeighbor - lowerAirDensityAtSeaLevel) / Mathf.Max(lowerAirDensityAtSeaLevelNeighbor, lowerAirDensityAtSeaLevel);
-							if (massDiffusionSpeed > 0)
+							if (pressureDiffusionSpeed > 0)
 							{
-								newLowerAirMass += massDiffusionSpeed * nMass;
-								newLowerAirEnergy += massDiffusionSpeed * nEnergy;
+								newLowerAirMass += pressureDiffusionSpeed * nMass;
+								newLowerAirEnergy += pressureDiffusionSpeed * nEnergy;
 							}
 							else
 							{
-								newLowerAirMass += massDiffusionSpeed * lowerAirMass;
-								newLowerAirEnergy += massDiffusionSpeed * lowerAirEnergy;
+								newLowerAirMass += pressureDiffusionSpeed * lowerAirMass;
+								newLowerAirEnergy += pressureDiffusionSpeed * lowerAirEnergy;
 							}
 							float nTempAtSeaLevel = state.LowerAirTemperature[nIndex] - world.Data.TemperatureLapseRate * Mathf.Max(state.SeaLevel, state.Elevation[nIndex]);
 							float tempAtSeaLevel = lowerAirTemperature - world.Data.TemperatureLapseRate * elevationOrSeaLevel;
@@ -924,6 +924,7 @@ namespace Sim {
 			nextState.GlobalTemperature = globalTemperature;
 			nextState.GlobalOceanCoverage = globalOceanCoverage * inverseWorldSize * inverseWorldSize;
 			nextState.GlobalCloudCoverage = globalCloudCoverage * inverseWorldSize * inverseWorldSize;
+			nextState.GlobalOceanVolume = globalOceanVolume;
 			nextState.AtmosphericMass = atmosphericMass;
 
 			_ProfileAtmosphereTick.End();

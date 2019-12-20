@@ -145,6 +145,7 @@ public partial class World {
 		public float GlobalEnergy;
 		public float GlobalTemperature;
 		public float GlobalOceanCoverage;
+		public float GlobalOceanVolume;
 		public float GlobalCloudCoverage;
 		public float GlobalEvaporation;
 		public float AtmosphericMass;

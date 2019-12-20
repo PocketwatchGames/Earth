@@ -947,8 +947,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 60, y: 0}
-  m_SizeDelta: {x: 110, y: 0}
+  m_AnchoredPosition: {x: 75, y: 0}
+  m_SizeDelta: {x: 140, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &142357343
 MonoBehaviour:
@@ -1157,8 +1157,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 60, y: 0}
-  m_SizeDelta: {x: 110, y: 0}
+  m_AnchoredPosition: {x: 75, y: 0}
+  m_SizeDelta: {x: 140, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &161257655
 MonoBehaviour:
@@ -1249,8 +1249,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 60, y: 0}
-  m_SizeDelta: {x: 110, y: 0}
+  m_AnchoredPosition: {x: 75, y: 0}
+  m_SizeDelta: {x: 140, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &169088174
 MonoBehaviour:
@@ -1950,8 +1950,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 60, y: 0}
-  m_SizeDelta: {x: 110, y: 0}
+  m_AnchoredPosition: {x: 75, y: 0}
+  m_SizeDelta: {x: 140, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &301080344
 MonoBehaviour:
@@ -2283,7 +2283,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 120, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &322512734
 MonoBehaviour:
@@ -4140,8 +4140,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 60, y: 0}
-  m_SizeDelta: {x: 110, y: 0}
+  m_AnchoredPosition: {x: 75, y: 0}
+  m_SizeDelta: {x: 140, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &620158779
 MonoBehaviour:
@@ -4539,7 +4539,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 120, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &660345139
 MonoBehaviour:
@@ -6239,7 +6239,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 120, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1035492632
 MonoBehaviour:
@@ -6337,8 +6337,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 60, y: 0}
-  m_SizeDelta: {x: 110, y: 0}
+  m_AnchoredPosition: {x: 75, y: 0}
+  m_SizeDelta: {x: 140, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1045818652
 MonoBehaviour:
@@ -6768,7 +6768,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 120, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1103507072
 MonoBehaviour:
@@ -9586,8 +9586,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 60, y: 0}
-  m_SizeDelta: {x: 110, y: 0}
+  m_AnchoredPosition: {x: 75, y: 0}
+  m_SizeDelta: {x: 140, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1577447009
 MonoBehaviour:
@@ -12270,8 +12270,8 @@ GameObject:
   - component: {fileID: 1931384954}
   - component: {fileID: 1931384953}
   - component: {fileID: 1931384951}
-  - component: {fileID: 1931384952}
   - component: {fileID: 1931384955}
+  - component: {fileID: 1931384952}
   m_Layer: 5
   m_Name: TileInfoPanel
   m_TagString: Untagged
@@ -12301,7 +12301,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 5, y: -5}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 160, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1931384951
 MonoBehaviour:
@@ -12337,7 +12337,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1931384949}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
@@ -12347,12 +12347,12 @@ MonoBehaviour:
     m_Bottom: 5
   m_ChildAlignment: 0
   m_Spacing: 5
-  m_ChildForceExpandWidth: 0
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
   m_ChildControlHeight: 1
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 1
+  m_ChildScaleWidth: 1
+  m_ChildScaleHeight: 0
 --- !u!114 &1931384953
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12401,7 +12401,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_HorizontalFit: 2
+  m_HorizontalFit: 0
   m_VerticalFit: 2
 --- !u!1 &1937318230
 GameObject:
@@ -13424,7 +13424,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 120, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2082991443
 MonoBehaviour:
@@ -14869,7 +14869,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e260af3b6cbbd054aa9feda0859514c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Seed: 3
+  Seed: 8
   WorldGenData:
     Size: 100
     MaxElevation: 10000
@@ -14877,7 +14877,7 @@ MonoBehaviour:
     StratosphereMass: 2583
     TroposphereMass: 7749
     MinTemperature: 253.15
-    MaxTemperature: 323.15
+    MaxTemperature: 300.15
     CarbonDioxide: 0.001
     PlanetTiltAngle: -23.5
     SolarRadiation: 1.367
@@ -14901,7 +14901,7 @@ MonoBehaviour:
     WindLandFriction: 0.5
     WindAirMovementHorizontal: 0.001
     WindAirMovementVertical: 0.001
-    WindHumidityMovement: 0.00001
+    WindHumidityMovement: 0.1
     PressureGradientWindMultiplier: 1000
     AdiabaticLapseRate: 0.0098
     GlobalCoriolisInfluenceWind: 0.5
@@ -14919,7 +14919,7 @@ MonoBehaviour:
     SunVectorSolarRadiationExponent: 2
     AtmosphericDepthExponent: 0.65
     LandHeatRadiation: 0.0001
-    CloudMassFullAbsorption: 100
+    CloudMassFullAbsorption: 0.5
     EnergyEmittedByUpperAtmosphere: 0.000000105
     EnergyLostThroughAtmosphereWindow: 0.000000015
     CloudOutgoingAbsorptionRate: 0.1
@@ -14928,13 +14928,12 @@ MonoBehaviour:
     DewPointTemperatureRange: 100
     DewPointZero: 213
     WaterVaporMassToAirMassAtDewPoint: 0.2
-    RainfallRate: 0.001
+    RainfallRate: 0.1
     EvapMinTemperature: 253
     EvapMaxTemperature: 413
     EvaporationRate: 0.002
-    rainPointTemperatureMultiplier: 0.00075
-    RainDropFormationSpeedTemperature: 10
-    RainDropDissapationSpeedWind: 0.00001
+    RainDropFormationSpeedTemperature: 1
+    RainDropCoalescenceWind: 1
     rainDropDragCoefficient: 0.5
     airDensity: 1.21
     waterDensity: 997
@@ -15008,10 +15007,7 @@ MonoBehaviour:
   MaxElevation: 5000
   maxHumidity: 300
   maxRainfall: 5
-  minCloudsToDraw: 1
-  maxCloudsWidth: 0.5
-  maxCloudAlpha: 50
-  maxCloudColor: 10000
+  maxCloudColor: 0.5
   MaxEnergyAbsorbed: 2500
   MainCamera: {fileID: 963194227}
   WorldIcons: {fileID: 870706485}
