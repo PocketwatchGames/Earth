@@ -27,7 +27,7 @@ namespace Sim {
 					float newCanopy = canopy;
 					if (canopy > 0)
 					{
-						if (world.IsOcean(state.Elevation[index], state.SeaLevel))
+						if (world.IsOcean(state.WaterDepth[index]))
 						{
 							newCanopy = 0;
 						}

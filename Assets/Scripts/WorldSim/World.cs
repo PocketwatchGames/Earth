@@ -77,7 +77,6 @@ public partial class World {
 		public float AtmosphereCO2;
 		public float AtmosphereO2;
 		public float AtmosphereN;
-		public float SeaLevel;
 		public float StratosphereMass;
 		public float CarbonDioxide;
 		public float PlanetTiltAngle;
@@ -106,6 +105,7 @@ public partial class World {
 		public float[] WaterTableDepth;
 		public float[] GroundWater;
 		public float[] SurfaceWater;
+		public float[] WaterDepth;
 		public float[] OceanSalinityDeep;
 		public float[] OceanSalinityShallow;
 		public float[] OceanDensityDeep;
@@ -156,7 +156,6 @@ public partial class World {
 			AtmosphereCO2 = from.AtmosphereCO2;
 			AtmosphereO2 = from.AtmosphereO2;
 			AtmosphereN = from.AtmosphereN;
-			SeaLevel = from.SeaLevel;
 			StratosphereMass = from.StratosphereMass;
 			CarbonDioxide = from.CarbonDioxide;
 			PlanetRadius = from.PlanetRadius;
@@ -173,6 +172,7 @@ public partial class World {
 			Array.Copy(from.WaterTableDepth, WaterTableDepth, numTiles);
 			Array.Copy(from.GroundWater, GroundWater, numTiles);
 			Array.Copy(from.SurfaceWater, SurfaceWater, numTiles);
+			Array.Copy(from.WaterDepth, WaterDepth, numTiles);
 			Array.Copy(from.Ice, Ice, numTiles);
 			Array.Copy(from.SoilFertility, SoilFertility, numTiles);
 			Array.Copy(from.Canopy, Canopy, numTiles);
@@ -243,6 +243,7 @@ public partial class World {
 			States[i].WaterTableDepth = new float[s];
 			States[i].GroundWater = new float[s];
 			States[i].SurfaceWater = new float[s];
+			States[i].WaterDepth = new float[s];
 			States[i].EnergyAbsorbed = new float[s];
 			States[i].Rainfall = new float[s];
 			States[i].Evaporation = new float[s];
@@ -413,9 +414,9 @@ public partial class World {
 		return nextStateIndex;
 	}
 
-	public bool IsOcean(float elevation, float seaLevel)
+	public bool IsOcean(float waterDepth)
 	{
-		return elevation < seaLevel;
+		return waterDepth > 0;
 	}
 
 

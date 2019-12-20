@@ -103,7 +103,7 @@ public class TileInfoPanel : MonoBehaviour
 			textLowerAtmosphere += "\nEvaporation: " + (state.Evaporation[index] * WorldComponent.World.Data.TicksPerYear).ToString("0.00");
 
 
-			if (WorldComponent.World.IsOcean(elevation, state.SeaLevel))
+			if (WorldComponent.World.IsOcean(state.WaterDepth[index]))
 			{
 				textSurfaceOcean += "SURFACE OCEAN";
 				textSurfaceOcean += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(state.OceanTemperatureShallow[index], WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
@@ -112,8 +112,8 @@ public class TileInfoPanel : MonoBehaviour
 				textSurfaceOcean += "\nCurrent: " + state.OceanCurrentShallow[index].ToString("0.0");
 
 				textDeepOcean += "DEEP OCEAN";
-				textDeepOcean += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(Sim.Atmosphere.GetWaterTemperature(WorldComponent.World, state.OceanEnergyDeep[index], state.SeaLevel - elevation), WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
-				textDeepOcean += "\nSalinity: " + (state.OceanSalinityDeep[index] / (state.SeaLevel - elevation)).ToString("0.00");
+				textDeepOcean += "\nTemperature: " + (int)WorldComponent.ConvertTemperature(Sim.Atmosphere.GetWaterTemperature(WorldComponent.World, state.OceanEnergyDeep[index], state.WaterDepth[index]), WorldComponent.TemperatureDisplay) + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
+				textDeepOcean += "\nSalinity: " + (state.OceanSalinityDeep[index] / state.WaterDepth[index]).ToString("0.00");
 				textDeepOcean += "\nDensity: " + state.OceanDensityDeep[index].ToString("0.00");
 				textDeepOcean += "\nEnergy: " + (uint)(state.OceanEnergyDeep[index]/1000) + "K";
 				textDeepOcean += "\nCurrent: " + state.OceanCurrentDeep[index].x.ToString("0.00") + ", " + state.OceanCurrentDeep[index].y.ToString("0.00");

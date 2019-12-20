@@ -174,8 +174,8 @@ public partial class WorldComponent {
 		var elevationColors = new List<CVP> { new CVP(Color.black, -2000), new CVP(new Color(0.5f,0.5f,0.5f), 1000), new CVP(Color.white, 4000) };
 		var oceanElevationColors = new List<CVP> {
 								new CVP(Color.black, MinElevation),
-								new CVP(Color.blue, state.SeaLevel - 1000),
-								new CVP(new Color(0.4f,0.3f,1.0f), state.SeaLevel), };
+								new CVP(Color.blue, -1000),
+								new CVP(new Color(0.4f,0.3f,1.0f), 0), };
 		var landTemperatureColors = new List<CVP>() { new CVP(new Color(0, 0.4f, 1.0f), -30 + World.Data.FreezingTemperature), new CVP(Color.white, World.Data.FreezingTemperature + 20), new CVP(new Color(1.0f, 0.4f, 0), 70 + World.Data.FreezingTemperature) };
 		var oceanTemperatureColors = new List<CVP>() { new CVP(new Color(0.0f, 0.0f, 0.6f), World.Data.FreezingTemperature), new CVP(new Color(0.0f, 1.0f, 1.0f), 60 + World.Data.FreezingTemperature) };
 
@@ -195,11 +195,11 @@ public partial class WorldComponent {
 
 				float elevation = state.Elevation[index];
 				float ice = state.Ice[index];
-				bool isOcean = World.IsOcean(elevation, state.SeaLevel);
+				bool isOcean = World.IsOcean(state.WaterDepth[index]);
 				float normalizedElevation = (elevation - MinElevation) * inverseElevationRange;
 
 				landVerts[index].z = -elevation * ElevationScale;
-				oceanVerts[index].z = -state.SeaLevel * ElevationScale;
+				oceanVerts[index].z = (elevation+state.WaterDepth[index]) * ElevationScale;
 
 				// Base color
 
@@ -221,23 +221,6 @@ public partial class WorldComponent {
 					color = color * 0.5f + color * Lerp(landTemperatureColors, state.LowerAirTemperature[index]) * 0.5f;
 					oceanColor = oceanColor * 0.5f + oceanColor * Lerp(oceanTemperatureColors, state.OceanTemperatureShallow[index]) * 0.5f;
 				}
-
-				//		if (showLayers.IsSet(Layers.Water))
-				//		{
-				//			float sw = MathUtils.Lerp(lastState.SurfaceWater[index], state.SurfaceWater[index], stateLerpT);
-				//			if (sw > 0 || ice > 0)
-				//			{
-				//				int width = (int)(Math.Min(1.0f, sw + ice) * (tileRenderSize - 2));
-				//				Rectangle surfaceWaterRect = new Rectangle(x * tileRenderSize + 1, y * tileRenderSize + 1, width, width);
-				//				Color waterColor = Color.Lerp(Color.Blue, Color.Teal, (elevation - state.SeaLevel) / (Data.MaxElevation - state.SeaLevel));
-				//				if (ice > 0)
-				//				{
-				//					waterColor = Color.Lerp(waterColor, Color.LightSteelBlue, Math.Min(1.0f, ice / Data.maxIce));
-				//				}
-
-				//				spriteBatch.Draw(whiteTex, surfaceWaterRect, waterColor * 0.75f);
-				//			}
-				//		}
 
 
 				if (!isOcean)
@@ -378,10 +361,10 @@ public partial class WorldComponent {
 					oceanColor = color = Lerp(
 						new List<CVP> {
 											new CVP(Color.black, MinElevation),
-											new CVP(new Color(0, 0, 0.5f), (state.SeaLevel - MinElevation)/2+MinElevation),
-											new CVP(new Color(0.4f, 0.4f, 1.0f), state.SeaLevel),
-											new CVP(Color.yellow, state.SeaLevel+1),
-											new CVP(new Color(0.5f, 0.5f, 0.5f), (MaxElevation-state.SeaLevel)/4+state.SeaLevel),
+											new CVP(new Color(0, 0, 0.5f), (-MinElevation)/2+MinElevation),
+											new CVP(new Color(0.4f, 0.4f, 1.0f), 0),
+											new CVP(Color.yellow, 1),
+											new CVP(new Color(0.5f, 0.5f, 0.5f), (MaxElevation)/4),
 											new CVP(Color.white, MaxElevation) },
 						elevation);
 				}
@@ -412,7 +395,7 @@ public partial class WorldComponent {
 											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
 											new CVP(Color.red, 50+World.Data.FreezingTemperature),
 											new CVP(Color.magenta, 75 + World.Data.FreezingTemperature) },
-						Atmosphere.GetWaterTemperature(World, state.OceanEnergyDeep[index], Math.Max(0, state.SeaLevel - elevation)));
+						Atmosphere.GetWaterTemperature(World, state.OceanEnergyDeep[index], Math.Max(0, state.WaterDepth[index])));
 				}
 				else if (showLayers.IsSet(Layers.OceanSalinityShallow))
 				{
@@ -423,7 +406,7 @@ public partial class WorldComponent {
 											new CVP(Color.yellow, 36),
 											new CVP(Color.red, 38),
 											new CVP(Color.white, 40) },
-						elevation < state.SeaLevel ? (state.OceanSalinityShallow[index] / World.Data.DeepOceanDepth) : 0);
+						(state.WaterDepth[index] > 0) ? (state.OceanSalinityShallow[index] / World.Data.DeepOceanDepth) : 0);
 				}
 				else if (showLayers.IsSet(Layers.OceanSalinityDeep))
 				{
@@ -434,7 +417,7 @@ public partial class WorldComponent {
 											new CVP(Color.yellow, 36),
 											new CVP(Color.red, 38),
 											new CVP(Color.white, 40) },
-						elevation < state.SeaLevel ? state.OceanSalinityDeep[index] / (state.SeaLevel - elevation) : 0);
+						(state.WaterDepth[index] > 0) ? state.OceanSalinityDeep[index] / state.WaterDepth[index] : 0);
 				}
 
 
@@ -452,7 +435,7 @@ public partial class WorldComponent {
 				{
 					var cloudColor = Color.Lerp(Color.white, Color.black, Mathf.Clamp01(state.RainDropMass[index] / (state.CloudMass[index] * maxCloudColor))) * (float)Math.Sqrt(Mathf.Clamp01(state.CloudMass[index] / World.Data.CloudMassFullAbsorption)) * 0.9f;
 					cloudCols[index] = cloudColor;
-					cloudVerts[index].z = -Mathf.Max(Math.Max(elevation, state.SeaLevel) + 1) * ElevationScale;
+					cloudVerts[index].z = -Mathf.Max(elevation+ state.WaterDepth[index] + 1) * ElevationScale;
 				}
 
 				if (showLayers.IsSet(Layers.SurfaceAirWind))
@@ -497,7 +480,6 @@ public partial class WorldComponent {
 
 	private void UpdateWindArrow(World.State state, int x, int y, int index, Vector3 wind, float maxSpeed)
 	{
-		float elevationOrSeaLevel = Math.Max(state.SeaLevel, state.Elevation[index]);
 		float maxWindSpeedVertical = maxSpeed / 10;
 		Color windColor;
 		if (wind.z < 0)
@@ -511,7 +493,7 @@ public partial class WorldComponent {
 		float windXYSpeed = Mathf.Sqrt(wind.x * wind.x + wind.y * wind.y);
 		float windAngle = Mathf.Atan2(wind.y, wind.x);
 
-		_windArrows[index].transform.position = new Vector3(x, y, -(elevationOrSeaLevel + 1000) * ElevationScale);
+		_windArrows[index].transform.position = new Vector3(x, y, -(state.Elevation[index]+state.WaterDepth[index] + 1000) * ElevationScale);
 		_windArrows[index].transform.localScale = Vector3.one * Mathf.Clamp01(windXYSpeed / maxSpeed);
 		_windArrows[index].transform.rotation = Quaternion.Euler(0, 0, Mathf.Rad2Deg * windAngle);
 		_windArrows[index].GetComponentInChildren<MeshRenderer>().material.color = windColor;

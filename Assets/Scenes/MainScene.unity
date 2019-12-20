@@ -15009,6 +15009,7 @@ MonoBehaviour:
   maxRainfall: 5
   maxCloudColor: 0.5
   MaxEnergyAbsorbed: 2500
+  surfaceWaterFullCoverage: 1000
   MainCamera: {fileID: 963194227}
   WorldIcons: {fileID: 870706485}
   LandMesh: {fileID: 1752473170}

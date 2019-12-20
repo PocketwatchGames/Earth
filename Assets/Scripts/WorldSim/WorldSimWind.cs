@@ -102,11 +102,12 @@ namespace Sim {
 					float upperTemperature = state.UpperAirTemperature[index];
 					float lowerTemperature = state.LowerAirTemperature[index];
 					float elevation = state.Elevation[index];
-					float elevationOrSeaLevel = Math.Max(state.SeaLevel, elevation);
+					float waterDepth = state.WaterDepth[index];
+					float elevationOrSeaLevel = elevation + waterDepth;
 					var normal = state.Normal[index];
 					float iceCoverage = state.Ice[index] * inverseFullIceCoverage;
 					float friction;
-					if (elevation < state.SeaLevel)
+					if (waterDepth > 0)
 					{
 						friction = world.Data.WindOceanFriction;
 					} else
@@ -131,25 +132,25 @@ namespace Sim {
 					{
 						int neighborIndex = world.GetNeighborIndex(x, y, 0);
 						neighborPressureDifferential += -lowerWindH.x * (lowerPressure - state.LowerAirPressure[neighborIndex]);
-						neighborElevationDifferential += -lowerWindH.x * (Mathf.Max(state.SeaLevel, state.Elevation[neighborIndex]) - elevationOrSeaLevel);
+						neighborElevationDifferential += -lowerWindH.x * (state.Elevation[neighborIndex] + state.WaterDepth[neighborIndex] - elevationOrSeaLevel);
 					}
 					else
 					{
 						var neighborIndex = world.GetNeighborIndex(x, y, 1);
 						neighborPressureDifferential += lowerWindH.x * (lowerPressure - state.LowerAirPressure[neighborIndex]);
-						neighborElevationDifferential += lowerWindH.x * (Mathf.Max(state.SeaLevel, state.Elevation[neighborIndex]) - elevationOrSeaLevel);
+						neighborElevationDifferential += lowerWindH.x * (state.Elevation[neighborIndex] + state.WaterDepth[neighborIndex] - elevationOrSeaLevel);
 					}
 					if (lowerWindH.y < 0)
 					{
 						var neighborIndex = world.GetNeighborIndex(x, y, 3);
 						neighborPressureDifferential += -lowerWindH.y * (lowerPressure - state.LowerAirPressure[neighborIndex]);
-						neighborElevationDifferential += -lowerWindH.y * (Mathf.Max(state.SeaLevel, state.Elevation[neighborIndex]) - elevationOrSeaLevel);
+						neighborElevationDifferential += -lowerWindH.y * (state.Elevation[neighborIndex] + state.WaterDepth[neighborIndex] - elevationOrSeaLevel);
 					}
 					else
 					{
 						var neighborIndex = world.GetNeighborIndex(x, y, 2);
 						neighborPressureDifferential += lowerWindH.y * (lowerPressure - state.LowerAirPressure[neighborIndex]);
-						neighborElevationDifferential += lowerWindH.y * (Mathf.Max(state.SeaLevel, state.Elevation[neighborIndex]) - elevationOrSeaLevel);
+						neighborElevationDifferential += lowerWindH.y * (state.Elevation[neighborIndex] + state.WaterDepth[neighborIndex] - elevationOrSeaLevel);
 					}
 					var verticalTemperatureDifferential = lowerTemperatureAtSeaLevel - upperTemperatureAtSeaLevel;
 
@@ -162,7 +163,7 @@ namespace Sim {
 					nextState.LowerWind[index] = new Vector3(lowerWindH.x, lowerWindH.y, lowerWindV);
 					nextState.UpperWind[index] = new Vector3(upperWindH.x, upperWindH.y, 0);
 
-					if (world.IsOcean(state.Elevation[index], state.SeaLevel))
+					if (world.IsOcean(state.WaterDepth[index]))
 					{
 						Vector2 shallowCurrentH;
 						if (iceCoverage < 1)
@@ -185,7 +186,7 @@ namespace Sim {
 						{
 							var neighbor = world.GetNeighbor(x, y, i);
 							int nIndex = world.GetIndex(neighbor.x, neighbor.y);
-							if (world.IsOcean(state.Elevation[nIndex], state.SeaLevel))
+							if (world.IsOcean(state.WaterDepth[nIndex]))
 							{
 								//var neighborWind = state.Wind[nIndex];
 								//nWind += neighborWind;
@@ -261,7 +262,7 @@ namespace Sim {
 			{
 				var nIndex = world.GetNeighborIndex(x, y, i);
 				// see bottom of: https://en.wikipedia.org/wiki/Vertical_pressure_variation
-				float neighborElevation = Mathf.Max(state.SeaLevel, state.Elevation[nIndex]);
+				float neighborElevation = state.Elevation[nIndex] + state.WaterDepth[nIndex];
 				float neighborTemperatureElevation;
 				if (isUpper)
 				{

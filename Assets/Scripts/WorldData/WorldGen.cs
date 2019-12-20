@@ -29,7 +29,6 @@ public static class WorldGen {
 		ref var state = ref world.States[0];
 		FastNoise noise = new FastNoise(seed);
 		noise.SetFrequency(10);
-		state.SeaLevel = 0;
 
 		int numSpecies = 4;
 		world.SpeciesDisplay[0].Name = "Hot Herb";
@@ -123,7 +122,7 @@ public static class WorldGen {
 					GetPerlinMinMax(world, noise, x, y, 2.0f, 60, -10, 10);
 				state.LowerAirTemperature[index] =
 					regionalTemperatureVariation + GetPerlinMinMax(world, noise, x, y, 0.25f, 80, -5, 5) +
-					(1.0f - Mathf.Clamp(e - state.SeaLevel, 0, worldGenData.MaxElevation) / (worldGenData.MaxElevation - state.SeaLevel)) * (1.0f - latitude * latitude) * (worldGenData.MaxTemperature - worldGenData.MinTemperature) + worldGenData.MinTemperature;
+					(1.0f - Mathf.Clamp(e, 0, worldGenData.MaxElevation) / (worldGenData.MaxElevation)) * (1.0f - latitude * latitude) * (worldGenData.MaxTemperature - worldGenData.MinTemperature) + worldGenData.MinTemperature;
 				state.UpperAirTemperature[index] =
 					GetPerlinMinMax(world, noise, x, y, 0.25f, 90, -5, 5) +
 					state.LowerAirTemperature[index] + data.TemperatureLapseRate * upperAirElevation;
@@ -161,9 +160,9 @@ public static class WorldGen {
 					state.OceanEnergyShallow[index] = Atmosphere.GetWaterEnergy(world, state.OceanTemperatureShallow[index], data.DeepOceanDepth);
 					state.OceanEnergyDeep[index] = Atmosphere.GetWaterEnergy(world, data.FreezingTemperature + 3, Math.Max(0, -e));
 					state.OceanSalinityShallow[index] = ((1.0f - Math.Abs(latitude)) * (worldGenData.MaxSalinity - worldGenData.MinSalinity) + worldGenData.MinSalinity) * data.DeepOceanDepth;
-					float deepOceanVolume = state.SeaLevel - state.Elevation[index];
-					state.OceanSalinityDeep[index] = (Math.Abs(latitude) * (worldGenData.MaxSalinity - worldGenData.MinSalinity) + worldGenData.MinSalinity) * deepOceanVolume;
-					state.OceanDensityDeep[index] = Atmosphere.GetOceanDensity(world, state.OceanEnergyDeep[index], state.OceanSalinityDeep[index], deepOceanVolume);
+					state.OceanSalinityDeep[index] = (Math.Abs(latitude) * (worldGenData.MaxSalinity - worldGenData.MinSalinity) + worldGenData.MinSalinity) * state.WaterDepth[index];
+					state.OceanDensityDeep[index] = Atmosphere.GetOceanDensity(world, state.OceanEnergyDeep[index], state.OceanSalinityDeep[index], state.WaterDepth[index]);
+					state.WaterDepth[index] = Mathf.Max(0,-e); 
 				}
 			}
 		}

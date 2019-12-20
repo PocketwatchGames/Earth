@@ -66,7 +66,7 @@ namespace Sim {
 						{
 							float startElevation = state.Elevation[index];
 							float endElevation = state.Elevation[newIndex];
-							if (!world.IsOcean(startElevation, state.SeaLevel) && !world.IsOcean(endElevation, state.SeaLevel))
+							if (!world.IsOcean(state.WaterDepth[index]) && !world.IsOcean(state.WaterDepth[index])) // TODO: this is broken now that sealevel isnt a constant
 							{
 								// continental collision
 								nextState.Elevation[newIndex] += 50;
@@ -76,7 +76,7 @@ namespace Sim {
 							else
 							{
 								// subduction
-								if (!world.IsOcean(startElevation, state.SeaLevel))
+								if (!world.IsOcean(state.WaterDepth[index]))
 								{
 									// We are moving OVER the adjacent tile
 									MoveTile(world, state, nextState, index, newIndex);
@@ -109,7 +109,7 @@ namespace Sim {
 					nextState.FlowDirection[index] = newFlowDirection;
 					nextState.Normal[index] = newNormal;
 
-					if (nextState.SurfaceWater[index] > 0 && world.IsOcean(nextState.Elevation[index], state.SeaLevel))
+					if (nextState.SurfaceWater[index] > 0 && world.IsOcean(nextState.WaterDepth[index]))
 					{
 						nextState.SurfaceWater[index] = 0;
 					}
@@ -139,7 +139,7 @@ namespace Sim {
 
 		static public void GetFlowDirectionAndNormal(World world, World.State state, int x, int y, int index, float elevation, out Vector2 flowDirection, out Vector3 normal)
 		{
-			if (world.IsOcean(elevation, state.SeaLevel))
+			if (world.IsOcean(state.WaterDepth[index]))
 			{
 				flowDirection = Vector2.zero;
 				normal = new Vector3(0, 0, 1);
