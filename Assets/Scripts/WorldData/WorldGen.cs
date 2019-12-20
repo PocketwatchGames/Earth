@@ -21,16 +21,15 @@ public static class WorldGen {
 	{
 		return noise.GetPerlin((float)x / world.Size * frequency + hash, (float)y / world.Size * frequency);
 	}
-	public static void Generate(World world, List<Sprite> speciesSprites, WorldData data, WorldGenData worldGenData)
+	public static void Generate(World world, List<Sprite> speciesSprites, WorldData data, WorldGenData worldGenData, int seed)
 	{
 		world.Data = data;
 		world.Init(worldGenData.Size, world.Data);
 
 		ref var state = ref world.States[0];
-		FastNoise noise = new FastNoise(67687);
+		FastNoise noise = new FastNoise(seed);
 		noise.SetFrequency(10);
 		state.SeaLevel = 0;
-		int numPlates = 12;
 
 		int numSpecies = 4;
 		world.SpeciesDisplay[0].Name = "Hot Herb";
@@ -88,7 +87,6 @@ public static class WorldGen {
 		state.Species[3].speciesEatRate = 1.0f / data.TicksPerYear;
 		state.Species[3].starvationSpeed = 12.0f / data.TicksPerYear;
 		state.Species[3].dehydrationSpeed = 12.0f / data.TicksPerYear;
-		int animalCount = 0;
 
 		for (int y = 0; y < world.Size; y++)
 		{
@@ -168,8 +166,7 @@ public static class WorldGen {
 			}
 		}
 
-		int numHerds = 20;
-		for (int h = 0; h < numHerds; h++)
+		for (int h = 0; h < worldGenData.NumHerds; h++)
 		{
 			int s = (int)(numSpecies * (noise.GetWhiteNoiseInt(h, 0) / 2 + 0.5f));
 			int p = (int)((noise.GetWhiteNoiseInt(h, 1) * 0.5f + 0.5f) * state.Species[s].speciesMaxPopulation);
@@ -212,7 +209,7 @@ public static class WorldGen {
 
 
 
-		for (int i = 1; i < numPlates; i++)
+		for (int i = 1; i < worldGenData.NumPlates; i++)
 		{
 			const float MaxPlateRadius = 40;
 			const float MinPlateRadius = 2;

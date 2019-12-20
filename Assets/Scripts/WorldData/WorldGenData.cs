@@ -13,8 +13,6 @@ public class WorldGenData {
 	public float MinElevation = -11500.0f;
 	public float StratosphereMass = 2583;
 	public float TroposphereMass = 7749;
-	public float LowerAirDensity = 1.2f;
-	public float UpperAirDensity = 0.4f;
 	public float MinTemperature = 253.15f;
 	public float MaxTemperature = 323.15f;
 	public float CarbonDioxide = 0.001f;
@@ -24,4 +22,6 @@ public class WorldGenData {
 	public float PlanetRotationSpeed = 0.0001458f;
 	public float MaxSalinity = 40;
 	public float MinSalinity = 30;
+	public int NumPlates = 12;
+	public int NumHerds = 20;
 }

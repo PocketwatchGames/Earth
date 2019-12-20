@@ -40,6 +40,8 @@ public partial class WorldComponent : MonoBehaviour
 		UpperAirWind = 1 << 29,
 		HeatAbsorbed = 1 << 30,
 		Evaporation = 1 << 31,
+		WindVert = 1 << 32,
+		CurrentVert = 1 << 33,
 	}
 	public enum TemperatureDisplayType {
 		Kelvin,
@@ -48,6 +50,7 @@ public partial class WorldComponent : MonoBehaviour
 	}
 
 	[Header("Data")]
+	public int Seed;
 	public WorldGenData WorldGenData;
 	public WorldData Data;
 
@@ -112,7 +115,7 @@ public partial class WorldComponent : MonoBehaviour
 		//		ActiveFeatures &= ~(SimFeature.TradeWinds);
 
 		Data.Init(WorldGenData.Size);
-		WorldGen.Generate(World, SpeciesSprites, Data, WorldGenData);
+		WorldGen.Generate(World, SpeciesSprites, Data, WorldGenData, Seed);
 		CreateWorldMesh();
 		MainCamera.transform.position = new Vector3(World.Size / 2, World.Size / 2, MainCamera.transform.position.z);
 

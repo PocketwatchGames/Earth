@@ -280,6 +280,14 @@ public partial class WorldComponent {
 											new CVP(Color.white, 0.05f) },
 						state.Evaporation[index] * World.Data.TicksPerYear);
 				}
+				else if (showLayers.IsSet(Layers.WindVert))
+				{
+					oceanColor = color = Lerp(new List<CVP> {
+											new CVP(Color.blue, -1.0f),
+											new CVP(Color.black, 0.0f),
+											new CVP(Color.red, 1.0f) },
+						state.LowerWind[index].z);
+				}
 				else if (showLayers.IsSet(Layers.Rainfall))
 				{
 					oceanColor = color = Lerp(new List<CVP> {

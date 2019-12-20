@@ -22,8 +22,7 @@ public class WorldData
 	//public float tradeWindSpeed = 12.0f; // average wind speeds around trade winds around 12 m/s
 										 //	public float pressureDifferentialWindSpeed = 70.0f; // hurricane wind speeds 70 m/s
 	public float PressureToVerticalWindSpeed = 0.0001f;
-	public float TemperatureDifferentialToVerticalWindSpeed = 0.01f;
-	public float DestinationTemperatureDifferentialVerticalWindSpeed = 0.1f;
+	public float DestinationPressureDifferentialToVerticalWindSpeed = 0.0001f;
 	public float MountainUpdraftWindSpeed = 0.1f;
 	public float MaxTerrainNormalForFriction = 0.25f;
 	public float AirMassDiffusionSpeedHorizontal = 0.1f;

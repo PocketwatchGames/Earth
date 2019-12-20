@@ -125,39 +125,38 @@ namespace Sim {
 					var lowerWindH = GetHorizontalWind(world, state, x, y, state.LowerWind[index], latitude, state.PlanetRotationSpeed, windInfo.coriolisParam, windInfo.inverseCoriolisParam, state.LowerAirPressure, state.LowerAirTemperature, false, lowerPressure, elevationOrSeaLevel, elevationOrSeaLevel, friction, surfaceAirDensity);
 
 					// within 1 km of the ground, frictional forces slow wind down
-					float neighborTemperatureDifferential = 0;
+					float neighborPressureDifferential = 0;
 					float neighborElevationDifferential = 0;
 					if (lowerWindH.x < 0)
 					{
 						int neighborIndex = world.GetNeighborIndex(x, y, 0);
-						neighborTemperatureDifferential += -lowerWindH.x * (lowerTemperature - state.LowerAirTemperature[neighborIndex]);
-						neighborElevationDifferential += (Mathf.Max(state.SeaLevel, state.Elevation[neighborIndex]) - elevationOrSeaLevel) * -lowerWindH.x;
+						neighborPressureDifferential += -lowerWindH.x * (lowerPressure - state.LowerAirPressure[neighborIndex]);
+						neighborElevationDifferential += -lowerWindH.x * (Mathf.Max(state.SeaLevel, state.Elevation[neighborIndex]) - elevationOrSeaLevel);
 					}
 					else
 					{
 						var neighborIndex = world.GetNeighborIndex(x, y, 1);
-						neighborTemperatureDifferential += lowerWindH.x * (lowerTemperature - state.LowerAirTemperature[neighborIndex]);
-						neighborElevationDifferential += (Mathf.Max(state.SeaLevel, state.Elevation[neighborIndex]) - elevationOrSeaLevel) * lowerWindH.x;
+						neighborPressureDifferential += lowerWindH.x * (lowerPressure - state.LowerAirPressure[neighborIndex]);
+						neighborElevationDifferential += lowerWindH.x * (Mathf.Max(state.SeaLevel, state.Elevation[neighborIndex]) - elevationOrSeaLevel);
 					}
 					if (lowerWindH.y < 0)
 					{
 						var neighborIndex = world.GetNeighborIndex(x, y, 3);
-						neighborTemperatureDifferential += -lowerWindH.y * (lowerTemperature - state.LowerAirTemperature[neighborIndex]);
-						neighborElevationDifferential += (Mathf.Max(state.SeaLevel, state.Elevation[neighborIndex]) - elevationOrSeaLevel) * -lowerWindH.y;
+						neighborPressureDifferential += -lowerWindH.y * (lowerPressure - state.LowerAirPressure[neighborIndex]);
+						neighborElevationDifferential += -lowerWindH.y * (Mathf.Max(state.SeaLevel, state.Elevation[neighborIndex]) - elevationOrSeaLevel);
 					}
 					else
 					{
 						var neighborIndex = world.GetNeighborIndex(x, y, 2);
-						neighborTemperatureDifferential += lowerWindH.y * (lowerTemperature - state.LowerAirTemperature[neighborIndex]);
-						neighborElevationDifferential += (Mathf.Max(state.SeaLevel, state.Elevation[neighborIndex]) - elevationOrSeaLevel) * lowerWindH.y;
+						neighborPressureDifferential += lowerWindH.y * (lowerPressure - state.LowerAirPressure[neighborIndex]);
+						neighborElevationDifferential += lowerWindH.y * (Mathf.Max(state.SeaLevel, state.Elevation[neighborIndex]) - elevationOrSeaLevel);
 					}
 					var verticalTemperatureDifferential = lowerTemperatureAtSeaLevel - upperTemperatureAtSeaLevel;
 
 					float lowerWindSpeedH = lowerWindH.magnitude;
 					float lowerWindV = neighborElevationDifferential * world.Data.MountainUpdraftWindSpeed;
-					lowerWindV += neighborTemperatureDifferential * world.Data.DestinationTemperatureDifferentialVerticalWindSpeed;
-					lowerWindV += (lowerPressure - upperPressure) * world.Data.PressureToVerticalWindSpeed; // convection
-					lowerWindV += verticalTemperatureDifferential * world.Data.TemperatureDifferentialToVerticalWindSpeed; // thermal
+					lowerWindV += neighborPressureDifferential * world.Data.DestinationPressureDifferentialToVerticalWindSpeed; // thermal
+					lowerWindV += (lowerPressure - upperPressure) * world.Data.PressureToVerticalWindSpeed; // thermal
 
 
 					nextState.LowerWind[index] = new Vector3(lowerWindH.x, lowerWindH.y, lowerWindV);

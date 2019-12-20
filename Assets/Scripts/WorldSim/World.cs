@@ -354,7 +354,13 @@ public partial class World {
 		{
 			while (TimeTillTick <= 0)
 			{
-				DoSimTick();
+				//try
+				//{
+					DoSimTick();
+				//} catch (Exception e)
+				//{
+				//	Debug.Break();
+				//}
 			}
 		}
 	}
