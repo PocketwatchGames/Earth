@@ -105,7 +105,7 @@ namespace Sim {
 					float waterDepth = state.WaterDepth[index];
 					float elevationOrSeaLevel = elevation + waterDepth;
 					var normal = state.Normal[index];
-					float iceCoverage = state.Ice[index] * inverseFullIceCoverage;
+					float iceCoverage = state.IceMass[index] * inverseFullIceCoverage;
 					float friction;
 					if (waterDepth > 0)
 					{
@@ -165,7 +165,10 @@ namespace Sim {
 
 					if (world.IsOcean(state.WaterDepth[index]))
 					{
+						Vector2 densityDifferential = Vector2.zero;
 						Vector2 shallowCurrentH;
+						float shallowCurrentV = 0;
+
 						if (iceCoverage < 1)
 						{
 							shallowCurrentH = GetCurrentHorizontal(world, x, y, latitude, state.PlanetRotationSpeed, windInfo.coriolisParam, windInfo.inverseCoriolisParam, lowerWindH);
@@ -178,72 +181,79 @@ namespace Sim {
 						{
 							shallowCurrentH = Vector2.zero;
 						}
+				//		shallowCurrentH += state.SurfaceGradient[index].normalized * Mathf.Pow(state.SurfaceGradient[index].magnitude, world.Data.FlowSpeedExponent) * world.Data.GravitationalAcceleration * world.Data.FlowSpeed;
 
-						float density = state.OceanDensityDeep[index];
-						Vector2 densityDifferential = Vector2.zero;
-						float shallowCurrentV = 0;
-						for (int i = 0; i < 4; i++)
+						if (state.DeepWaterMass[index] > 0)
 						{
-							var neighbor = world.GetNeighbor(x, y, i);
-							int nIndex = world.GetIndex(neighbor.x, neighbor.y);
-							if (world.IsOcean(state.WaterDepth[nIndex]))
+							float density = state.DeepWaterDensity[index];
+							for (int i = 0; i < 4; i++)
 							{
-								//var neighborWind = state.Wind[nIndex];
-								//nWind += neighborWind;
+								var neighbor = world.GetNeighbor(x, y, i);
+								int nIndex = world.GetIndex(neighbor.x, neighbor.y);
+								if (state.DeepWaterMass[nIndex] > 0)
+								{
+									//var neighborWind = state.Wind[nIndex];
+									//nWind += neighborWind;
 
-								switch (i)
-								{
-									case 0:
-										densityDifferential.x += state.OceanDensityDeep[nIndex] - density;
-										break;
-									case 1:
-										densityDifferential.x -= state.OceanDensityDeep[nIndex] - density;
-										break;
-									case 2:
-										densityDifferential.y -= state.OceanDensityDeep[nIndex] - density;
-										break;
-									case 3:
-										densityDifferential.y += state.OceanDensityDeep[nIndex] - density;
-										break;
+									switch (i)
+									{
+										case 0:
+											densityDifferential.x += state.DeepWaterDensity[nIndex] - density;
+											break;
+										case 1:
+											densityDifferential.x -= state.DeepWaterDensity[nIndex] - density;
+											break;
+										case 2:
+											densityDifferential.y -= state.DeepWaterDensity[nIndex] - density;
+											break;
+										case 3:
+											densityDifferential.y += state.DeepWaterDensity[nIndex] - density;
+											break;
+									}
 								}
-							} else
-							{
-								switch (i)
+								else
 								{
-									case 0:
-										shallowCurrentV += shallowCurrentH.x;
-										if (shallowCurrentH.x < 0)
-										{
-											shallowCurrentH.x = 0;
-										}
-										break;
-									case 1:
-										shallowCurrentV -= shallowCurrentH.x;
-										if (shallowCurrentH.x > 0)
-										{
-											shallowCurrentH.x = 0;
-										}
-										break;
-									case 2:
-										shallowCurrentV -= shallowCurrentH.y;
-										if (shallowCurrentH.y > 0)
-										{
-											shallowCurrentH.y = 0;
-										}
-										break;
-									case 3:
-										shallowCurrentV += shallowCurrentH.y;
-										if (shallowCurrentH.y < 0)
-										{
-											shallowCurrentH.y = 0;
-										}
-										break;
+									//switch (i)
+									//{
+									//	case 0:
+									//		shallowCurrentV += shallowCurrentH.x;
+									//		if (shallowCurrentH.x < 0)
+									//		{
+									//			shallowCurrentH.x = 0;
+									//		}
+									//		break;
+									//	case 1:
+									//		shallowCurrentV -= shallowCurrentH.x;
+									//		if (shallowCurrentH.x > 0)
+									//		{
+									//			shallowCurrentH.x = 0;
+									//		}
+									//		break;
+									//	case 2:
+									//		shallowCurrentV -= shallowCurrentH.y;
+									//		if (shallowCurrentH.y > 0)
+									//		{
+									//			shallowCurrentH.y = 0;
+									//		}
+									//		break;
+									//	case 3:
+									//		shallowCurrentV += shallowCurrentH.y;
+									//		if (shallowCurrentH.y < 0)
+									//		{
+									//			shallowCurrentH.y = 0;
+									//		}
+									//		break;
+									//}
 								}
 							}
 						}
 						densityDifferential *= world.Data.OceanDensityCurrentSpeed;
-						nextState.OceanCurrentDeep[index] = new Vector3(densityDifferential.x, densityDifferential.y, 0);
-						nextState.OceanCurrentShallow[index] = new Vector3(shallowCurrentH.x, shallowCurrentH.y, shallowCurrentV);
+						nextState.DeepWaterCurrent[index] = new Vector3(densityDifferential.x, densityDifferential.y, 0);
+						nextState.ShallowWaterCurrent[index] = new Vector3(shallowCurrentH.x, shallowCurrentH.y, shallowCurrentV);
+					} else
+					{
+						nextState.DeepWaterCurrent[index] = Vector3.zero;
+						nextState.ShallowWaterCurrent[index] = Vector3.zero;
 					}
 				}
 			}

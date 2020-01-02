@@ -20,42 +20,36 @@ namespace Sim {
 					int index = world.GetIndex(x, y);
 
 					// Foliage
-					float freshWaterAvailability = 0;
+					//float freshWaterAvailability = 0;
 					float canopy = state.Canopy[index];
 					float airHeat = state.LowerAirTemperature[index];
 
 					float newCanopy = canopy;
 					if (canopy > 0)
 					{
-						if (world.IsOcean(state.WaterDepth[index]))
-						{
-							newCanopy = 0;
-						}
-						else
-						{
-							float t = state.LowerAirTemperature[index];
-							float sf = state.SoilFertility[index];
-							//float groundWaterSaturation = GetGroundWaterSaturation(state.GroundWater[index], state.WaterTableDepth[index], sf * world.Data.MaxSoilPorousness);
-							//float surfaceWater = state.SurfaceWater[index];
-							//freshWaterAvailability = GetFreshWaterAvailability(surfaceWater, groundWaterSaturation);
+						float waterCoverage = Mathf.Clamp01(state.WaterDepth[index] / world.Data.FullWaterCoverage);
+						float t = state.LowerAirTemperature[index];
+						float sf = state.SoilFertility[index];
+						//float groundWaterSaturation = GetGroundWaterSaturation(state.GroundWater[index], state.WaterTableDepth[index], sf * world.Data.MaxSoilPorousness);
+						//float surfaceWater = state.SurfaceWater[index];
+						//freshWaterAvailability = GetFreshWaterAvailability(surfaceWater, groundWaterSaturation);
 
-							float iceCoverage = Mathf.Clamp01(state.Ice[index] / world.Data.FullIceCoverage);
+						float iceCoverage = Mathf.Clamp01(state.IceMass[index] / world.Data.FullIceCoverage);
 
-							float desiredCanopy = sf * (state.Rainfall[index] + state.SurfaceWater[index]) * (1.0f - iceCoverage) * Mathf.Clamp01((t - world.Data.MinTemperatureCanopy) / (world.Data.MaxTemperatureCanopy - world.Data.MinTemperatureCanopy));
-							float canopyGrowth = (desiredCanopy - canopy) * world.Data.canopyGrowthRate;
-							newCanopy += canopyGrowth;
+						float desiredCanopy = sf * (state.Rainfall[index] + state.GroundWater[index]) * (1.0f - waterCoverage) * (1.0f - iceCoverage) * Mathf.Clamp01((t - world.Data.MinTemperatureCanopy) / (world.Data.MaxTemperatureCanopy - world.Data.MinTemperatureCanopy));
+						float canopyGrowth = (desiredCanopy - canopy) * world.Data.canopyGrowthRate;
+						newCanopy += canopyGrowth;
 
-							//float expansion = canopy * canopyGrowth * 0.25f;
-							//for (int i = 0; i < 4; i++)
-							//{
-							//	var n = GetNeighbor(x, y, i);
-							//	int neighborIndex = GetIndex(n.x, n.y);
-							//	if (world.IsOcean(state.Elevation[neighborIndex], state.SeaLevel))
-							//	{
-							//		nextState.Canopy[neighborIndex] = Math.Min(1.0f, nextState.Canopy[neighborIndex] + expansion);
-							//	}
-							//}
-						}
+						//float expansion = canopy * canopyGrowth * 0.25f;
+						//for (int i = 0; i < 4; i++)
+						//{
+						//	var n = GetNeighbor(x, y, i);
+						//	int neighborIndex = GetIndex(n.x, n.y);
+						//	if (world.IsOcean(state.Elevation[neighborIndex], state.SeaLevel))
+						//	{
+						//		nextState.Canopy[neighborIndex] = Math.Min(1.0f, nextState.Canopy[neighborIndex] + expansion);
+						//	}
+						//}
 						nextState.Canopy[index] = Math.Max(0, newCanopy);
 
 					}
@@ -95,7 +89,7 @@ namespace Sim {
 							continue;
 						}
 						int tileIndex = world.GetIndex(tile.x, tile.y);
-						water += state.SurfaceWater[tileIndex];
+				//		water += state.SurfaceWater[tileIndex];
 						comfort += Mathf.Clamp01((species.RestingTemperature + species.TemperatureRange - state.LowerAirTemperature[tileIndex]) / species.TemperatureRange);
 						food += state.Canopy[tileIndex];
 						radiation += state.Radiation[tileIndex];
@@ -122,7 +116,7 @@ namespace Sim {
 				nextState.Herds[i].Social = social;
 
 				// Update unit resources (disease)
-				float immuneSystem = 1;
+				//float immuneSystem = 1;
 				// Immune system strength is based on water/food/comfort consumed
 				//				if (state.Herds[i].Units[j].Maturity)
 				//nextState.Herds[i].Units[j].Disease += immuneSystem * populationDensity;

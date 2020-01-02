@@ -68,11 +68,20 @@ public partial class WorldComponent : MonoBehaviour
 	public float maxPressure = 600;
 	public float MinElevation = -11000;
 	public float MaxElevation = 10000;
+	public float MaxDepth = 11000;
 	public float maxHumidity = 300;
 	public float maxRainfall = 5.0f;
 	public float maxCloudColor = 300.0f;
 	public float MaxEnergyAbsorbed = 300;
-	public float surfaceWaterFullCoverage = 50;
+	public float MinSalinity = 0;
+	public float MaxSalinity = 50;
+	public float waterDepthThreshold = 10;
+	public float DisplayMaxWindSpeedLowerAtm = 50;
+	public float DisplayMaxWindSpeedUpperAtm = 250;
+	public float DisplayMaxWindSpeedSurfaceWater = 5;
+	public float DisplayMaxWindSpeedDeepWater = 0.5f;
+	public float DisplayMaxVerticalWindSpeed = 1.0f;
+	public float MaxEvap = 5.0f;
 
 
 	[Header("Internal")]

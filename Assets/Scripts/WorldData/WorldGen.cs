@@ -89,6 +89,9 @@ public static class WorldGen {
 
 		float inverseDewPointTemperatureRange = 1.0f / world.Data.DewPointTemperatureRange;
 
+		double totalWaterVolume = 1350000000000000000;
+		float waterVolumePerTile = (float)(totalWaterVolume / (world.Size * world.Size) * world.Data.InverseMetersPerTile * world.Data.InverseMetersPerTile);
+
 		for (int y = 0; y < world.Size; y++)
 		{
 			for (int x = 0; x < world.Size; x++)
@@ -99,16 +102,13 @@ public static class WorldGen {
 					GetPerlinMinMax(world, noise, x, y, 0.5f, 10, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.3f +
 					GetPerlinMinMax(world, noise, x, y, 1.0f, 20, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.2f +
 					GetPerlinMinMax(world, noise, x, y, 2.0f, 30, worldGenData.MinElevation, worldGenData.MaxElevation) * 0.1f;
+				float depth = Mathf.Max(0, -e);
+				//float depth = waterVolumePerTile;
 				state.Elevation[index] = e;
+				state.WaterDepth[index] = depth;
 				float latitude = world.GetLatitude(y);
 
-				float elevationOrSeaLevel = Math.Max(0, e);
-
-				Vector2 newFlowDirection;
-				Vector3 newNormal;
-				Geology.GetFlowDirectionAndNormal(world, state, x, y, index, e, out newFlowDirection, out newNormal);
-				state.FlowDirection[index] = newFlowDirection;
-				state.Normal[index] = newNormal;
+				float elevationOrSeaLevel = e + state.WaterDepth[index];
 
 				float troposphereColumnHeight = data.TropopauseElevation - elevationOrSeaLevel;
 				float upperAirColumnHeight = troposphereColumnHeight - data.BoundaryZoneElevation;
@@ -122,7 +122,7 @@ public static class WorldGen {
 					GetPerlinMinMax(world, noise, x, y, 2.0f, 60, -10, 10);
 				state.LowerAirTemperature[index] =
 					regionalTemperatureVariation + GetPerlinMinMax(world, noise, x, y, 0.25f, 80, -5, 5) +
-					(1.0f - Mathf.Clamp(e, 0, worldGenData.MaxElevation) / (worldGenData.MaxElevation)) * (1.0f - latitude * latitude) * (worldGenData.MaxTemperature - worldGenData.MinTemperature) + worldGenData.MinTemperature;
+					(1.0f - latitude * latitude) * (worldGenData.MaxTemperature - worldGenData.MinTemperature) + worldGenData.MinTemperature + data.TemperatureLapseRate * elevationOrSeaLevel;
 				state.UpperAirTemperature[index] =
 					GetPerlinMinMax(world, noise, x, y, 0.25f, 90, -5, 5) +
 					state.LowerAirTemperature[index] + data.TemperatureLapseRate * upperAirElevation;
@@ -139,31 +139,45 @@ public static class WorldGen {
 				state.UpperAirMass[index] = Atmosphere.GetAirMass(world, state.UpperAirPressure[index], upperAirElevation, state.UpperAirTemperature[index]) - state.StratosphereMass;
 				state.LowerAirMass[index] = Atmosphere.GetAirMass(world, state.LowerAirPressure[index], elevationOrSeaLevel, state.LowerAirTemperature[index]) - state.StratosphereMass - state.UpperAirMass[index];
 
-				state.UpperAirEnergy[index] = Atmosphere.GetAirEnergy(world, state.UpperAirTemperature[index], state.UpperAirMass[index]);
-				state.LowerAirEnergy[index] = Atmosphere.GetAirEnergy(world, state.LowerAirTemperature[index], state.LowerAirMass[index]);
-
 
 				state.CloudMass[index] = GetPerlinMinMax(world, noise, x, y, 3.0f, 2000, 0, 1) * data.CloudMassFullAbsorption;
 				float relativeHumidity = Mathf.Pow(GetPerlinNormalized(world, noise, x, y, 1.0f, 400), 3);
 				state.Humidity[index] = Atmosphere.GetAbsoluteHumidity(world, state.LowerAirTemperature[index], relativeHumidity, state.LowerAirMass[index], inverseDewPointTemperatureRange);
 				state.WaterTableDepth[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 200, data.MinWaterTableDepth, data.MaxWaterTableDepth);
 				state.SoilFertility[index] = GetPerlinNormalized(world, noise, x, y, 1.0f, 400);
-				state.Ice[index] = 0;
-				if (e >= 0)
-				{
-					state.SurfaceWater[index] = Mathf.Pow(GetPerlinNormalized(world, noise, x, y, 1.0f, 100),3)*10;
-					state.GroundWater[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 300, 0, state.WaterTableDepth[index] * state.SoilFertility[index] / (data.MaxSoilPorousness * data.MaxWaterTableDepth));
-					state.Canopy[index] = Mathf.Pow(GetPerlinNormalized(world, noise, x, y, 2.0f, 1000),2);
-				} else
-				{
-					state.OceanTemperatureShallow[index] = Math.Max(data.FreezingTemperature, state.LowerAirTemperature[index]);
-					state.OceanEnergyShallow[index] = Atmosphere.GetWaterEnergy(world, state.OceanTemperatureShallow[index], data.DeepOceanDepth);
-					state.OceanEnergyDeep[index] = Atmosphere.GetWaterEnergy(world, data.FreezingTemperature + 3, Math.Max(0, -e));
-					state.OceanSalinityShallow[index] = ((1.0f - Math.Abs(latitude)) * (worldGenData.MaxSalinity - worldGenData.MinSalinity) + worldGenData.MinSalinity) * data.DeepOceanDepth;
-					state.OceanSalinityDeep[index] = (Math.Abs(latitude) * (worldGenData.MaxSalinity - worldGenData.MinSalinity) + worldGenData.MinSalinity) * state.WaterDepth[index];
-					state.OceanDensityDeep[index] = Atmosphere.GetOceanDensity(world, state.OceanEnergyDeep[index], state.OceanSalinityDeep[index], state.WaterDepth[index]);
-					state.WaterDepth[index] = Mathf.Max(0,-e); 
-				}
+				state.IceMass[index] = 0;
+
+				state.UpperAirEnergy[index] = Atmosphere.GetAirEnergy(world, state.UpperAirTemperature[index], state.UpperAirMass[index], state.CloudMass[index], world.Data.LatentHeatWaterLiquid, world.Data.SpecificHeatWater);
+				state.LowerAirEnergy[index] = Atmosphere.GetAirEnergy(world, state.LowerAirTemperature[index], state.LowerAirMass[index], state.Humidity[index], world.Data.LatentHeatWaterLiquid + world.Data.LatentHeatWaterVapor, world.Data.SpecificHeatWaterVapor);
+
+
+				float shallowDepth = Mathf.Min(data.DeepOceanDepth, depth);
+				float deepDepth = Mathf.Max(0, depth - data.DeepOceanDepth);
+				float shallowSalinity = shallowDepth == 0 ? 0 : (1.0f - Math.Abs(latitude)) * (worldGenData.MaxSalinity - worldGenData.MinSalinity) + worldGenData.MinSalinity;
+				float deepSalinity = deepDepth == 0 ? 0 : Math.Abs(latitude) * (worldGenData.MaxSalinity - worldGenData.MinSalinity) + worldGenData.MinSalinity;
+
+				state.ShallowWaterTemperature[index] = Math.Max(data.FreezingTemperature, state.LowerAirTemperature[index]);
+				float shallowOceanMass = GetWaterMass(world, shallowDepth, state.ShallowWaterTemperature[index], shallowSalinity);
+				state.ShallowWaterMass[index] = shallowOceanMass * (1.0f - shallowSalinity);
+				state.ShallowSaltMass[index] = shallowOceanMass * shallowSalinity;
+				state.ShallowWaterEnergy[index] = Atmosphere.GetWaterEnergy(world, state.ShallowWaterTemperature[index], state.ShallowWaterMass[index], state.ShallowSaltMass[index]);
+				float shallowOceanDensity = Atmosphere.GetWaterDensity(world, state.ShallowWaterEnergy[index], state.ShallowSaltMass[index], state.ShallowWaterMass[index]);
+
+				float deepOceanTemperature = data.FreezingTemperature + 3;
+				float deepOceanMass = GetWaterMass(world, deepDepth, deepOceanTemperature, deepSalinity);
+				state.DeepWaterMass[index] = deepOceanMass * (1.0f - deepSalinity);
+				state.DeepSaltMass[index] = deepOceanMass * deepSalinity;
+				state.DeepWaterEnergy[index] = Atmosphere.GetWaterEnergy(world, deepOceanTemperature, state.DeepWaterMass[index], state.DeepSaltMass[index]);
+				state.DeepWaterDensity[index] = Atmosphere.GetWaterDensity(world, state.DeepWaterEnergy[index], state.DeepSaltMass[index], state.DeepWaterMass[index]);
+
+				Vector2 newTerrainGradient, newSurfaceGradient;
+				Vector3 newNormal;
+				Geology.GetGradientAndNormal(world, state, x, y, index, e, out newTerrainGradient, out newSurfaceGradient, out newNormal);
+				state.TerrainGradient[index] = newTerrainGradient;
+				state.SurfaceGradient[index] = newSurfaceGradient;
+				state.Normal[index] = newNormal;
+
+
 			}
 		}
 
@@ -234,6 +248,12 @@ public static class WorldGen {
 		{
 			world.States[i].CopyFrom(world.States[0]);
 		}
+	}
+
+	static public float GetWaterMass(World world, float depth, float temperature, float salinityPSU)
+	{
+		float density = world.Data.waterDensity + world.Data.OceanDensityPerDegree * (temperature - world.Data.FreezingTemperature) + world.Data.OceanDensityPerSalinity * salinityPSU;
+		return depth * density;
 	}
 
 }

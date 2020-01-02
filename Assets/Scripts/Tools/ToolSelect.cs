@@ -6,6 +6,7 @@ public class ToolSelect : GameTool
 {
 	public TileInfoPanel TileInfoPanel;
 	public WorldComponent World;
+	public bool TileSelected;
 
 	// Start is called before the first frame update
 	void Awake()
@@ -20,8 +21,23 @@ public class ToolSelect : GameTool
 		{
 			return;
 		}
-		var p = World.ScreenToWorld(Input.mousePosition);
-		TileInfoPanel.TileInfoPoint = p;
+
+		if (!TileSelected)
+		{
+			var p = World.ScreenToWorld(Input.mousePosition);
+			TileInfoPanel.TileInfoPoint = p;
+		}
+
+		if (Input.GetMouseButton(0))
+		{
+			TileSelected = true;
+		} else if (Input.GetMouseButton(1))
+		{
+			TileSelected = false;
+		}
+
+
+
 	}
 
 	public override void OnSelect()

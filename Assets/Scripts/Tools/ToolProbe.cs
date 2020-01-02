@@ -72,7 +72,6 @@ public class Probe {
 	public float[] Rainfall = new float[SampleCount];
 	public float[] Evaporation = new float[SampleCount];
 	public float[] GroundWater = new float[SampleCount];
-	public float[] SurfaceWater = new float[SampleCount];
 	public float[] Canopy = new float[SampleCount];
 
 	public void Update(World world, World.State state)
@@ -84,7 +83,6 @@ public class Probe {
 		CloudCover[CurSampleIndex] = state.CloudMass[index];
 		Rainfall[CurSampleIndex] = state.Rainfall[index];
 		GroundWater[CurSampleIndex] = state.GroundWater[index];
-		SurfaceWater[CurSampleIndex] = state.SurfaceWater[index];
 		Canopy[CurSampleIndex] = state.Canopy[index];
 		CurSampleIndex = (CurSampleIndex + 1) % SampleCount;
 		TotalSamples = Math.Min(SampleCount, TotalSamples + 1);

@@ -21,10 +21,11 @@ namespace Sim {
 				{
 					int index = world.GetIndex(x, y);
 					float elevation = state.Elevation[index];
-					Vector2 newFlowDirection;
+					Vector2 newTerrainGradient, newSurfaceGradient;
 					Vector3 newNormal;
-					GetFlowDirectionAndNormal(world, state, x, y, index, elevation, out newFlowDirection, out newNormal);
-					nextState.FlowDirection[index] = newFlowDirection;
+					GetGradientAndNormal(world, state, x, y, index, elevation, out newTerrainGradient, out newSurfaceGradient, out newNormal);
+					nextState.TerrainGradient[index] = newTerrainGradient;
+					nextState.SurfaceGradient[index] = newSurfaceGradient;
 					nextState.Normal[index] = newNormal;
 				}
 			}
@@ -103,16 +104,12 @@ namespace Sim {
 				{
 					int index = world.GetIndex(x, y);
 					float elevation = state.Elevation[index];
-					Vector2 newFlowDirection;
+					Vector2 newSurfaceGradient, newTerrainGradient;
 					Vector3 newNormal;
-					GetFlowDirectionAndNormal(world, nextState, x, y, index, elevation, out newFlowDirection, out newNormal);
-					nextState.FlowDirection[index] = newFlowDirection;
+					GetGradientAndNormal(world, nextState, x, y, index, elevation, out newTerrainGradient, out newSurfaceGradient, out newNormal);
+					nextState.TerrainGradient[index] = newTerrainGradient;
+					nextState.SurfaceGradient[index] = newSurfaceGradient;
 					nextState.Normal[index] = newNormal;
-
-					if (nextState.SurfaceWater[index] > 0 && world.IsOcean(nextState.WaterDepth[index]))
-					{
-						nextState.SurfaceWater[index] = 0;
-					}
 				}
 			}
 
@@ -125,71 +122,42 @@ namespace Sim {
 			nextState.Canopy[newIndex] = state.Canopy[index];
 			nextState.WaterTableDepth[newIndex] = state.WaterTableDepth[index];
 			nextState.GroundWater[newIndex] = state.GroundWater[index];
-			nextState.SurfaceWater[newIndex] = state.SurfaceWater[index];
-			nextState.OceanSalinityShallow[newIndex] = state.OceanSalinityShallow[index];
-			nextState.OceanSalinityDeep[newIndex] = state.OceanSalinityDeep[index];
-			nextState.OceanTemperatureShallow[newIndex] = state.OceanTemperatureShallow[index];
-			nextState.OceanEnergyShallow[newIndex] = state.OceanEnergyShallow[index];
-			nextState.OceanEnergyDeep[newIndex] = state.OceanEnergyDeep[index];
-			nextState.Ice[newIndex] = state.Ice[index];
+			nextState.ShallowSaltMass[newIndex] = state.ShallowSaltMass[index];
+			nextState.DeepSaltMass[newIndex] = state.DeepSaltMass[index];
+			nextState.ShallowWaterTemperature[newIndex] = state.ShallowWaterTemperature[index];
+			nextState.ShallowWaterEnergy[newIndex] = state.ShallowWaterEnergy[index];
+			nextState.DeepWaterEnergy[newIndex] = state.DeepWaterEnergy[index];
+			nextState.IceMass[newIndex] = state.IceMass[index];
 			nextState.SoilFertility[newIndex] = state.SoilFertility[index];
 
 		}
 
 
-		static public void GetFlowDirectionAndNormal(World world, World.State state, int x, int y, int index, float elevation, out Vector2 flowDirection, out Vector3 normal)
+		static public void GetGradientAndNormal(World world, World.State state, int x, int y, int index, float elevation, out Vector2 terrainGradient, out Vector2 surfaceGradient, out Vector3 normal)
 		{
-			if (world.IsOcean(state.WaterDepth[index]))
-			{
-				flowDirection = Vector2.zero;
-				normal = new Vector3(0, 0, 1);
-			}
-			else
-			{
-				int indexW = world.GetIndex(world.WrapX(x - 1), y);
-				int indexE = world.GetIndex(world.WrapX(x + 1), y);
-				int indexN = world.GetIndex(x, world.WrapY(y - 1));
-				int indexS = world.GetIndex(x, world.WrapY(y + 1));
-				float e = state.Elevation[index];
-				float west = state.Elevation[indexW];
-				float east = state.Elevation[indexE];
-				float north = state.Elevation[indexN];
-				float south = state.Elevation[indexS];
+			int indexW = world.GetIndex(world.WrapX(x - 1), y);
+			int indexE = world.GetIndex(world.WrapX(x + 1), y);
+			int indexN = world.GetIndex(x, world.WrapY(y + 1));
+			int indexS = world.GetIndex(x, world.WrapY(y - 1));
+			float e = state.Elevation[index];
+			float west = e - state.Elevation[indexW];
+			float east = e - state.Elevation[indexE];
+			float north = e - state.Elevation[indexN];
+			float south = e - state.Elevation[indexS];
 
-				e += state.SurfaceWater[index];
-				west += state.SurfaceWater[indexW];
-				east += state.SurfaceWater[indexE];
-				north += state.SurfaceWater[indexN];
-				south += state.SurfaceWater[indexS];
+			Vector2 g = new Vector2(east > west ? Mathf.Max(0, east) : -Mathf.Max(0, west), north > south ? Mathf.Max(0, north) : -Mathf.Max(0, south));
+			terrainGradient = g * world.Data.InverseMetersPerTile;
 
-				Vector2 g;
-				if (west < e && west < east && west < north && west < south)
-				{
-					g = new Vector2(west - e, 0);
-				}
-				else if (east < e && east < west && east < north && east < south)
-				{
-					g = new Vector2(e - east, 0);
-				}
-				else if (north < e && north < west && north < east && north < south)
-				{
-					g = new Vector2(0, north - e);
-				}
-				else if (south < e && south < west && south < north && south < east)
-				{
-					g = new Vector2(0, e - south);
-				}
-				else
-				{
-					g = Vector2.zero;
-				}
+			float depth = state.WaterDepth[index];
+			west += depth - state.WaterDepth[indexW];
+			east += depth - state.WaterDepth[indexE];
+			north += depth - state.WaterDepth[indexN];
+			south += depth - state.WaterDepth[indexS];
 
-				flowDirection = new Vector2(Math.Sign(g.x) * (1.0f + (float)Math.Pow(Math.Abs(g.x) / world.Data.MetersPerTile, world.Data.FlowSpeedExponent)), Math.Sign(g.y) * (1.0f + (float)Math.Pow(Math.Abs(g.x) / world.Data.MetersPerTile, world.Data.FlowSpeedExponent)));
+			g = new Vector2(east > west ? Mathf.Max(0, east) : -Mathf.Max(0, west), north > south ? Mathf.Max(0, north) : -Mathf.Max(0, south));
+			surfaceGradient = g * world.Data.InverseMetersPerTile;
 
-				// TODO: this is wong, gradient is just steepest downhill direction
-				normal = Vector3.Normalize(new Vector3(g.x, g.y, world.Data.MetersPerTile));
-
-			}
+			normal = Vector3.Normalize(new Vector3((west - east) / 2, (south - north) / 2, world.Data.MetersPerTile));
 		}
 
 

@@ -48,10 +48,10 @@ public class ToolElevation : GameTool
 							int index = World.World.GetIndex(x, y);
 							nextState.Elevation[index] += Direction * distT * DeltaPerSecond * Time.deltaTime;
 							float oceanDepth = nextState.WaterDepth[index];
-							nextState.OceanEnergyShallow[index] = Sim.Atmosphere.GetWaterEnergy(World.World, nextState.LowerAirTemperature[index], World.World.Data.DeepOceanDepth);
-							nextState.OceanEnergyDeep[index] = Sim.Atmosphere.GetWaterEnergy(World.World, World.World.Data.FreezingTemperature + 3, oceanDepth);
-							nextState.OceanSalinityDeep[index] = oceanDepth * 35;
-							nextState.OceanSalinityShallow[index] = World.World.Data.DeepOceanDepth * 35;
+							nextState.ShallowWaterEnergy[index] = Sim.Atmosphere.GetWaterEnergy(World.World, nextState.LowerAirTemperature[index], World.World.Data.DeepOceanDepth, nextState.ShallowSaltMass[index]);
+							nextState.DeepWaterEnergy[index] = Sim.Atmosphere.GetWaterEnergy(World.World, World.World.Data.FreezingTemperature + 3, oceanDepth, 0);
+							nextState.DeepSaltMass[index] = oceanDepth * 35;
+							nextState.ShallowSaltMass[index] = World.World.Data.DeepOceanDepth * 35;
 						}
 					}
 				}

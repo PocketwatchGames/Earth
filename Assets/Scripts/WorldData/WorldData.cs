@@ -35,6 +35,7 @@ public class WorldData
 	public float WindAirMovementHorizontal = 0.001f;
 	public float WindAirMovementVertical = 0.01f;
 	public float WindHumidityMovement = 0.1f;
+	public float HumidityToCloudPercent = 0.1f;
 	public float PressureGradientWindMultiplier = 4000;
 	public float AdiabaticLapseRate = 0.0098f;
 	// http://tornado.sfsu.edu/geosciences/classes/e260/Coriolis_rdg/GeostrophicApproximation.html
@@ -49,12 +50,13 @@ public class WorldData
 	public float AtmosphericHeatReflection = 0.07f; // 7% is refelcted due to atmospheric scattering 
 	public float CloudIncomingAbsorptionRate = 0.06f; // 6% absorbed by clouds
 	public float CloudIncomingReflectionRate = 0.50f; // 24% incoming  reflected back to space by clouds (avg, globally)
-	public float EvaporativeHeatLoss = 600f; // global average = 78 watts
+	//public float EvaporativeHeatLoss = 0.6f; // global average = 78 watts
 	// Net Back Radiation: The ocean transmits electromagnetic radiation into the atmosphere in proportion to the fourth power of the sea surface temperature(black-body radiation)
 	// https://eesc.columbia.edu/courses/ees/climate/lectures/o_atm.html
 	public float OceanHeatRadiation = 0.000000066f; // global average = 66 watts per m^2 of ocean
 	public float OceanAirConductionWarming = 0.016f; // global avg = 16 watts per degree delta between air and ocean (global avg = 24 watts per m^2 of ocean)
 	public float OceanAirConductionCooling = 0.008f; // 
+	public float WaterAirConductionDepth = 10.0f;
 	public float OceanIceConduction = 0.00001f; // small
 	public float LengthOfDaySolarRadiationExponent = 0.5f;
 	public float SunVectorSolarRadiationExponent = 2;
@@ -92,10 +94,13 @@ public class WorldData
 	public float OceanUpwellingSpeed = 0.0001f;
 	public float OceanTemperatureVerticalMixingSpeed = 0.0001f;
 	public float SalinityVerticalMixingSpeed = 0.001f;
-	public float OceanDensityPerSalinity = 0.0008f;
-	public float OceanDensityPerDegree = 0.0002f;
-	public float OceanDensityCurrentSpeed = 100f;
-	public float FullIceCoverage = 1.0f;
+	public float OceanDensityPerSalinity = 800f;
+	public float OceanDensityPerDegree = 0.2f;
+	public float OceanDensityCurrentSpeed = 0.1f;
+	public float FullIceCoverage = 3.0f;
+	public float FullWaterCoverage = 50.0f;
+	public float LatentHeatWaterLiquid = 334.0f;
+	public float LatentHeatWaterVapor = 2264.705f;
 
 	[Header("Fresh Water")]
 	public float FlowSpeed = 10.0f; // mississippi travels at around 3 km/h
@@ -143,16 +148,17 @@ public class WorldData
 	public float AlbedoReductionSoilQuality = 0.15f;
 	public float AlbedoFoliage = 0.1f;
 
+	// specific heat is joules to raise one degree
 	[Header("Specific Heats")] // in kJ/kgK
-	public float SpecificHeatIce = 2.108f; // specific heat is joules to raise one degree
-	public float SpecificHeatFreshWater = 4.187f; // specific heat is joules to raise one degree
-	public float SpecificHeatSeaWater = 3.85f; // specific heat is joules to raise one degree
-	public float SpecificHeatAtmosphere = 1.158f; // specific heat is joules to raise one degree
+	public float SpecificHeatIce = 2.108f; 
+	public float SpecificHeatWater = 4.187f;
+	public float SpecificHeatWaterVapor = 1.996f;
+	public float SpecificHeatSalt = 0.85f;
+	public float SpecificHeatAtmosphere = 1.158f;
 
 	[Header("Masses")]
 	public float MassEarthAir = 1.29f;
-	public float MassSeaWater = 1024f;
-	public float MassFreshWater = 1000f;
+	public float MassWater = 1000f;
 	public float MassIce = 919f;
 
 
