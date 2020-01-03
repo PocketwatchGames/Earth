@@ -13,6 +13,7 @@ namespace Sim {
 		static public void Tick(World world, World.State state, World.State nextState)
 		{
 			_ProfileEarthTick.Begin();
+			float inverseFullIceCoverage = 1.0f / (world.Data.MassIce * world.Data.FullIceCoverage);
 			for (int y = 0; y < world.Size; y++)
 			{
 				for (int x = 0; x < world.Size; x++)
@@ -25,7 +26,7 @@ namespace Sim {
 					float airHeat = state.LowerAirTemperature[index];
 
 					float newCanopy = canopy;
-					if (canopy > 0)
+		//			if (canopy > 0)
 					{
 						float waterCoverage = Mathf.Clamp01(state.WaterDepth[index] / world.Data.FullWaterCoverage);
 						float t = state.LowerAirTemperature[index];
@@ -34,7 +35,7 @@ namespace Sim {
 						//float surfaceWater = state.SurfaceWater[index];
 						//freshWaterAvailability = GetFreshWaterAvailability(surfaceWater, groundWaterSaturation);
 
-						float iceCoverage = Mathf.Clamp01(state.IceMass[index] / world.Data.FullIceCoverage);
+						float iceCoverage = Mathf.Clamp01(state.IceMass[index] * inverseFullIceCoverage);
 
 						float desiredCanopy = sf * (state.Rainfall[index] + state.GroundWater[index]) * (1.0f - waterCoverage) * (1.0f - iceCoverage) * Mathf.Clamp01((t - world.Data.MinTemperatureCanopy) / (world.Data.MaxTemperatureCanopy - world.Data.MinTemperatureCanopy));
 						float canopyGrowth = (desiredCanopy - canopy) * world.Data.canopyGrowthRate;

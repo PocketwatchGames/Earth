@@ -132,25 +132,25 @@ namespace Sim {
 					{
 						int neighborIndex = world.GetNeighborIndex(x, y, 0);
 						neighborPressureDifferential += -lowerWindH.x * (lowerPressure - state.LowerAirPressure[neighborIndex]);
-						neighborElevationDifferential += -lowerWindH.x * (state.Elevation[neighborIndex] + state.WaterDepth[neighborIndex] - elevationOrSeaLevel);
+						neighborElevationDifferential += -lowerWindH.x * (state.Elevation[neighborIndex] + state.WaterAndIceDepth[neighborIndex] - elevationOrSeaLevel);
 					}
 					else
 					{
 						var neighborIndex = world.GetNeighborIndex(x, y, 1);
 						neighborPressureDifferential += lowerWindH.x * (lowerPressure - state.LowerAirPressure[neighborIndex]);
-						neighborElevationDifferential += lowerWindH.x * (state.Elevation[neighborIndex] + state.WaterDepth[neighborIndex] - elevationOrSeaLevel);
+						neighborElevationDifferential += lowerWindH.x * (state.Elevation[neighborIndex] + state.WaterAndIceDepth[neighborIndex] - elevationOrSeaLevel);
 					}
 					if (lowerWindH.y < 0)
 					{
 						var neighborIndex = world.GetNeighborIndex(x, y, 3);
 						neighborPressureDifferential += -lowerWindH.y * (lowerPressure - state.LowerAirPressure[neighborIndex]);
-						neighborElevationDifferential += -lowerWindH.y * (state.Elevation[neighborIndex] + state.WaterDepth[neighborIndex] - elevationOrSeaLevel);
+						neighborElevationDifferential += -lowerWindH.y * (state.Elevation[neighborIndex] + state.WaterAndIceDepth[neighborIndex] - elevationOrSeaLevel);
 					}
 					else
 					{
 						var neighborIndex = world.GetNeighborIndex(x, y, 2);
 						neighborPressureDifferential += lowerWindH.y * (lowerPressure - state.LowerAirPressure[neighborIndex]);
-						neighborElevationDifferential += lowerWindH.y * (state.Elevation[neighborIndex] + state.WaterDepth[neighborIndex] - elevationOrSeaLevel);
+						neighborElevationDifferential += lowerWindH.y * (state.Elevation[neighborIndex] + state.WaterAndIceDepth[neighborIndex] - elevationOrSeaLevel);
 					}
 					var verticalTemperatureDifferential = lowerTemperatureAtSeaLevel - upperTemperatureAtSeaLevel;
 

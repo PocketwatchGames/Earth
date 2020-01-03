@@ -105,6 +105,7 @@ public partial class World {
 		public float[] WaterTableDepth;
 		public float[] GroundWater;
 		public float[] WaterDepth;
+		public float[] WaterAndIceDepth;
 		public float[] ShallowWaterMass;
 		public float[] ShallowWaterEnergy;
 		public float[] ShallowSaltMass;
@@ -141,7 +142,7 @@ public partial class World {
 		public float GlobalEnergyAbsorbedOcean;
 		public float GlobalEnergyOceanRadiation;
 		public float GlobalEnergyOceanConduction;
-		public float GlobalEnergyOceanEvapHeat;
+		public float GlobalEnergyEvapotranspiration;
 		public float GlobalEnergyOutAtmosphericWindow;
 		public float GlobalEnergyOutEmittedAtmosphere;
 		public float GlobalEnergy;
@@ -151,6 +152,7 @@ public partial class World {
 		public float GlobalSeaLevel;
 		public float GlobalCloudCoverage;
 		public float GlobalEvaporation;
+		public float GlobalRainfall;
 		public float AtmosphericMass;
 
 		public void CopyFrom(State from)
@@ -247,6 +249,7 @@ public partial class World {
 			States[i].WaterTableDepth = new float[s];
 			States[i].GroundWater = new float[s];
 			States[i].WaterDepth = new float[s];
+			States[i].WaterAndIceDepth = new float[s];
 			States[i].EnergyAbsorbed = new float[s];
 			States[i].Rainfall = new float[s];
 			States[i].Evaporation = new float[s];

@@ -62,6 +62,7 @@ public class WorldData
 	public float SunVectorSolarRadiationExponent = 2;
 	public float AtmosphericDepthExponent = 0.5f;
 	public float LandHeatRadiation = 0.0001f;
+	public float maxGroundWaterTemperature = 283;
 
 	// TODO: tune these to match the science
 	public float CloudMassFullAbsorption = 50.0f; // how much heat gain/loss is caused by cloud cover
@@ -99,8 +100,7 @@ public class WorldData
 	public float OceanDensityCurrentSpeed = 0.1f;
 	public float FullIceCoverage = 3.0f;
 	public float FullWaterCoverage = 50.0f;
-	public float LatentHeatWaterLiquid = 334.0f;
-	public float LatentHeatWaterVapor = 2264.705f;
+	public float FullCanopyCoverage = 2000;
 
 	[Header("Fresh Water")]
 	public float FlowSpeed = 10.0f; // mississippi travels at around 3 km/h
@@ -155,6 +155,8 @@ public class WorldData
 	public float SpecificHeatWaterVapor = 1.996f;
 	public float SpecificHeatSalt = 0.85f;
 	public float SpecificHeatAtmosphere = 1.158f;
+	public float LatentHeatWaterLiquid = 334.0f;
+	public float LatentHeatWaterVapor = 2264.705f;
 
 	[Header("Masses")]
 	public float MassEarthAir = 1.29f;
@@ -194,8 +196,6 @@ public class WorldData
 		canopyGrowthRate /= TicksPerYear;
 		canopyDeathRate /= TicksPerYear;
 
-		GroundWaterReplenishmentSpeed /= TicksPerYear;
-		GroundWaterFlowSpeed /= TicksPerYear;
 
 		InverseMetersPerTile = 1.0f / MetersPerTile;
 

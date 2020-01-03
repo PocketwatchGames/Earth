@@ -106,9 +106,10 @@ public static class WorldGen {
 				//float depth = waterVolumePerTile;
 				state.Elevation[index] = e;
 				state.WaterDepth[index] = depth;
+				state.WaterAndIceDepth[index] = depth;
 				float latitude = world.GetLatitude(y);
 
-				float elevationOrSeaLevel = e + state.WaterDepth[index];
+				float elevationOrSeaLevel = e + state.WaterAndIceDepth[index];
 
 				float troposphereColumnHeight = data.TropopauseElevation - elevationOrSeaLevel;
 				float upperAirColumnHeight = troposphereColumnHeight - data.BoundaryZoneElevation;
@@ -146,9 +147,18 @@ public static class WorldGen {
 				state.WaterTableDepth[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 200, data.MinWaterTableDepth, data.MaxWaterTableDepth);
 				state.SoilFertility[index] = GetPerlinNormalized(world, noise, x, y, 1.0f, 400);
 				state.IceMass[index] = 0;
+				float maxGroundWater = state.WaterTableDepth[index] * state.SoilFertility[index] * world.Data.MassWater * world.Data.MaxSoilPorousness;
+				if (depth > 0)
+				{
+					state.GroundWater[index] = maxGroundWater;
+				} else
+				{
+					state.GroundWater[index] = maxGroundWater * 0.2f;
+				}
+				state.LandEnergy[index] = state.GroundWater[index] * (world.Data.SpecificHeatWater * world.Data.maxGroundWaterTemperature + world.Data.LatentHeatWaterLiquid);
 
 				state.UpperAirEnergy[index] = Atmosphere.GetAirEnergy(world, state.UpperAirTemperature[index], state.UpperAirMass[index], state.CloudMass[index], world.Data.LatentHeatWaterLiquid, world.Data.SpecificHeatWater);
-				state.LowerAirEnergy[index] = Atmosphere.GetAirEnergy(world, state.LowerAirTemperature[index], state.LowerAirMass[index], state.Humidity[index], world.Data.LatentHeatWaterLiquid + world.Data.LatentHeatWaterVapor, world.Data.SpecificHeatWaterVapor);
+				state.LowerAirEnergy[index] = Atmosphere.GetAirEnergy(world, state.LowerAirTemperature[index], state.LowerAirMass[index], state.Humidity[index], world.Data.LatentHeatWaterVapor, world.Data.SpecificHeatWaterVapor);
 
 
 				float shallowDepth = Mathf.Min(data.DeepOceanDepth, depth);

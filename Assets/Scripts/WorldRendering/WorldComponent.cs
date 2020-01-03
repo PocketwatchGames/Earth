@@ -82,6 +82,7 @@ public partial class WorldComponent : MonoBehaviour
 	public float DisplayMaxWindSpeedDeepWater = 0.5f;
 	public float DisplayMaxVerticalWindSpeed = 1.0f;
 	public float MaxEvap = 5.0f;
+	public float DisplayMaxCanopy = 1000;
 
 
 	[Header("Internal")]

@@ -41,19 +41,22 @@ namespace Sim {
 			float globalEnergyAbsorbedOcean = 0;
 			float globalEnergyOceanRadiation = 0;
 			float globalEnergyOceanConduction = 0;
-			float globalEnergyOceanEvapHeat = 0;
+			float globalEnergyEvapotranspiration = 0;
 			float globalEnergyOutAtmosphericWindow = 0;
 			float globalEnergyOutEmittedAtmosphere = 0;
 			float globalOceanCoverage = 0;
 			float globalCloudCoverage = 0;
 			float globalOceanVolume = 0;
 			float globalTemperature = 0;
+			float globalEvaporation = 0;
+			float globalRainfall = 0;
 			float atmosphericMass = 0;
 			float seaLevel = 0;
 			int seaLevelTiles = 0;
 
-			float inverseWaterCoverage = 1.0f / world.Data.FullWaterCoverage;
-			float inverseFullIceCoverage = world.Data.MassIce / world.Data.FullIceCoverage;
+			float inverseFullCanopyCoverage = 1.0f / world.Data.FullCanopyCoverage;
+			float inverseFullWaterCoverage = 1.0f / world.Data.FullWaterCoverage;
+			float inverseFullIceCoverage = 1.0f / (world.Data.MassIce * world.Data.FullIceCoverage);
 			float iceMeltRate = 1.0f / (world.Data.SpecificHeatIce * world.Data.MassIce);
 			float inverseCloudMassFullAbsorption = 1.0f / world.Data.CloudMassFullAbsorption;
 			float inverseWorldSize = 1.0f / world.Size;
@@ -80,7 +83,9 @@ namespace Sim {
 
 					float elevation = state.Elevation[index];
 					float waterDepth = state.WaterDepth[index];
-					float elevationOrSeaLevel = elevation+waterDepth;
+					float iceMass = state.IceMass[index];
+					float waterAndIceDepth = state.WaterAndIceDepth[index];
+					float elevationOrSeaLevel = elevation+ waterAndIceDepth;
 					float landEnergy = state.LandEnergy[index];
 					float cloudMass = state.CloudMass[index];
 					float rainDropMass = state.RainDropMass[index];
@@ -95,7 +100,6 @@ namespace Sim {
 					float humidity = state.Humidity[index];
 					float waterTableDepth = state.WaterTableDepth[index];
 					float soilFertility = state.SoilFertility[index];
-					float iceMass = state.IceMass[index];
 					float radiation = 0.001f;
 					var lowerWind = state.LowerWind[index];
 					var upperWind = state.UpperWind[index];
@@ -103,43 +107,38 @@ namespace Sim {
 					var currentShallow = state.ShallowWaterCurrent[index];
 					var surfaceGradient = state.SurfaceGradient[index];
 					var terrainGradient = state.TerrainGradient[index];
+					float groundWater = state.GroundWater[index];
+					float canopy = state.Canopy[index];
 
 					float deepWaterEnergy = 0;
 					float shallowWaterEnergy = 0;
-					float deepWaterMass = 0;
 					float shallowWaterMass = 0;
 					float deepWaterDensity =0;
 					float deepSaltMass=0;
 					float shallowSaltMass=0;
 					float shallowWaterTemperature=0;
 					float deepWaterTemperature=0;
-					float groundWater=0;
-					float canopy=0;
-					Vector3 terrainNormal=Vector3.zero;
 
-					bool isOcean = world.IsOcean(waterDepth);
-					if (isOcean)
+					shallowWaterMass = state.ShallowWaterMass[index];
+					if (shallowWaterMass > 0)
 					{
-						shallowWaterMass = state.ShallowWaterMass[index];
 						shallowWaterEnergy = state.ShallowWaterEnergy[index];
 						shallowSaltMass = state.ShallowSaltMass[index];
 						shallowWaterTemperature = state.ShallowWaterTemperature[index];
-						deepWaterMass = state.DeepWaterMass[index];
+					}
+					float deepWaterMass = state.DeepWaterMass[index];
+					if (deepWaterMass > 0)
+					{
 						deepWaterEnergy = state.DeepWaterEnergy[index];
 						deepSaltMass = state.DeepSaltMass[index];
 						deepWaterDensity = state.DeepWaterDensity[index];
 						deepWaterTemperature = GetWaterTemperature(world, deepWaterEnergy, deepWaterMass, deepSaltMass);
+					}
 
-						if (waterDepth > world.Data.DeepOceanDepth)
-						{
-							seaLevel += elevationOrSeaLevel;
-							seaLevelTiles++;
-						}
-					} else
+					if (deepWaterMass > 0)
 					{
-						groundWater = state.GroundWater[index];
-						canopy = state.Canopy[index];
-						terrainNormal = state.Normal[index];
+						seaLevel += elevationOrSeaLevel;
+						seaLevelTiles++;
 					}
 
 					float evaporation = 0;
@@ -148,11 +147,12 @@ namespace Sim {
 					float newRainfall = 0;
 					float newRadiation = radiation;
 					float inverseMassOfAtmosphericColumn = 1.0f / (upperAirMass + lowerAirMass);
-					float iceCoverage = Mathf.Min(1.0f, iceMass * inverseFullIceCoverage);
-					float waterCoverage = Mathf.Min(1.0f, waterDepth * inverseFullIceCoverage);
+					float iceCoverage = Mathf.Min(1.0f, Mathf.Pow(iceMass * inverseFullIceCoverage, 0.6667f));
+					float waterCoverage = Mathf.Min(1.0f, Mathf.Pow(waterDepth * inverseFullWaterCoverage, 0.6667f));
+					float canopyCoverage = Mathf.Min(1.0f, Mathf.Pow(canopy * inverseFullCanopyCoverage, 0.6667f));
 					float relativeHumidity = GetRelativeHumidity(world, lowerAirTemperature, humidity, lowerAirMass, inverseDewPointTemperatureRange);
 					float dewPoint = GetDewPoint(world, lowerAirTemperature, relativeHumidity);
-					float cloudElevation = GetCloudElevation(world, upperAirTemperature, dewPoint);
+					float cloudElevation = GetCloudElevation(world, upperAirTemperature, dewPoint, elevationOrSeaLevel);
 					float cloudOpacity = Math.Min(1.0f, Mathf.Pow(cloudMass * inverseCloudMassFullAbsorption, 0.6667f)); // bottom surface of volume
 					//float groundWaterSaturation = Animals.GetGroundWaterSaturation(state.GroundWater[index], state.WaterTableDepth[index], soilFertility * world.Data.MaxSoilPorousness);
 					float energyAbsorbed = 0;
@@ -198,6 +198,7 @@ namespace Sim {
 					float newDeepSaltMass = 0;
 					float newShallowWaterMass = 0;
 					float newDeepWaterMass = 0;
+
 
 					_ProfileAtmosphereSetup.End();
 
@@ -295,7 +296,7 @@ namespace Sim {
 
 
 						//surface ocean
-						if (isOcean)
+						if (shallowWaterMass > 0)
 						{
 							movePos = new Vector3(x, y, 0) + currentShallow * metersPerSecondToTilesPerTick;
 							movePos.x = RepeatExclusive(movePos.x, world.Size);
@@ -428,7 +429,7 @@ namespace Sim {
 
 					_ProfileAtmosphereEnergyBudget.Begin();
 
-					if (isOcean)
+					if (waterCoverage > 0)
 					{
 						globalOceanCoverage += waterCoverage;
 						// TODO: this currently includes ice.... should it?
@@ -486,27 +487,22 @@ namespace Sim {
 						// reflection off surface
 						float energyReflected = 0;
 						{
-							float slopeAlbedo = 0;
-							if (isOcean)
-							{
-								slopeAlbedo = Mathf.Pow(1.0f - Math.Max(0, sunVector.z), 9);
-							}
 							if (iceMass > 0)
 							{
-								energyReflected += incomingRadiation * iceCoverage * GetAlbedo(world.Data.AlbedoIce, slopeAlbedo);
+								energyReflected += incomingRadiation * iceCoverage * GetAlbedo(world.Data.AlbedoIce, 0);
 							}
-							if (isOcean)
+							if (waterCoverage > 0)
 							{
-								energyReflected += incomingRadiation * GetAlbedo(world.Data.AlbedoWater, slopeAlbedo) * (1.0f - iceCoverage);
+								float slopeAlbedo = Mathf.Pow(1.0f - Math.Max(0, sunVector.z), 9);
+								energyReflected += waterCoverage * incomingRadiation * GetAlbedo(world.Data.AlbedoWater, slopeAlbedo) * (1.0f - iceCoverage);
 							}
-							else
+							if (waterCoverage < 1)
 							{
 								// reflect some incoming radiation
-								float surfaceWater = groundWater; // TODO: deal with rivers here
-								float waterReflectivity = surfaceWater * world.Data.AlbedoWater * inverseWaterCoverage;
+								float slopeAlbedo = 0;
 								float soilReflectivity = GetAlbedo(world.Data.AlbedoLand - world.Data.AlbedoReductionSoilQuality * soilFertility, slopeAlbedo);
-								float heatReflectedLand = canopy * world.Data.AlbedoFoliage + Math.Max(0, 1.0f - canopy) * (surfaceWater * GetAlbedo(world.Data.AlbedoWater, slopeAlbedo) + Math.Max(0, 1.0f - surfaceWater) * soilReflectivity);
-								energyReflected += incomingRadiation * Mathf.Clamp01(heatReflectedLand) * (1.0f - iceCoverage);
+								float heatReflectedLand = canopyCoverage * world.Data.AlbedoFoliage + Math.Max(0, 1.0f - canopyCoverage) * soilReflectivity;
+								energyReflected += incomingRadiation * Mathf.Clamp01(heatReflectedLand) * (1.0f - iceCoverage) * (1.0f - waterCoverage);
 							}
 							incomingRadiation -= energyReflected;
 
@@ -542,17 +538,20 @@ namespace Sim {
 						// freeze the top meter based on surface temperature (plus incoming radiation)
 						if (iceCoverage < 1)
 						{
-							if (isOcean)
+							if (shallowWaterMass > 0)
 							{
 								// world.Data.SpecificHeatIce * world.Data.MassIce == KJ required to raise one cubic meter by 1 degree
-								float seaWaterHeatingRate = world.Data.MassWater  / GetSpecificHeatOfWater(world, shallowWaterMass, shallowSaltMass);
-								float surfaceTemp = lowerAirTemperature + incomingRadiation * seaWaterHeatingRate;
+								float specificHeatWater = GetSpecificHeatOfWater(world, shallowWaterMass, shallowSaltMass);
+								float seaWaterHeatingRate = world.Data.MassWater  / specificHeatWater;
+								//float surfaceTemp = lowerAirTemperature + incomingRadiation * seaWaterHeatingRate;
+								float localHeating = 0; // TODO: add in some local heating
+								float surfaceTemp = (lowerAirTemperature + localHeating) * (1.0f - iceCoverage) + shallowWaterTemperature * iceCoverage;
 								if (surfaceTemp < world.Data.FreezingTemperature)
 								{
-									float iceMassFrozen = Mathf.Min(newShallowWaterMass, world.Data.MassWater * Math.Min(world.Data.FullIceCoverage - iceCoverage, (world.Data.FreezingTemperature - surfaceTemp) * seaWaterHeatingRate));
+									float iceMassFrozen = Mathf.Min(shallowWaterMass, Mathf.Min(Mathf.Max(0, world.Data.FullIceCoverage * world.Data.MassIce - iceMass), (world.Data.FreezingTemperature - surfaceTemp) * seaWaterHeatingRate));
 									newIceMass += iceMassFrozen;
 									newShallowWaterMass -= iceMassFrozen;
-									float energyTransfer = iceMassFrozen * (world.Data.SpecificHeatIce * world.Data.FreezingTemperature + world.Data.LatentHeatWaterLiquid);
+									float energyTransfer = iceMassFrozen * world.Data.SpecificHeatWater * shallowWaterTemperature;
 									newShallowWaterEnergy -= energyTransfer;
 								}
 
@@ -568,9 +567,7 @@ namespace Sim {
 										world,
 										waterCoverage,
 										evapRate,
-										groundWater,
 										waterTableDepth,
-										waterDepth,
 										shallowWaterMass,
 										shallowSaltMass,
 										shallowWaterEnergy,
@@ -578,11 +575,10 @@ namespace Sim {
 										ref newHumidity,
 										ref newLowerAirEnergy,
 										ref newShallowWaterEnergy,
-										ref newGroundWater,
 										ref newShallowWaterMass,
 										out evaporation,
 										out evapotranspiration);
-									globalEnergyOceanEvapHeat += evapotranspiration;
+									globalEnergyEvapotranspiration += evapotranspiration;
 								}
 							}
 						}
@@ -635,24 +631,34 @@ namespace Sim {
 								globalEnergyOceanRadiation += oceanRadiation;
 							}
 
-						//	if (shallowWaterTemperature < world.Data.FreezingTemperature)
-						//	{
-						//		float massToAchieveEquilibrium = (shallowWaterEnergy - shallowWaterMass * world.Data.LatentHeatWaterLiquid) / (world.Data.FreezingTemperature * GetSpecificHeatOfWater(world, shallowWaterMass, shallowSaltMass));
-						//		float massFrozen = Mathf.Clamp((shallowWaterMass + shallowSaltMass) - massToAchieveEquilibrium, 0, shallowWaterMass);
-						//		newIceMass += massFrozen;
-						//		float energyTransfer = massFrozen * (world.Data.SpecificHeatIce * world.Data.FreezingTemperature + world.Data.LatentHeatWaterLiquid);
-						//		newShallowWaterEnergy -= energyTransfer;
-						//	}
+							if (shallowWaterTemperature < world.Data.FreezingTemperature)
+							{
+								float massFrozen = shallowWaterMass - Mathf.Min(shallowWaterMass,
+									(shallowWaterEnergy - shallowSaltMass * (world.Data.FreezingTemperature + world.Data.SpecificHeatSalt) - shallowWaterMass * (world.Data.FreezingTemperature * world.Data.SpecificHeatIce)) 
+									/ ((world.Data.FreezingTemperature * world.Data.SpecificHeatWater + world.Data.LatentHeatWaterLiquid) - (world.Data.FreezingTemperature * world.Data.SpecificHeatIce)));
+
+								newIceMass += massFrozen;
+								float energyTransfer = massFrozen * (world.Data.SpecificHeatWater * world.Data.FreezingTemperature); // no latent heat for ice -- water latent heat stays in the system, warming the water
+								newShallowWaterEnergy -= energyTransfer;
+							}
 						}
 					}
 
 					// radiate heat from land
 					{
 						// TODO: deal with the fact that this also incorporates ground water
-						float radiationRate = (1.0f - soilFertility) * (1.0f - groundWater / (world.Data.MaxWaterTableDepth * world.Data.MaxSoilPorousness)) * (1.0f / (1.0f + canopy));
-						float heatRadiated = landEnergy * Mathf.Clamp01(world.Data.SecondsPerTick * radiationRate * world.Data.LandHeatRadiation);
+						float groundWaterEnergy = Mathf.Min(landEnergy, groundWater * (world.Data.maxGroundWaterTemperature * world.Data.SpecificHeatWater + world.Data.LatentHeatWaterLiquid));
+						float radiationRate = (1.0f - soilFertility) * (1.0f / (1.0f + canopyCoverage));
+						float heatRadiated = (landEnergy - groundWaterEnergy) * Mathf.Clamp01(world.Data.SecondsPerTick * radiationRate * world.Data.LandHeatRadiation);
 						newLandEnergy -= heatRadiated;
-						newLowerAirEnergy += heatRadiated;
+						if (deepWaterMass > 0)
+						{
+							newDeepWaterEnergy += heatRadiated;
+						} else
+						{
+							newShallowWaterEnergy += heatRadiated * waterCoverage;
+							newLowerAirEnergy += heatRadiated * (1.0f - waterCoverage);
+						}
 					}
 
 					// reduce ice
@@ -661,7 +667,7 @@ namespace Sim {
 					{
 						newIceMass -= iceMelted;
 						newShallowWaterMass += iceMelted;
-						float energyTransfer = iceMelted * (world.Data.SpecificHeatWater * world.Data.FreezingTemperature + world.Data.LatentHeatWaterLiquid);
+						float energyTransfer = iceMelted * (world.Data.SpecificHeatWater * world.Data.FreezingTemperature);
 						newShallowWaterEnergy += energyTransfer;
 					}
 
@@ -695,7 +701,6 @@ namespace Sim {
 					_ProfileAtmosphereMoveV.Begin();
 					MoveWaterVaporVertically(
 						world,
-						isOcean,
 						humidity,
 						relativeHumidity,
 						lowerWind,
@@ -706,7 +711,7 @@ namespace Sim {
 						rainDropMass,
 						dewPoint,
 						cloudElevation,
-						waterDepth,
+						elevationOrSeaLevel,
 						ref newIceMass,
 						ref newHumidity,
 						ref newCloudMass,
@@ -762,7 +767,6 @@ namespace Sim {
 						MoveOceanVertically(
 							world,
 							state,
-							waterDepth,
 							iceMass,
 							shallowWaterEnergy,
 							deepWaterEnergy,
@@ -780,7 +784,7 @@ namespace Sim {
 							ref newShallowWaterMass,
 							ref newDeepWaterMass);
 					}
-					SeepWaterIntoGround(world, groundWater, shallowWaterMass, soilFertility, waterTableDepth, ref newGroundWater, ref newShallowWaterMass, ref newLandEnergy, ref newShallowWaterEnergy);
+					SeepWaterIntoGround(world, groundWater, landEnergy, shallowWaterMass, soilFertility, waterTableDepth, shallowWaterTemperature, ref newGroundWater, ref newShallowWaterMass, ref newLandEnergy, ref newShallowWaterEnergy);
 					_ProfileAtmosphereMoveV.End();
 
 
@@ -792,7 +796,7 @@ namespace Sim {
 					{
 						int nIndex = world.GetNeighborIndex(index, i);
 						float nElevation = state.Elevation[nIndex];
-						float nWaterDepth = state.WaterDepth[nIndex];
+						float nWaterDepth = state.WaterAndIceDepth[nIndex];
 
 						//TODO: make air diffuse faster at low density
 						//Mixing Upper atmosphere
@@ -852,7 +856,7 @@ namespace Sim {
 							}
 						}
 
-						if (isOcean)
+						if (shallowWaterMass > 0)
 						{
 							//if (shallowWaterMass > 0)
 							//{
@@ -938,15 +942,15 @@ namespace Sim {
 					nextState.CloudMass[index] = Mathf.Max(0, nextState.CloudMass[index] + newCloudMass);
 					nextState.RainDropMass[index] = Mathf.Max(0, nextState.RainDropMass[index] + newRainDropMass);
 					nextState.ShallowWaterMass[index] = Mathf.Max(0, nextState.ShallowWaterMass[index] + newShallowWaterMass);
-					nextState.ShallowWaterEnergy[index] = Mathf.Max(0, nextState.ShallowWaterEnergy[index] + newShallowWaterEnergy);
+					nextState.ShallowWaterEnergy[index] = nextState.ShallowWaterMass[index] == 0 ? 0 : Mathf.Max(0, nextState.ShallowWaterEnergy[index] + newShallowWaterEnergy);
 					nextState.ShallowSaltMass[index] = Mathf.Max(0, nextState.ShallowSaltMass[index] + newShallowSaltMass);
 					float shallowOceanDensity = GetWaterDensity(world, nextState.ShallowWaterEnergy[index], nextState.ShallowSaltMass[index], nextState.ShallowWaterMass[index]);
 					nextState.DeepWaterMass[index] = Mathf.Max(0, nextState.DeepWaterMass[index] + newDeepWaterMass);
 					nextState.DeepWaterEnergy[index] = Mathf.Max(0, nextState.DeepWaterEnergy[index] + newDeepWaterEnergy);
 					nextState.DeepSaltMass[index] = Mathf.Max(0, nextState.DeepSaltMass[index] + newDeepSaltMass);
+					nextState.GroundWater[index] = Mathf.Max(0, nextState.GroundWater[index] + newGroundWater);
 
 					nextState.IceMass[index] = Mathf.Max(0, newIceMass);
-					nextState.GroundWater[index] = Mathf.Max(0, newGroundWater);
 					nextState.Radiation[index] = Mathf.Max(0, newRadiation);
 
 					nextState.Evaporation[index] = evaporation;
@@ -954,6 +958,8 @@ namespace Sim {
 					nextState.EnergyAbsorbed[index] = energyAbsorbed;
 
 					globalEnergyGained += energyAbsorbed;
+					globalRainfall += newRainfall;
+					globalEvaporation += evaporation;
 
 					_ProfileAtmosphereFinal.End();
 
@@ -1002,16 +1008,17 @@ namespace Sim {
 					float shallowWaterTemperature = GetWaterTemperature(world, nextState.ShallowWaterEnergy[index], nextState.ShallowWaterMass[index], nextState.ShallowSaltMass[index]);
 					float deepWaterTemperature = GetWaterTemperature(world, nextState.DeepWaterEnergy[index], nextState.DeepWaterMass[index], nextState.DeepSaltMass[index]);
 					nextState.ShallowWaterTemperature[index] = shallowWaterTemperature;
-					nextState.WaterDepth[index] = Mathf.Max(0,
+					float waterDepth = Mathf.Max(0,
 						GetWaterVolumeByTemperature(world, nextState.ShallowWaterMass[index], nextState.ShallowSaltMass[index], shallowWaterTemperature) +
-						GetWaterVolumeByTemperature(world, nextState.DeepWaterMass[index], nextState.DeepSaltMass[index], deepWaterTemperature)) +
-						nextState.IceMass[index] / world.Data.MassIce;
+						GetWaterVolumeByTemperature(world, nextState.DeepWaterMass[index], nextState.DeepSaltMass[index], deepWaterTemperature));
+					nextState.WaterDepth[index] = waterDepth;
+					nextState.WaterAndIceDepth[index] = waterDepth + nextState.IceMass[index] / world.Data.MassIce;
 					nextState.DeepWaterDensity[index] = GetWaterDensity(world, nextState.DeepWaterEnergy[index], nextState.DeepSaltMass[index], nextState.DeepWaterMass[index]);
 
 				}
 				float elevation = nextState.Elevation[index];
-				float elevationOrSeaLevel = elevation + nextState.WaterDepth[index];
-				nextState.LowerAirTemperature[index] = GetAirTemperature(world, nextState.LowerAirEnergy[index], nextState.LowerAirMass[index], nextState.Humidity[index], world.Data.LatentHeatWaterLiquid + world.Data.LatentHeatWaterVapor, world.Data.SpecificHeatWaterVapor);
+				float elevationOrSeaLevel = elevation + nextState.WaterAndIceDepth[index];
+				nextState.LowerAirTemperature[index] = GetAirTemperature(world, nextState.LowerAirEnergy[index], nextState.LowerAirMass[index], nextState.Humidity[index], world.Data.LatentHeatWaterVapor, world.Data.SpecificHeatWaterVapor);
 				nextState.LowerAirPressure[index] = Mathf.Max(0, GetAirPressure(world, nextState.LowerAirMass[index] + nextState.UpperAirMass[index] + state.StratosphereMass, elevationOrSeaLevel, nextState.LowerAirTemperature[index]));
 				nextState.UpperAirTemperature[index] = GetAirTemperature(world, nextState.UpperAirEnergy[index], nextState.UpperAirMass[index], nextState.CloudMass[index], world.Data.LatentHeatWaterLiquid, world.Data.SpecificHeatWater);
 				nextState.UpperAirPressure[index] = Mathf.Max(0, GetAirPressure(world, nextState.UpperAirMass[index] + state.StratosphereMass, elevationOrSeaLevel + world.Data.BoundaryZoneElevation, nextState.UpperAirTemperature[index]));
@@ -1040,12 +1047,14 @@ namespace Sim {
 			nextState.GlobalEnergyAbsorbedOcean = globalEnergyAbsorbedOcean;
 			nextState.GlobalEnergyOceanRadiation = globalEnergyOceanRadiation;
 			nextState.GlobalEnergyOceanConduction = globalEnergyOceanConduction;
-			nextState.GlobalEnergyOceanEvapHeat = globalEnergyOceanEvapHeat;
+			nextState.GlobalEnergyEvapotranspiration = globalEnergyEvapotranspiration;
 			nextState.GlobalEnergyOutAtmosphericWindow = globalEnergyOutAtmosphericWindow;
 			nextState.GlobalEnergyOutEmittedAtmosphere = globalEnergyOutEmittedAtmosphere;
 			nextState.GlobalTemperature = globalTemperature;
 			nextState.GlobalOceanCoverage = globalOceanCoverage * inverseWorldSize * inverseWorldSize;
 			nextState.GlobalCloudCoverage = globalCloudCoverage * inverseWorldSize * inverseWorldSize;
+			nextState.GlobalEvaporation = globalEvaporation;
+			nextState.GlobalRainfall = globalRainfall;
 			nextState.GlobalOceanVolume = globalOceanVolume;
 			nextState.GlobalSeaLevel = seaLevel / seaLevelTiles;
 			nextState.AtmosphericMass = atmosphericMass;
@@ -1128,7 +1137,6 @@ namespace Sim {
 
 		static private void MoveWaterVaporVertically(
 			World world,
-			bool isOcean,
 			float humidity,
 			float relativeHumidity,
 			Vector3 lowerWind,
@@ -1139,7 +1147,7 @@ namespace Sim {
 			float rainDropMass, 
 			float dewPoint,
 			float cloudElevation,
-			float waterDepth,
+			float elevationOrSeaLevel,
 			ref float newIceMass, 
 			ref float newHumidity, 
 			ref float newCloudMass, 
@@ -1157,7 +1165,7 @@ namespace Sim {
 			{
 				float condensationMass = humidity * (relativeHumidity - 1.0f) / relativeHumidity;
 				newHumidity -= condensationMass;
-				float energyTransfer = condensationMass * (world.Data.LatentHeatWaterLiquid + world.Data.LatentHeatWaterVapor + world.Data.SpecificHeatWaterVapor * lowerAirTemperature);
+				float energyTransfer = condensationMass * (world.Data.LatentHeatWaterLiquid + world.Data.SpecificHeatWaterVapor * lowerAirTemperature);
 				newLowerAirEnergy -= energyTransfer;
 				if (lowerAirTemperature <= world.Data.FreezingTemperature)
 				{
@@ -1172,10 +1180,11 @@ namespace Sim {
 
 			if (lowerWind.z > 0)
 			{
-				float humidityToCloud = Mathf.Min(1.0f, lowerWind.z * world.Data.SecondsPerTick / cloudElevation) * humidity * world.Data.HumidityToCloudPercent;
+				float humidityToCloud = Mathf.Min(1.0f, lowerWind.z * world.Data.SecondsPerTick / (cloudElevation - elevationOrSeaLevel)) * humidity * world.Data.HumidityToCloudPercent;
 				newCloudMass += humidityToCloud;
 				newHumidity -= humidityToCloud;
-				float energyTransfer = humidityToCloud * (world.Data.LatentHeatWaterLiquid + world.Data.LatentHeatWaterVapor + world.Data.SpecificHeatWaterVapor * lowerAirTemperature);
+				// We're moving the latent heat of water vapor here since we want it to heat up the upper air around the cloud
+				float energyTransfer = humidityToCloud * (world.Data.LatentHeatWaterVapor + world.Data.SpecificHeatWaterVapor * lowerAirTemperature);
 				newLowerAirEnergy -= energyTransfer;
 				newUpperAirEnergy += energyTransfer;
 			}
@@ -1203,14 +1212,16 @@ namespace Sim {
 							float rainDropMassToHumidity = Mathf.Min(newRainfall, rainDropFallTime * world.Data.rainDropEvapRate);
 							newRainfall -= rainDropMassToHumidity;
 							newHumidity += rainDropMassToHumidity;
-							float energyTransfer = upperAirTemperature * world.Data.SpecificHeatWater + rainDropMassToHumidity * world.Data.LatentHeatWaterLiquid;
+							// This sucks heat out of the lower atmosphere in the form of latent heat of water vapor
+							float energyTransfer = rainDropMassToHumidity * (upperAirTemperature * world.Data.SpecificHeatWater + world.Data.LatentHeatWaterLiquid);
 							newUpperAirEnergy -= energyTransfer;
 							newLowerAirEnergy += energyTransfer;
 						}
 						if (newRainfall > 0)
 						{
 							newShallowWaterMass += newRainfall;
-							float energyTransfer = newRainfall * (world.Data.SpecificHeatWater * upperAirTemperature + world.Data.LatentHeatWaterLiquid);
+							// No real state change here
+							float energyTransfer = newRainfall * (upperAirTemperature * world.Data.SpecificHeatWater + world.Data.LatentHeatWaterLiquid);
 							newShallowWaterEnergy += energyTransfer;
 							newUpperAirEnergy -= energyTransfer;
 						}
@@ -1221,23 +1232,23 @@ namespace Sim {
 		}
 
 
-		static private void SeepWaterIntoGround(World world, float groundWater, float shallowWaterMass, float soilFertility, float waterTableDepth, ref float newGroundWater, ref float newShallowWater, ref float newGroundEnergy, ref float newShallowEnergy)
+		static private void SeepWaterIntoGround(World world, float groundWater, float groundEnergy, float shallowWaterMass, float soilFertility, float waterTableDepth, float shallowWaterTemperature, ref float newGroundWater, ref float newShallowWater, ref float newGroundEnergy, ref float newShallowEnergy)
 		{
-			float maxGroundWater = soilFertility * waterTableDepth * world.Data.MaxSoilPorousness;
+			float maxGroundWater = soilFertility * waterTableDepth * world.Data.MaxSoilPorousness * world.Data.MassWater;
 			if (groundWater >= maxGroundWater && groundWater > 0)
 			{
-				float massTransfer = maxGroundWater - groundWater;
+				float massTransfer = groundWater - maxGroundWater;
 				newShallowWater += massTransfer;
 				newGroundWater -= massTransfer;
-				float energyTransfer = massTransfer / groundWater;
+				float energyTransfer = massTransfer / groundWater * groundEnergy; // TODO: this isn't great, some of that ground energy is in the terrain, not just in the water
 				newShallowEnergy += energyTransfer;
 				newGroundEnergy -= energyTransfer;
 			} else if (shallowWaterMass > 0)
 			{
-				float massTransfer = Math.Min(shallowWaterMass * soilFertility * world.Data.GroundWaterReplenishmentSpeed, maxGroundWater - newGroundWater);
+				float massTransfer = Mathf.Min(shallowWaterMass, Math.Min(soilFertility * world.Data.GroundWaterReplenishmentSpeed, maxGroundWater - groundWater));
 				newGroundWater += massTransfer;
 				newShallowWater -= massTransfer;
-				float energyTransfer = massTransfer / shallowWaterMass;
+				float energyTransfer = massTransfer * (shallowWaterTemperature * world.Data.SpecificHeatWater + world.Data.LatentHeatWaterLiquid);
 				newShallowEnergy -= energyTransfer;
 				newGroundEnergy += energyTransfer;
 			}
@@ -1284,9 +1295,7 @@ namespace Sim {
 			World world, 
 			float waterCoverage, 
 			float evapRate, 
-			float groundWater, 
 			float waterTableDepth, 
-			float waterDepth,
 			float shallowWaterMass,
 			float shallowSaltMass,
 			float shallowWaterEnergy,
@@ -1294,7 +1303,6 @@ namespace Sim {
 			ref float newHumidity, 
 			ref float newLowerAirEnergy, 
 			ref float newShallowWaterEnergy, 
-			ref float newGroundWater, 
 			ref float newShallowWaterMass,
 			out float evaporation, 
 			out float evapotranspiration)
@@ -1309,16 +1317,17 @@ namespace Sim {
 				newHumidity += evapMass;
 				newShallowWaterMass -= evapMass;
 				evaporation += evapMass;
-				evapotranspiration += evapMass * (world.Data.SpecificHeatWater * shallowWaterTemperature + world.Data.LatentHeatWaterLiquid + world.Data.LatentHeatWaterVapor);
-				newShallowWaterEnergy -= evapotranspiration;
-				newLowerAirEnergy += evapotranspiration;
+				// this sucks energy out of the lower atmosphere since it uses up some energy to fill up the latent heat of water vapor
+				float energyTransfer = evapMass * (world.Data.SpecificHeatWater * shallowWaterTemperature + world.Data.LatentHeatWaterLiquid);
+				newShallowWaterEnergy -= energyTransfer;
+				newLowerAirEnergy += energyTransfer;
+				evapotranspiration = evapMass * world.Data.LatentHeatWaterVapor;
 			}
 		}
 
 		static private void MoveOceanVertically(
 		World world,
 		World.State state,
-		float depth,
 		float ice,
 		float shallowWaterEnergy,
 		float oceanEnergyDeep,
@@ -1338,16 +1347,16 @@ namespace Sim {
 		{
 			{
 
-				if (oceanTemperatureShallow <= world.Data.FreezingTemperature + 5)
+				//if (oceanTemperatureShallow <= world.Data.FreezingTemperature + 5)
+				//{
+				//	//float salinityExchange = oceanSalinityShallow;
+				//	//newOceanSalinityDeep += salinityExchange;
+				//	//newOceanSalinityShallow -= salinityExchange;
+				//	//newOceanEnergyDeep = world.Data.FreezingTemperature;
+				//}
+				//else
 				{
-					//float salinityExchange = oceanSalinityShallow;
-					//newOceanSalinityDeep += salinityExchange;
-					//newOceanSalinityShallow -= salinityExchange;
-					//newOceanEnergyDeep = world.Data.FreezingTemperature;
-				}
-				else
-				{
-					float salinityExchange = (deepSaltMass / deepWaterMass - shallowSaltMass / shallowWaterMass) * world.Data.SalinityVerticalMixingSpeed * (shallowSaltMass + deepSaltMass) * world.Data.SecondsPerTick;
+					float salinityExchange = (deepSaltMass / (deepWaterMass + deepSaltMass) - shallowSaltMass / (shallowWaterMass + shallowSaltMass)) * world.Data.SalinityVerticalMixingSpeed * (shallowSaltMass + deepSaltMass) * world.Data.SecondsPerTick;
 					newDeepSaltMass -= salinityExchange * deepWaterMass / (deepWaterMass + shallowWaterMass);
 					newShallowSaltMass += salinityExchange * shallowWaterMass / (deepWaterMass + shallowWaterMass);
 
@@ -1463,9 +1472,9 @@ namespace Sim {
 		{
 			return lowerAirTemperature - (1.0f - relativeHumidity) * world.Data.DewPointTemperaturePerRelativeHumidity;
 		}
-		static public float GetCloudElevation(World world, float upperAirTemperature, float dewPoint)
+		static public float GetCloudElevation(World world, float upperAirTemperature, float dewPoint, float elevationOrSeaLevel)
 		{
-			return world.Data.BoundaryZoneElevation + (upperAirTemperature - dewPoint) * world.Data.DewPointElevationPerDegree;
+			return elevationOrSeaLevel + Mathf.Max(0, world.Data.BoundaryZoneElevation + (upperAirTemperature - dewPoint) * world.Data.DewPointElevationPerDegree);
 		}
 
 		static public float GetSpecificHeatOfWater(World world, float waterMass, float saltMass)
