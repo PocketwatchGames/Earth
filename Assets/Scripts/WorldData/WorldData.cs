@@ -47,7 +47,7 @@ public class WorldData
 	// atmospheric heat balance https://energyeducation.ca/encyclopedia/Earth%27s_heat_balance
 	// https://en.wikipedia.org/wiki/Earth%27s_energy_budget
 	public float AtmosphericHeatAbsorption = 0.297f; // total absorbed by atmosphere AFTER reflection about 30%
-	public float AtmosphericHeatReflection = 0.07f; // 7% is refelcted due to atmospheric scattering 
+	public float AtmosphericHeatReflection = 0.07f; // 7% is reflected due to atmospheric scattering 
 	public float CloudIncomingAbsorptionRate = 0.06f; // 6% absorbed by clouds
 	public float CloudIncomingReflectionRate = 0.50f; // 24% incoming  reflected back to space by clouds (avg, globally)
 	//public float EvaporativeHeatLoss = 0.6f; // global average = 78 watts
@@ -65,11 +65,12 @@ public class WorldData
 	public float maxGroundWaterTemperature = 283;
 
 	// TODO: tune these to match the science
-	public float CloudMassFullAbsorption = 0.9f; // how much heat gain/loss is caused by cloud cover (cumulus cloud is 0.3g/cubic meter, and about 3 kilometers high)
+	public float CloudMassFullAbsorption = 0.5f; // how much heat gain/loss is caused by cloud cover (cumulus cloud is 0.3g/cubic meter, and about 3 kilometers high)
 	public float EnergyEmittedByAtmosphere = 0.000000199f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
 	public float EnergyLostThroughAtmosphereWindow = 0.00000004f; // AKA Atmospheric window global average = 40 watts
-	public float CloudOutgoingAbsorptionRate = 0.1f;
+	public float CloudOutgoingAbsorptionRate = 0.05f;
 	public float EnergyTrappedByGreenhouseGasses = 0.1f;
+	public float EnergyTrappedByWaterVapor = 0.1f;
 	public float HumidityHeatAbsorption = 1.0f;
 
 	[Header("Evap, Humidity and Clouds")]

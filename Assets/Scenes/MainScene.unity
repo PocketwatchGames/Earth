@@ -15266,8 +15266,9 @@ MonoBehaviour:
     CloudMassFullAbsorption: 0.5
     EnergyEmittedByAtmosphere: 0.00000022
     EnergyLostThroughAtmosphereWindow: 0.075
-    CloudOutgoingAbsorptionRate: 0.1
+    CloudOutgoingAbsorptionRate: 0.05
     EnergyTrappedByGreenhouseGasses: 0.0125
+    EnergyTrappedByWaterVapor: 0.1
     HumidityHeatAbsorption: 1
     DewPointTemperatureRange: 100
     DewPointZero: 213
