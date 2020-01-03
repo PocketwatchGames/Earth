@@ -69,7 +69,7 @@ public partial class WorldComponent : MonoBehaviour
 	public float MinElevation = -11000;
 	public float MaxElevation = 10000;
 	public float MaxDepth = 11000;
-	public float maxHumidity = 300;
+	public float maxHumidity = 50;
 	public float maxRainfall = 5.0f;
 	public float maxCloudColor = 300.0f;
 	public float MaxEnergyAbsorbed = 300;

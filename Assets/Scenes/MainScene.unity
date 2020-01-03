@@ -15211,7 +15211,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e260af3b6cbbd054aa9feda0859514c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Seed: 8
+  Seed: 10
   WorldGenData:
     Size: 100
     MaxElevation: 10000
@@ -15249,10 +15249,10 @@ MonoBehaviour:
     AdiabaticLapseRate: 0.0098
     GlobalCoriolisInfluenceWind: 0.75
     GlobalCoriolisInfluenceOcean: 0.5
-    AtmosphericHeatAbsorption: 0.297
-    AtmosphericHeatReflection: 0.07
-    CloudIncomingAbsorptionRate: 0.06
-    CloudIncomingReflectionRate: 0.5
+    AtmosphericHeatAbsorption: 0.0000383
+    AtmosphericHeatReflection: 0.00000903
+    CloudIncomingAbsorptionRate: 0.2
+    CloudIncomingReflectionRate: 0.35
     OceanHeatRadiation: 1e-10
     OceanAirConductionWarming: 0.016
     OceanAirConductionCooling: 0.008
@@ -15261,13 +15261,13 @@ MonoBehaviour:
     LengthOfDaySolarRadiationExponent: 0.5
     SunVectorSolarRadiationExponent: 2
     AtmosphericDepthExponent: 0.65
-    LandHeatRadiation: 0.00001
+    LandHeatRadiation: 0.2
     maxGroundWaterTemperature: 283
     CloudMassFullAbsorption: 0.5
-    EnergyEmittedByUpperAtmosphere: 0.000000105
-    EnergyLostThroughAtmosphereWindow: 0.000000015
+    EnergyEmittedByAtmosphere: 0.00000022
+    EnergyLostThroughAtmosphereWindow: 0.075
     CloudOutgoingAbsorptionRate: 0.1
-    EnergyTrappedByGreenhouseGasses: 0.1
+    EnergyTrappedByGreenhouseGasses: 0.0125
     HumidityHeatAbsorption: 1
     DewPointTemperatureRange: 100
     DewPointZero: 213
@@ -15354,7 +15354,7 @@ MonoBehaviour:
   MinElevation: -6000
   MaxElevation: 5000
   MaxDepth: 11000
-  maxHumidity: 300
+  maxHumidity: 100
   maxRainfall: 10
   maxCloudColor: 0.5
   MaxEnergyAbsorbed: 2500
@@ -15381,7 +15381,7 @@ MonoBehaviour:
     type: 3}
   SpeciesSprites:
   - {fileID: 21300000, guid: 350e145db0207094e95ab9b0ab7313c4, type: 3}
-  Threaded: 0
+  Threaded: 1
 --- !u!114 &3077867981240493798
 MonoBehaviour:
   m_ObjectHideFlags: 0

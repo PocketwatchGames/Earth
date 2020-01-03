@@ -61,12 +61,12 @@ public class WorldData
 	public float LengthOfDaySolarRadiationExponent = 0.5f;
 	public float SunVectorSolarRadiationExponent = 2;
 	public float AtmosphericDepthExponent = 0.5f;
-	public float LandHeatRadiation = 0.0001f;
+	public float LandHeatRadiation = 10f;
 	public float maxGroundWaterTemperature = 283;
 
 	// TODO: tune these to match the science
-	public float CloudMassFullAbsorption = 50.0f; // how much heat gain/loss is caused by cloud cover
-	public float EnergyEmittedByUpperAtmosphere = 0.000000199f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
+	public float CloudMassFullAbsorption = 0.9f; // how much heat gain/loss is caused by cloud cover (cumulus cloud is 0.3g/cubic meter, and about 3 kilometers high)
+	public float EnergyEmittedByAtmosphere = 0.000000199f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
 	public float EnergyLostThroughAtmosphereWindow = 0.00000004f; // AKA Atmospheric window global average = 40 watts
 	public float CloudOutgoingAbsorptionRate = 0.1f;
 	public float EnergyTrappedByGreenhouseGasses = 0.1f;

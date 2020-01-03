@@ -166,7 +166,7 @@ public static class WorldGen {
 				float shallowSalinity = shallowDepth == 0 ? 0 : (1.0f - Math.Abs(latitude)) * (worldGenData.MaxSalinity - worldGenData.MinSalinity) + worldGenData.MinSalinity;
 				float deepSalinity = deepDepth == 0 ? 0 : Math.Abs(latitude) * (worldGenData.MaxSalinity - worldGenData.MinSalinity) + worldGenData.MinSalinity;
 
-				state.ShallowWaterTemperature[index] = Math.Max(data.FreezingTemperature, state.LowerAirTemperature[index]);
+				state.ShallowWaterTemperature[index] = state.LowerAirTemperature[index] + 2;
 				float shallowOceanMass = GetWaterMass(world, shallowDepth, state.ShallowWaterTemperature[index], shallowSalinity);
 				state.ShallowWaterMass[index] = shallowOceanMass * (1.0f - shallowSalinity);
 				state.ShallowSaltMass[index] = shallowOceanMass * shallowSalinity;
@@ -188,6 +188,12 @@ public static class WorldGen {
 				state.Normal[index] = newNormal;
 
 
+				float waterCoverage = Mathf.Clamp01(state.WaterDepth[index] / world.Data.FullWaterCoverage);
+				float iceCoverage = Mathf.Clamp01(state.IceMass[index] / (world.Data.MassIce * world.Data.FullIceCoverage));
+
+				state.Canopy[index] = state.SoilFertility[index] * (state.GroundWater[index]) * (1.0f - waterCoverage) * (1.0f - iceCoverage) * Mathf.Clamp01((state.LowerAirTemperature[index] - world.Data.MinTemperatureCanopy) / (world.Data.MaxTemperatureCanopy - world.Data.MinTemperatureCanopy));
+
+				
 			}
 		}
 
