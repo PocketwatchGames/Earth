@@ -15245,9 +15245,9 @@ MonoBehaviour:
     WindAirMovementVertical: 0.001
     WindHumidityMovement: 0.1
     HumidityToCloudPercent: 0.1
-    PressureGradientWindMultiplier: 10000
+    PressureGradientWindMultiplier: 1000
     AdiabaticLapseRate: 0.0098
-    GlobalCoriolisInfluenceWind: 0.75
+    GlobalCoriolisInfluenceWind: 0.5
     GlobalCoriolisInfluenceOcean: 0.5
     AtmosphericHeatAbsorption: 0.000035
     AtmosphericHeatReflection: 0.00000903
@@ -15285,7 +15285,7 @@ MonoBehaviour:
     rainDropEvapRate: 0.000001
     DeepOceanDepth: 500
     WindToOceanCurrentFactor: 0.25
-    OceanCurrentSpeed: 0.1
+    OceanCurrentSpeed: 0.01
     OceanHorizontalMixingSpeed: 0.1
     OceanUpwellingSpeed: 0.001
     OceanTemperatureVerticalMixingSpeed: 0.1
@@ -15303,6 +15303,7 @@ MonoBehaviour:
     MaxSoilPorousness: 0.1
     GroundWaterReplenishmentSpeed: 1000
     GroundWaterFlowSpeed: 0.5
+    FlowMax: 0.25
     canopyGrowthRate: 10
     canopyDeathRate: 0.2
     freshWaterMaxAvailability: 0.1
@@ -15382,7 +15383,7 @@ MonoBehaviour:
     type: 3}
   SpeciesSprites:
   - {fileID: 21300000, guid: 350e145db0207094e95ab9b0ab7313c4, type: 3}
-  Threaded: 1
+  Threaded: 0
 --- !u!114 &3077867981240493798
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -21,11 +21,12 @@ namespace Sim {
 				{
 					int index = world.GetIndex(x, y);
 					float elevation = state.Elevation[index];
-					Vector2 newTerrainGradient, newSurfaceGradient;
+					Vector4 newShallowWaterFlow;
+					Vector2 newFlowDirectionGroundWater;
 					Vector3 newNormal;
-					GetGradientAndNormal(world, state, x, y, index, elevation, out newTerrainGradient, out newSurfaceGradient, out newNormal);
-					nextState.TerrainGradient[index] = newTerrainGradient;
-					nextState.SurfaceGradient[index] = newSurfaceGradient;
+					GetNormalAndFlow(world, state, x, y, index, elevation, state.SoilFertility[index], out newFlowDirectionGroundWater, out newShallowWaterFlow, out newNormal);
+					nextState.FlowDirectionGroundWater[index] = newFlowDirectionGroundWater;
+					nextState.ShallowWaterFlow[index] = newShallowWaterFlow;
 					nextState.Normal[index] = newNormal;
 				}
 			}
@@ -104,11 +105,12 @@ namespace Sim {
 				{
 					int index = world.GetIndex(x, y);
 					float elevation = state.Elevation[index];
-					Vector2 newSurfaceGradient, newTerrainGradient;
+					Vector2 newFlowDirectionGroundWater;
+					Vector4 newShallowWaterFlow;
 					Vector3 newNormal;
-					GetGradientAndNormal(world, nextState, x, y, index, elevation, out newTerrainGradient, out newSurfaceGradient, out newNormal);
-					nextState.TerrainGradient[index] = newTerrainGradient;
-					nextState.SurfaceGradient[index] = newSurfaceGradient;
+					GetNormalAndFlow(world, nextState, x, y, index, elevation, state.SoilFertility[index], out newFlowDirectionGroundWater, out newShallowWaterFlow, out newNormal);
+					nextState.FlowDirectionGroundWater[index] = newFlowDirectionGroundWater;
+					nextState.ShallowWaterFlow[index] = newShallowWaterFlow;
 					nextState.Normal[index] = newNormal;
 				}
 			}
@@ -133,7 +135,7 @@ namespace Sim {
 		}
 
 
-		static public void GetGradientAndNormal(World world, World.State state, int x, int y, int index, float elevation, out Vector2 terrainGradient, out Vector2 surfaceGradient, out Vector3 normal)
+		static public void GetNormalAndFlow(World world, World.State state, int x, int y, int index, float elevation, float soilFertility, out Vector2 groundWaterFlowDirection, out Vector4 shallowWaterFlow, out Vector3 normal)
 		{
 			int indexW = world.GetIndex(world.WrapX(x - 1), y);
 			int indexE = world.GetIndex(world.WrapX(x + 1), y);
@@ -145,17 +147,34 @@ namespace Sim {
 			float north = e - state.Elevation[indexN];
 			float south = e - state.Elevation[indexS];
 
-			Vector2 g = new Vector2(east > west ? Mathf.Max(0, east) : -Mathf.Max(0, west), north > south ? Mathf.Max(0, north) : -Mathf.Max(0, south));
-			terrainGradient = g * world.Data.InverseMetersPerTile;
+			var g = new Vector2(east > west ? Mathf.Max(0, east) : -Mathf.Max(0, west), north > south ? Mathf.Max(0, north) : -Mathf.Max(0, south));
+			groundWaterFlowDirection = g * world.Data.InverseMetersPerTile * world.Data.GroundWaterFlowSpeed * soilFertility * world.Data.GravitationalAcceleration;
 
+			shallowWaterFlow = Vector4.zero;
 			float depth = state.WaterDepth[index];
-			west += depth - state.WaterDepth[indexW];
-			east += depth - state.WaterDepth[indexE];
-			north += depth - state.WaterDepth[indexN];
-			south += depth - state.WaterDepth[indexS];
+			if (depth > 0)
+			{
+				west += (depth - state.WaterAndIceDepth[indexW]);
+				east += (depth - state.WaterAndIceDepth[indexE]);
+				north += (depth - state.WaterAndIceDepth[indexN]);
+				south += (depth - state.WaterAndIceDepth[indexS]);
 
-			g = new Vector2(east > west ? Mathf.Max(0, east) : -Mathf.Max(0, west), north > south ? Mathf.Max(0, north) : -Mathf.Max(0, south));
-			surfaceGradient = g * world.Data.InverseMetersPerTile;
+				shallowWaterFlow.x = Mathf.Max(0, west/2) * world.Data.InverseMetersPerTile * world.Data.GravitationalAcceleration * world.Data.FlowSpeed * world.Data.SecondsPerTick;
+				shallowWaterFlow.y = Mathf.Max(0, east/2) * world.Data.InverseMetersPerTile * world.Data.GravitationalAcceleration * world.Data.FlowSpeed * world.Data.SecondsPerTick;
+				shallowWaterFlow.z = Mathf.Max(0, north/2) * world.Data.InverseMetersPerTile * world.Data.GravitationalAcceleration * world.Data.FlowSpeed * world.Data.SecondsPerTick;
+				shallowWaterFlow.w = Mathf.Max(0, south/2) * world.Data.InverseMetersPerTile * world.Data.GravitationalAcceleration * world.Data.FlowSpeed * world.Data.SecondsPerTick;
+
+				float totalFlow = shallowWaterFlow.x+ shallowWaterFlow.y+ shallowWaterFlow.z+ shallowWaterFlow.w;
+				if (totalFlow > depth)
+				{
+					shallowWaterFlow /= totalFlow;
+				}
+				else if (depth > 0)
+				{
+					shallowWaterFlow /= depth;
+				}
+				shallowWaterFlow *= world.Data.FlowMax;
+			}
 
 			normal = Vector3.Normalize(new Vector3((west - east) / 2, (south - north) / 2, world.Data.MetersPerTile));
 		}

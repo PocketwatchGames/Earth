@@ -123,8 +123,8 @@ public partial class World {
 		public Vector3[] DeepWaterCurrent;
 		public Vector3[] UpperWind;
 		public Vector3[] LowerWind;
-		public Vector2[] SurfaceGradient;
-		public Vector2[] TerrainGradient;
+		public Vector4[] ShallowWaterFlow;
+		public Vector2[] FlowDirectionGroundWater;
 		public Vector3[] Normal;
 
 		// for display
@@ -180,8 +180,8 @@ public partial class World {
 			Array.Copy(from.Canopy, Canopy, numTiles);
 			Array.Copy(from.Radiation, Radiation, numTiles);
 			Array.Copy(from.AnimalsPerTile, AnimalsPerTile, numTiles);
-			Array.Copy(from.SurfaceGradient, SurfaceGradient, numTiles);
-			Array.Copy(from.TerrainGradient, TerrainGradient, numTiles);
+			Array.Copy(from.FlowDirectionGroundWater, FlowDirectionGroundWater, numTiles);
+			Array.Copy(from.ShallowWaterFlow, ShallowWaterFlow, numTiles);
 			Array.Copy(from.Normal, Normal, numTiles);
 			Array.Clear(GroundWater, 0, numTiles);
 			Array.Clear(UpperAirMass, 0, numTiles);
@@ -269,8 +269,8 @@ public partial class World {
 			States[i].ShallowWaterCurrent = new Vector3[s];
 			States[i].DeepWaterCurrent = new Vector3[s];
 			States[i].Radiation = new float[s];
-			States[i].SurfaceGradient = new Vector2[s];
-			States[i].TerrainGradient = new Vector2[s];
+			States[i].ShallowWaterFlow = new Vector4[s];
+			States[i].FlowDirectionGroundWater = new Vector2[s];
 			States[i].Normal = new Vector3[s];
 			States[i].AnimalsPerTile = new int[s * MaxGroupsPerTile];
 			for (int j = 0; j < s * MaxGroupsPerTile; j++)

@@ -182,11 +182,12 @@ public static class WorldGen {
 				state.DeepWaterEnergy[index] = Atmosphere.GetWaterEnergy(world, deepOceanTemperature, state.DeepWaterMass[index], state.DeepSaltMass[index]);
 				state.DeepWaterDensity[index] = Atmosphere.GetWaterDensity(world, state.DeepWaterEnergy[index], state.DeepSaltMass[index], state.DeepWaterMass[index]);
 
-				Vector2 newTerrainGradient, newSurfaceGradient;
+				Vector4 newShallowWaterFlow;
+				Vector2 newGroundWaterFlowDirection;
 				Vector3 newNormal;
-				Geology.GetGradientAndNormal(world, state, x, y, index, e, out newTerrainGradient, out newSurfaceGradient, out newNormal);
-				state.TerrainGradient[index] = newTerrainGradient;
-				state.SurfaceGradient[index] = newSurfaceGradient;
+				Geology.GetNormalAndFlow(world, state, x, y, index, e, state.SoilFertility[index], out newGroundWaterFlowDirection, out newShallowWaterFlow, out newNormal);
+				state.FlowDirectionGroundWater[index] = newGroundWaterFlowDirection;
+				state.ShallowWaterFlow[index] = newShallowWaterFlow;
 				state.Normal[index] = newNormal;
 
 

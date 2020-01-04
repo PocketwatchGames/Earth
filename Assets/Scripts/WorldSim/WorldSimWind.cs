@@ -103,7 +103,8 @@ namespace Sim {
 					float lowerTemperature = state.LowerAirTemperature[index];
 					float elevation = state.Elevation[index];
 					float waterDepth = state.WaterDepth[index];
-					float elevationOrSeaLevel = elevation + waterDepth;
+					float waterAndIceDepth = state.WaterAndIceDepth[index];
+					float elevationOrSeaLevel = elevation + waterAndIceDepth;
 					var normal = state.Normal[index];
 					float iceCoverage = state.IceMass[index] * inverseFullIceCoverage;
 					float friction;
@@ -181,7 +182,6 @@ namespace Sim {
 						{
 							shallowCurrentH = Vector2.zero;
 						}
-				//		shallowCurrentH += state.SurfaceGradient[index].normalized * Mathf.Pow(state.SurfaceGradient[index].magnitude, world.Data.FlowSpeedExponent) * world.Data.GravitationalAcceleration * world.Data.FlowSpeed;
 
 						if (state.DeepWaterMass[index] > 0)
 						{

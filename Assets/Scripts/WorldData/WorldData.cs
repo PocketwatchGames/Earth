@@ -111,6 +111,7 @@ public class WorldData
 	public float MaxSoilPorousness = 0.1f;
 	public float GroundWaterReplenishmentSpeed = 10.0f;
 	public float GroundWaterFlowSpeed = 0.5f;
+	public float FlowMax = 0.25f;
 
 	[Header("Ecology")]
 	public float canopyGrowthRate = 100.0f;

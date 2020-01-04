@@ -126,7 +126,6 @@ public class TileInfoPanel : MonoBehaviour
 			textTerrain += "\nWater Table Depth: " + (int)state.WaterTableDepth[index];
 			textTerrain += "\nGround Water: " + (state.GroundWater[index] / WorldComponent.Data.MassWater).ToString("0.00");
 			textTerrain += "\nLand Energy: " + state.LandEnergy[index].ToString("0.0");
-			textTerrain += "\nGradient: " + state.TerrainGradient[index];
 			textTerrain += "\nSurface Abs: " + ConvertTileEnergyToWatts(state.EnergyAbsorbed[index]).ToString("0.0");
 			TerrainPanel.SetText(textTerrain);
 			//	spriteBatch.DrawString(font, "Wind: " + Wind[index], new Vector2(5, textY += 15), Color.White);
