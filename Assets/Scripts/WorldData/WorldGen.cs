@@ -166,10 +166,12 @@ public static class WorldGen {
 				float shallowSalinity = shallowDepth == 0 ? 0 : (1.0f - Math.Abs(latitude)) * (worldGenData.MaxSalinity - worldGenData.MinSalinity) + worldGenData.MinSalinity;
 				float deepSalinity = deepDepth == 0 ? 0 : Math.Abs(latitude) * (worldGenData.MaxSalinity - worldGenData.MinSalinity) + worldGenData.MinSalinity;
 
-				state.ShallowWaterTemperature[index] = state.LowerAirTemperature[index] + 2;
+				state.ShallowWaterTemperature[index] = Mathf.Max(world.Data.FreezingTemperature, state.LowerAirTemperature[index] + 2);
 				float shallowOceanMass = GetWaterMass(world, shallowDepth, state.ShallowWaterTemperature[index], shallowSalinity);
 				state.ShallowWaterMass[index] = shallowOceanMass * (1.0f - shallowSalinity);
 				state.ShallowSaltMass[index] = shallowOceanMass * shallowSalinity;
+				state.IceMass[index] = Mathf.Min(state.ShallowWaterMass[index], world.Data.FullIceCoverage * world.Data.MassIce * Mathf.Clamp01(-(state.LowerAirTemperature[index] - world.Data.FreezingTemperature) / 10));
+				state.ShallowWaterMass[index] -= state.IceMass[index];
 				state.ShallowWaterEnergy[index] = Atmosphere.GetWaterEnergy(world, state.ShallowWaterTemperature[index], state.ShallowWaterMass[index], state.ShallowSaltMass[index]);
 				float shallowOceanDensity = Atmosphere.GetWaterDensity(world, state.ShallowWaterEnergy[index], state.ShallowSaltMass[index], state.ShallowWaterMass[index]);
 

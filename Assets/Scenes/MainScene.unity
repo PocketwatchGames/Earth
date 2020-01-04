@@ -15211,7 +15211,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e260af3b6cbbd054aa9feda0859514c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Seed: 10
+  Seed: 11
   WorldGenData:
     Size: 100
     MaxElevation: 10000
@@ -15243,15 +15243,15 @@ MonoBehaviour:
     WindLandFriction: 0.5
     WindAirMovementHorizontal: 0.001
     WindAirMovementVertical: 0.001
-    WindHumidityMovement: 0.001
+    WindHumidityMovement: 0.1
     HumidityToCloudPercent: 0.1
     PressureGradientWindMultiplier: 10000
     AdiabaticLapseRate: 0.0098
     GlobalCoriolisInfluenceWind: 0.75
     GlobalCoriolisInfluenceOcean: 0.5
-    AtmosphericHeatAbsorption: 0.0000383
+    AtmosphericHeatAbsorption: 0.000035
     AtmosphericHeatReflection: 0.00000903
-    CloudIncomingAbsorptionRate: 0.2
+    CloudIncomingAbsorptionRate: 0.25
     CloudIncomingReflectionRate: 0.35
     OceanHeatRadiation: 1e-10
     OceanAirConductionWarming: 0.016

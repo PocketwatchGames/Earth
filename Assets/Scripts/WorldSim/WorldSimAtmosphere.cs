@@ -543,7 +543,7 @@ namespace Sim {
 									float iceMassFrozen = Mathf.Min(shallowWaterMass, Mathf.Min(Mathf.Max(0, world.Data.FullIceCoverage * world.Data.MassIce - iceMass), (world.Data.FreezingTemperature - surfaceTemp) * seaWaterHeatingRate));
 									newIceMass += iceMassFrozen;
 									newShallowWaterMass -= iceMassFrozen;
-									float energyTransfer = iceMassFrozen * world.Data.SpecificHeatWater * shallowWaterTemperature;
+									float energyTransfer = iceMassFrozen * world.Data.SpecificHeatWater * surfaceTemp;
 									newShallowWaterEnergy -= energyTransfer;
 								}
 
@@ -660,7 +660,7 @@ namespace Sim {
 					{
 						newIceMass -= iceMelted;
 						newShallowWaterMass += iceMelted;
-						float energyTransfer = iceMelted * (world.Data.SpecificHeatWater * world.Data.FreezingTemperature);
+						float energyTransfer = iceMelted * (world.Data.SpecificHeatIce * world.Data.FreezingTemperature);
 						newShallowWaterEnergy += energyTransfer;
 					}
 
@@ -673,9 +673,9 @@ namespace Sim {
 
 					// absorb some outgoing energy in clouds
 					//					float energyRadiatedToSpace = energyEmittedByUpperAtmosphere * Mathf.Max(1.0f, state.CarbonDioxide * (1.0f - world.Data.EnergyTrappedByGreenhouseGasses));
-					float upperAtmosphereInfraredAbsorption = Mathf.Min(1, cloudCoverage * world.Data.CloudOutgoingAbsorptionRate);
+					float upperAtmosphereInfraredAbsorption = Mathf.Min(1, cloudMass * world.Data.CloudOutgoingAbsorptionRate);
 					upperAtmosphereInfraredAbsorption += (1.0f - upperAtmosphereInfraredAbsorption) * Mathf.Min(1.0f, upperAirMass * state.CarbonDioxide * world.Data.EnergyTrappedByGreenhouseGasses);
-					float lowerAtmosphereInfraredAbsorption = Mathf.Min(1.0f, (humidity + lowerAirMass * state.CarbonDioxide) * world.Data.EnergyTrappedByGreenhouseGasses);
+					float lowerAtmosphereInfraredAbsorption = Mathf.Min(1.0f, (lowerAirMass * state.CarbonDioxide) * world.Data.EnergyTrappedByGreenhouseGasses + humidity * world.Data.EnergyTrappedByWaterVapor);
 
 					{
 						float energyEmittedByUpperAtmosphere = world.Data.EnergyEmittedByAtmosphere * world.Data.SecondsPerTick * upperAirEnergy;
