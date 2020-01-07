@@ -260,33 +260,37 @@ public partial class WorldComponent {
 				if (showLayers.IsSet(Layers.LowerAirTemperature))
 				{
 					oceanColor = color = Lerp(new List<CVP> {
-											new CVP(Color.black, -50+World.Data.FreezingTemperature),
-											new CVP(Color.white, -25+World.Data.FreezingTemperature),
-											new CVP(Color.blue, 0+World.Data.FreezingTemperature),
-											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
-											new CVP(Color.red, 50+World.Data.FreezingTemperature),
-											new CVP(Color.magenta, 75 + World.Data.FreezingTemperature) },
-						state.LowerAirTemperature[index]);
+											new CVP(Color.black, 0),
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
+						(state.LowerAirTemperature[index]-DisplayMinTemperature) / (DisplayMaxTemperature - DisplayMinTemperature));
 				}
 				else if (showLayers.IsSet(Layers.UpperAirTemperature))
 				{
 					oceanColor = color = Lerp(new List<CVP> {
-											new CVP(Color.black, -50+World.Data.FreezingTemperature),
-											new CVP(Color.white, -25+World.Data.FreezingTemperature),
-											new CVP(Color.blue, 0+World.Data.FreezingTemperature),
-											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
-											new CVP(Color.red, 50+World.Data.FreezingTemperature),
-											new CVP(Color.magenta, 75 + World.Data.FreezingTemperature) },
-						state.UpperAirTemperature[index]);
+											new CVP(Color.black, 0),
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
+						(state.UpperAirTemperature[index] - DisplayMinTemperature) / (DisplayMaxTemperature - DisplayMinTemperature));
 				}
 				else if (showLayers.IsSet(Layers.Evaporation))
 				{
 					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.blue, 0.25f),
-											new CVP(Color.yellow, 0.5f),
-											new CVP(Color.red, 0.75f),
-											new CVP(Color.white, 1) },
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
 						state.Evaporation[index] * inverseMaxEvapMass);
 				}
 				else if (showLayers.IsSet(Layers.WindVert))
@@ -301,20 +305,24 @@ public partial class WorldComponent {
 				{
 					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.blue, 0.25f),
-											new CVP(Color.yellow, 0.5f),
-											new CVP(Color.red, 0.75f),
-											new CVP(Color.white, 1.0f) },
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
 						state.Rainfall[index] * inverseMaxRainfall);
 				}
 				else if (showLayers.IsSet(Layers.HeatAbsorbed))
 				{
 					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.blue, 0.25f),
-											new CVP(Color.yellow, 0.5f),
-											new CVP(Color.red, 0.75f),
-											new CVP(Color.white, 1.0f) },
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
 						state.EnergyAbsorbed[index]/MaxEnergyAbsorbed);
 				}
 				else if (showLayers.IsSet(Layers.LowerAirPressure))
@@ -322,10 +330,12 @@ public partial class WorldComponent {
 					float p = (state.LowerAirPressure[index] - minPressure) / (maxPressure - minPressure);
 					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.blue, 0.25f),
-											new CVP(Color.yellow, 0.5f),
-											new CVP(Color.red, 0.75f),
-											new CVP(Color.white, 1.0f) },
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
 						p);
 				}
 				else if (showLayers.IsSet(Layers.UpperAirPressure))
@@ -333,34 +343,38 @@ public partial class WorldComponent {
 					float p = (state.UpperAirPressure[index] - minPressure) / (maxPressure - minPressure);
 					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.blue, 0.25f),
-											new CVP(Color.yellow, 0.5f),
-											new CVP(Color.red, 0.75f),
-											new CVP(Color.white, 1.0f) },
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
 						p);
 				}
 				else if (showLayers.IsSet(Layers.WaterVapor))
 				{
 					float humidityDisplay = state.Humidity[index] / maxHumidity;
-					color = oceanColor = Lerp(new List<CVP> {
+					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.blue, 0.2f),
-											new CVP(Color.green, 0.4f),
-											new CVP(Color.yellow, 0.6f),
-											new CVP(Color.red, 0.8f),
-											new CVP(Color.white, 1) },
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
 											humidityDisplay);
 				}
 				else if (showLayers.IsSet(Layers.RelativeHumidity))
 				{
 					float relativeHumidity = Mathf.Clamp01(Atmosphere.GetRelativeHumidity(World, state.LowerAirTemperature[index], state.Humidity[index], state.LowerAirMass[index], inverseDewPointTemperatureRange));
-					color = oceanColor = Lerp(new List<CVP> {
+					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.blue, 0.2f),
-											new CVP(Color.green, 0.4f),
-											new CVP(Color.yellow, 0.6f),
-											new CVP(Color.red, 0.8f),
-											new CVP(Color.white, 1) },
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
 											relativeHumidity);
 
 				}
@@ -370,13 +384,14 @@ public partial class WorldComponent {
 				}
 				else if (showLayers.IsSet(Layers.GroundWater))
 				{
-					color = oceanColor = Lerp(new List<CVP> {
+					oceanColor = color = Lerp(new List<CVP> {
 											new CVP(Color.black, 0),
-											new CVP(Color.blue, 0.2f),
-											new CVP(Color.green, 0.4f),
-											new CVP(Color.yellow, 0.6f),
-											new CVP(Color.red, 0.8f),
-											new CVP(Color.white, 1) },
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
 											Math.Min(1.0f, state.GroundWater[index] * inverseMaxGroundWater));
 				}
 				else if (showLayers.IsSet(Layers.WaterTableDepth))
@@ -405,24 +420,27 @@ public partial class WorldComponent {
 				if (showLayers.IsSet(Layers.OceanTemperatureShallow))
 				{
 					oceanColor = color = Lerp(new List<CVP> {
-											new CVP(Color.black, -50+World.Data.FreezingTemperature),
-											new CVP(Color.white, -25+World.Data.FreezingTemperature),
-											new CVP(Color.blue, 0+World.Data.FreezingTemperature),
-											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
-											new CVP(Color.red, 50+World.Data.FreezingTemperature),
-											new CVP(Color.magenta, 75 + World.Data.FreezingTemperature) },
-						state.ShallowWaterTemperature[index]);
+											new CVP(Color.black, 0),
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
+						(state.ShallowWaterTemperature[index] - DisplayMinTemperature) / (DisplayMaxTemperature - DisplayMinTemperature));
 				}
 				else if (showLayers.IsSet(Layers.OceanTemperatureDeep))
 				{
+					float deepWaterTemperature = Atmosphere.GetWaterTemperature(World, state.DeepWaterEnergy[index], Math.Max(0, state.DeepWaterMass[index]), state.DeepSaltMass[index]);
 					oceanColor = color = Lerp(new List<CVP> {
-											new CVP(Color.black, -50+World.Data.FreezingTemperature),
-											new CVP(Color.white, -25+World.Data.FreezingTemperature),
-											new CVP(Color.blue, 0+World.Data.FreezingTemperature),
-											new CVP(Color.yellow, 25+World.Data.FreezingTemperature),
-											new CVP(Color.red, 50+World.Data.FreezingTemperature),
-											new CVP(Color.magenta, 75 + World.Data.FreezingTemperature) },
-						Atmosphere.GetWaterTemperature(World, state.DeepWaterEnergy[index], Math.Max(0, state.DeepWaterMass[index]), state.DeepSaltMass[index]));
+											new CVP(Color.black, 0),
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
+						(deepWaterTemperature - DisplayMinTemperature) / (DisplayMaxTemperature - DisplayMinTemperature));
 				}
 				else if (showLayers.IsSet(Layers.OceanSalinityShallow))
 				{
@@ -431,14 +449,16 @@ public partial class WorldComponent {
 					{
 						s = (state.ShallowSaltMass[index] / shallowOceanMass - MinSalinity) / (MaxSalinity - MinSalinity);
 					}
-//					s = state.WaterDepth[index] / 2000;
-					color = oceanColor = Lerp(new List<CVP> {
-										new CVP(Color.black, 0),
-										new CVP(Color.blue, 0.2f),
-										new CVP(Color.green, 0.4f),
-										new CVP(Color.yellow, 0.6f),
-										new CVP(Color.red, 0.8f),
-										new CVP(Color.white, 1) }, s);
+					//					s = state.WaterDepth[index] / 2000;
+					oceanColor = color = Lerp(new List<CVP> {
+											new CVP(Color.black, 0),
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
+										s);
 				}
 				else if (showLayers.IsSet(Layers.OceanSalinityDeep))
 				{
@@ -447,13 +467,15 @@ public partial class WorldComponent {
 					{
 						s = (state.DeepSaltMass[index] / deepOceanMass - MinSalinity) / (MaxSalinity - MinSalinity);
 					}
-					color = oceanColor = Lerp(new List<CVP> {
-										new CVP(Color.black, 0),
-										new CVP(Color.blue, 0.2f),
-										new CVP(Color.green, 0.4f),
-										new CVP(Color.yellow, 0.6f),
-										new CVP(Color.red, 0.8f),
-										new CVP(Color.white, 1) }, s);
+					oceanColor = color = Lerp(new List<CVP> {
+											new CVP(Color.black, 0),
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
+										s);
 				}
 
 

@@ -50,6 +50,7 @@ public class WorldData
 	public float AtmosphericHeatReflection = 0.07f; // 7% is reflected due to atmospheric scattering 
 	public float CloudIncomingAbsorptionRate = 0.06f; // 6% absorbed by clouds
 	public float CloudIncomingReflectionRate = 0.50f; // 24% incoming  reflected back to space by clouds (avg, globally)
+	public float CloudOutgoingReflectionRate = 0.50f;
 	//public float EvaporativeHeatLoss = 0.6f; // global average = 78 watts
 	// Net Back Radiation: The ocean transmits electromagnetic radiation into the atmosphere in proportion to the fourth power of the sea surface temperature(black-body radiation)
 	// https://eesc.columbia.edu/courses/ees/climate/lectures/o_atm.html
@@ -58,6 +59,7 @@ public class WorldData
 	public float OceanAirConductionCooling = 0.008f; // 
 	public float WaterAirConductionDepth = 10.0f;
 	public float OceanIceConduction = 0.00001f; // small
+	public float IceAirConductionCooling = 0.008f;
 	public float LengthOfDaySolarRadiationExponent = 0.5f;
 	public float SunVectorSolarRadiationExponent = 2;
 	public float AtmosphericDepthExponent = 0.5f;
@@ -83,10 +85,14 @@ public class WorldData
 	public float EvaporationRate = 0.002f; // TODO: evaporation on earth maxes out around 2.5M per year 
 	public float RainDropFormationSpeedTemperature = 10f;
 	public float RainDropCoalescenceWind = 0.00001f;
+	public float RainDropEntropy = 0.1f;
 	public float rainDropDragCoefficient = 0.5f;
+	public float rainDropMinSize = 0.1f;
 	public float airDensity = 1.21f;
 	public float waterDensity = 997;
 	public float rainDropEvapRate = 0.000001f;
+	public float CloudDissapationRateWind = 0.1f;
+	public float CloudDissapationRateDryAir = 0.1f;
 
 	[Header("Ocean")]
 	public float DeepOceanDepth = 500;

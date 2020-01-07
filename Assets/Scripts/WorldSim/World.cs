@@ -145,6 +145,10 @@ public partial class World {
 		public float GlobalEnergyEvapotranspiration;
 		public float GlobalEnergyOutAtmosphericWindow;
 		public float GlobalEnergyOutEmittedAtmosphere;
+		public float GlobalEnergySurfaceRadiation;
+		public float GlobalEnergyBackRadiation;
+		public float GlobalEnergyIRAbsorbedAtmosphere;
+		public float GlobalEnergySurfaceConduction;
 		public float GlobalEnergy;
 		public float GlobalTemperature;
 		public float GlobalOceanCoverage;

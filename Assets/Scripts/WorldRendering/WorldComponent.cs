@@ -83,6 +83,8 @@ public partial class WorldComponent : MonoBehaviour
 	public float DisplayMaxVerticalWindSpeed = 1.0f;
 	public float MaxEvap = 5.0f;
 	public float DisplayMaxCanopy = 1000;
+	public float DisplayMinTemperature = 223;
+	public float DisplayMaxTemperature = 323;
 
 
 	[Header("Internal")]

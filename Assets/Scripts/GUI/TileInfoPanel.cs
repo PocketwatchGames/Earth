@@ -50,6 +50,7 @@ public class TileInfoPanel : MonoBehaviour
 		textGlobal += "\nGlobal Sea Level: " + (state.GlobalSeaLevel).ToString("0.00");
 		textGlobal += "\nOcean Coverage: " + (state.GlobalOceanCoverage * 100).ToString("0.0") + "%";
 		textGlobal += "\nOcean Volume: " + (state.GlobalOceanVolume / 1000000000).ToString("0.00") + " B";
+		textGlobal += "\nTemperature: " + WorldComponent.ConvertTemperature(state.GlobalTemperature / totalTiles, WorldComponent.TemperatureDisplay).ToString("0.00") + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 		textGlobal += "\nAtmospheric Mass: " + (state.AtmosphericMass / 1000).ToString("0") + " K";
 		textGlobal += "\nRainfall: " + (state.GlobalRainfall / (totalTiles * WorldComponent.Data.MassWater) * WorldComponent.Data.TicksPerYear).ToString("0.00");
 		textGlobal += "\nEvaporation: " + (state.GlobalEvaporation / (totalTiles * WorldComponent.Data.MassWater) * WorldComponent.Data.TicksPerYear).ToString("0.00");
@@ -58,19 +59,23 @@ public class TileInfoPanel : MonoBehaviour
 		textEnergy += "\nDelta: " + ConvertTileEnergyToWatts((state.GlobalEnergyIncoming - totalReflected - totalOutgoing) / totalTiles).ToString("0.0");
 		textEnergy += "\nIncoming: " + ConvertTileEnergyToWatts(state.GlobalEnergyIncoming / totalTiles).ToString("0.0");
 		textEnergy += "\nReflected: " + ConvertTileEnergyToWatts((totalReflected) / totalTiles).ToString("0.0");
-		textEnergy += "\nOutgoing: " + ConvertTileEnergyToWatts(totalOutgoing / totalTiles).ToString("0.0");
-		textEnergy += "\nOut Atm Window: " + ConvertTileEnergyToWatts(state.GlobalEnergyOutAtmosphericWindow / totalTiles).ToString("0.0");
-		textEnergy += "\nOut Atm Radiation: " + ConvertTileEnergyToWatts(state.GlobalEnergyOutEmittedAtmosphere / totalTiles).ToString("0.0");
 		textEnergy += "\nReflected Cloud: " + ConvertTileEnergyToWatts(state.GlobalEnergyReflectedCloud / totalTiles).ToString("0.0");
 		textEnergy += "\nReflected Atmos: " + ConvertTileEnergyToWatts(state.GlobalEnergyReflectedAtmosphere / totalTiles).ToString("0.0");
 		textEnergy += "\nReflected Surf: " + ConvertTileEnergyToWatts(state.GlobalEnergyReflectedSurface / totalTiles).ToString("0.0");
+		textEnergy += "\nAbs Atm Total: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedAtmosphere / totalTiles).ToString("0.0");
 		textEnergy += "\nAbs Clouds: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedCloud / totalTiles).ToString("0.0");
-		textEnergy += "\nAbs Atm: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedAtmosphere / totalTiles).ToString("0.0");
-		textEnergy += "\nAbs Surface: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedSurface / totalTiles).ToString("0.0");
+		textEnergy += "\nAbs Surface Total: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedSurface / totalTiles).ToString("0.0");
 		textEnergy += "\nAbs Ocean: " + ConvertTileEnergyToWatts(state.GlobalEnergyAbsorbedOcean / totalTiles).ToString("0.0");
+		textEnergy += "\nOutgoing IR: " + ConvertTileEnergyToWatts(totalOutgoing / totalTiles).ToString("0.0");
+		textEnergy += "\nOut Atm Window: " + ConvertTileEnergyToWatts(state.GlobalEnergyOutAtmosphericWindow / totalTiles).ToString("0.0");
+		textEnergy += "\nOut Atm Radiation: " + ConvertTileEnergyToWatts(state.GlobalEnergyOutEmittedAtmosphere / totalTiles).ToString("0.0");
+		textEnergy += "\nSurface Radiation: " + ConvertTileEnergyToWatts(state.GlobalEnergySurfaceRadiation / totalTiles).ToString("0.0");
+		textEnergy += "\nIR Atm Absorbed: " + ConvertTileEnergyToWatts(state.GlobalEnergyIRAbsorbedAtmosphere / totalTiles).ToString("0.0");
+		textEnergy += "\nBack Radiation: " + ConvertTileEnergyToWatts(state.GlobalEnergyBackRadiation / totalTiles).ToString("0.0");
+		textEnergy += "\nEvapotranspiration: " + ConvertTileEnergyToWatts(state.GlobalEnergyEvapotranspiration / totalTiles).ToString("0.0");
+		textEnergy += "\nSurface Conduction: " + ConvertTileEnergyToWatts(state.GlobalEnergySurfaceConduction / totalTiles).ToString("0.0");
 		textEnergy += "\nOcean Radiation: " + ConvertTileEnergyToWatts(state.GlobalEnergyOceanRadiation / (totalTiles * state.GlobalOceanCoverage)).ToString("0.0");
 		textEnergy += "\nOcean Conduction: " + ConvertTileEnergyToWatts(state.GlobalEnergyOceanConduction / (totalTiles * state.GlobalOceanCoverage)).ToString("0.0");
-		textEnergy += "\nEvapotranspiration: " + ConvertTileEnergyToWatts(state.GlobalEnergyEvapotranspiration / (totalTiles * state.GlobalOceanCoverage)).ToString("0.0");
 		EnergyPanel.SetText(textEnergy);
 		if (TileInfoPoint.x >= 0 && TileInfoPoint.x < WorldComponent.World.Size && TileInfoPoint.y >= 0 && TileInfoPoint.y < WorldComponent.World.Size)
 		{
