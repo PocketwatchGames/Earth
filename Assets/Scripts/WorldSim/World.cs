@@ -83,6 +83,7 @@ public partial class World {
 		public float SolarRadiation;
 		public float PlanetRadius;
 		public float PlanetRotationSpeed;
+		public float GeothermalHeat;
 
 		public SpeciesType[] Species;
 		public SpeciesStat[] SpeciesStats;
@@ -157,6 +158,8 @@ public partial class World {
 		public float GlobalCloudCoverage;
 		public float GlobalEvaporation;
 		public float GlobalRainfall;
+		public float GlobalWaterVapor;
+		public float GlobalCloudMass;
 		public float AtmosphericMass;
 
 		public void CopyFrom(State from)
@@ -171,6 +174,7 @@ public partial class World {
 			PlanetRotationSpeed = from.PlanetRotationSpeed;
 			PlanetTiltAngle = from.PlanetTiltAngle;
 			SolarRadiation = from.SolarRadiation;
+			GeothermalHeat = from.GeothermalHeat;
 
 			int numTiles = from.UpperAirTemperature.Length;
 			Array.Copy(from.Species, Species, Species.Length);
@@ -180,6 +184,7 @@ public partial class World {
 			Array.Copy(from.Elevation, Elevation, numTiles);
 			Array.Copy(from.WaterTableDepth, WaterTableDepth, numTiles);
 			Array.Copy(from.IceMass, IceMass, numTiles);
+			Array.Copy(from.LandEnergy, LandEnergy, numTiles);
 			Array.Copy(from.SoilFertility, SoilFertility, numTiles);
 			Array.Copy(from.Canopy, Canopy, numTiles);
 			Array.Copy(from.Radiation, Radiation, numTiles);
@@ -192,7 +197,6 @@ public partial class World {
 			Array.Clear(UpperAirEnergy, 0, numTiles);
 			Array.Clear(LowerAirMass, 0, numTiles);
 			Array.Clear(LowerAirEnergy, 0, numTiles);
-			Array.Clear(LandEnergy, 0, numTiles);
 			Array.Clear(Humidity, 0, numTiles);
 			Array.Clear(CloudMass, 0, numTiles);
 			Array.Clear(RainDropMass, 0, numTiles);

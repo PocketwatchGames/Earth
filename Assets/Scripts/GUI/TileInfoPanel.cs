@@ -52,8 +52,10 @@ public class TileInfoPanel : MonoBehaviour
 		textGlobal += "\nOcean Volume: " + (state.GlobalOceanVolume / 1000000000).ToString("0.00") + " B";
 		textGlobal += "\nTemperature: " + WorldComponent.ConvertTemperature(state.GlobalTemperature / totalTiles, WorldComponent.TemperatureDisplay).ToString("0.00") + ((WorldComponent.TemperatureDisplay == WorldComponent.TemperatureDisplayType.Celsius) ? "C" : "F");
 		textGlobal += "\nAtmospheric Mass: " + (state.AtmosphericMass / 1000).ToString("0") + " K";
-		textGlobal += "\nRainfall: " + (state.GlobalRainfall / (totalTiles * WorldComponent.Data.MassWater) * WorldComponent.Data.TicksPerYear).ToString("0.00");
-		textGlobal += "\nEvaporation: " + (state.GlobalEvaporation / (totalTiles * WorldComponent.Data.MassWater) * WorldComponent.Data.TicksPerYear).ToString("0.00");
+		textGlobal += "\nCloud Mass: " + (state.GlobalCloudMass / totalTiles).ToString("0.00");
+		textGlobal += "\nWater Vapor: " + (state.GlobalWaterVapor / totalTiles).ToString("0.00");
+		textGlobal += "\nRainfall: " + (state.GlobalRainfall * WorldComponent.Data.TicksPerYear / (totalTiles * WorldComponent.Data.MassWater)).ToString("0.00");
+		textGlobal += "\nEvaporation: " + (state.GlobalEvaporation * WorldComponent.Data.TicksPerYear / (totalTiles * WorldComponent.Data.MassWater)).ToString("0.00");
 		GlobalPanel.SetText(textGlobal);
 		textEnergy = "Total: " + (state.GlobalEnergy / 1000000).ToString("0") + " MJ";
 		textEnergy += "\nDelta: " + ConvertTileEnergyToWatts((state.GlobalEnergyIncoming - totalReflected - totalOutgoing) / totalTiles).ToString("0.0");

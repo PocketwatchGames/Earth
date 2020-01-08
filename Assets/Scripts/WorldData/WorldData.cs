@@ -37,7 +37,6 @@ public class WorldData
 	public float WindHumidityMovement = 0.1f;
 	public float HumidityToCloudPercent = 0.1f;
 	public float PressureGradientWindMultiplier = 4000;
-	public float AdiabaticLapseRate = 0.0098f;
 	// http://tornado.sfsu.edu/geosciences/classes/e260/Coriolis_rdg/GeostrophicApproximation.html
 	// states that geostrophic wind is only realistic at middle altitudes (500M), less so at 10K and at the surface, so we reduce overall coriolis effect by 25% to account
 	public float GlobalCoriolisInfluenceWind = 0.75f;
@@ -54,26 +53,21 @@ public class WorldData
 	//public float EvaporativeHeatLoss = 0.6f; // global average = 78 watts
 	// Net Back Radiation: The ocean transmits electromagnetic radiation into the atmosphere in proportion to the fourth power of the sea surface temperature(black-body radiation)
 	// https://eesc.columbia.edu/courses/ees/climate/lectures/o_atm.html
-	public float OceanHeatRadiation = 0.000000066f; // global average = 66 watts per m^2 of ocean
 	public float OceanAirConductionWarming = 0.016f; // global avg = 16 watts per degree delta between air and ocean (global avg = 24 watts per m^2 of ocean)
 	public float OceanAirConductionCooling = 0.008f; // 
 	public float WaterAirConductionDepth = 10.0f;
 	public float OceanIceConduction = 0.00001f; // small
 	public float IceAirConductionCooling = 0.008f;
-	public float LengthOfDaySolarRadiationExponent = 0.5f;
-	public float SunVectorSolarRadiationExponent = 2;
-	public float AtmosphericDepthExponent = 0.5f;
-	public float LandHeatRadiation = 10f;
 	public float maxGroundWaterTemperature = 283;
+	public float SoilHeatDepth = 2;
 
 	// TODO: tune these to match the science
 	public float CloudMassFullAbsorption = 0.5f; // how much heat gain/loss is caused by cloud cover (cumulus cloud is 0.3g/cubic meter, and about 3 kilometers high)
 	public float EnergyEmittedByAtmosphere = 0.000000199f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
-	public float EnergyLostThroughAtmosphereWindow = 0.00000004f; // AKA Atmospheric window global average = 40 watts
+	public float EnergyLostThroughAtmosphereWindow = 0.067f; // AKA Atmospheric window global average = 40 watts = 6.7% of all surface and atmospheric radiation
 	public float CloudOutgoingAbsorptionRate = 0.05f;
 	public float EnergyTrappedByGreenhouseGasses = 0.1f;
 	public float EnergyTrappedByWaterVapor = 0.1f;
-	public float HumidityHeatAbsorption = 1.0f;
 
 	[Header("Evap, Humidity and Clouds")]
 	public float DewPointTemperatureRange = 100.0f;
@@ -140,6 +134,7 @@ public class WorldData
 	public float MinTropopauseElevation = 9000f;
 	public float TropopauseElevationSeason = 1000f;
 	public float TemperatureLapseRate = -0.0065f;
+	public float AdiabaticLapseRate = 0.0098f;
 	public float GravitationalAcceleration = 9.80665f;
 	public float StaticPressure = 101325;
 	public float StdTemp = 288.15f;
@@ -148,6 +143,7 @@ public class WorldData
 	public float FreezingTemperature = 273.15f;
 	public float DewPointElevationPerDegree = 67.73f;
 	public float DewPointTemperaturePerRelativeHumidity = 20;
+	public float StefanBoltzmannConstant = 0.00000005670373f;
 
 	[Header("Albedo")]
 	public float AlbedoWater = 0.06f; // How much heat is reflected back by the water
@@ -163,13 +159,20 @@ public class WorldData
 	public float SpecificHeatWaterVapor = 1.996f;
 	public float SpecificHeatSalt = 0.85f;
 	public float SpecificHeatAtmosphere = 1.158f;
+	public float SpecificHeatSoil = 0.84f;
 	public float LatentHeatWaterLiquid = 334.0f;
 	public float LatentHeatWaterVapor = 2264.705f;
-
-	[Header("Masses")]
+	public float EmissivityWater = 0.96f;
+	public float EmissivityIce = 0.96f;
+	public float EmissivityDirt = 0.92f;
+	public float EmissivitySand = 0.76f;
 	public float MassEarthAir = 1.29f;
 	public float MassWater = 1000f;
+	public float MassSalt = 2170f;
 	public float MassIce = 919f;
+	public float MassSoil = 1200f;
+	public float MassSand = 1600f;
+
 
 
 	[NonSerialized]

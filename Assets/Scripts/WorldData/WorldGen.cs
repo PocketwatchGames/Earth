@@ -131,6 +131,7 @@ public static class WorldGen {
 				state.UpperAirPressure[index] = data.StaticPressure - regionalTemperatureVariation * 1000;
 				state.LowerAirPressure[index] = data.StaticPressure - regionalTemperatureVariation * 1000;
 
+				state.GeothermalHeat = worldGenData.GeothermalHeat;
 				state.PlanetRotationSpeed = worldGenData.PlanetRotationSpeed;
 				state.PlanetRadius = worldGenData.PlanetRadius;
 				state.SolarRadiation = worldGenData.SolarRadiation;
@@ -140,7 +141,7 @@ public static class WorldGen {
 
 
 				float relativeHumidity = Mathf.Pow(GetPerlinNormalized(world, noise, x, y, 1.0f, 400), 3);
-				state.CloudMass[index] = Mathf.Pow(GetPerlinMinMax(world, noise, x, y, 1.0f, 2000, 0, 1), 0.25f) * relativeHumidity;
+				state.CloudMass[index] = Mathf.Pow(GetPerlinMinMax(world, noise, x, y, 1.0f, 2000, 0, 1), 0.85f) * Mathf.Pow(relativeHumidity, 0.5f);
 				float totalAirMassUpper = Atmosphere.GetAirMass(world, state.UpperAirPressure[index], upperAirElevation, state.UpperAirTemperature[index]) - state.StratosphereMass;
 				float totalAirMassLower = Atmosphere.GetAirMass(world, state.LowerAirPressure[index], elevationOrSeaLevel, state.LowerAirTemperature[index]) - state.StratosphereMass - totalAirMassUpper;
 				state.Humidity[index] = Atmosphere.GetAbsoluteHumidity(world, state.LowerAirTemperature[index], relativeHumidity, totalAirMassLower, inverseDewPointTemperatureRange);
@@ -161,12 +162,9 @@ public static class WorldGen {
 				{
 					state.GroundWater[index] = maxGroundWater * 0.2f;
 				}
-				// TODO: ground water energy should probably be tracked independently
-				state.LandEnergy[index] = state.GroundWater[index] * world.Data.SpecificHeatWater * world.Data.maxGroundWaterTemperature;
 
 				state.UpperAirEnergy[index] = Atmosphere.GetAirEnergy(world, state.UpperAirTemperature[index], state.UpperAirMass[index], state.CloudMass[index], world.Data.SpecificHeatWater);
 				state.LowerAirEnergy[index] = Atmosphere.GetAirEnergy(world, state.LowerAirTemperature[index], state.LowerAirMass[index], state.Humidity[index], world.Data.SpecificHeatWaterVapor);
-
 
 				float shallowDepth = Mathf.Min(data.DeepOceanDepth, depth);
 				float deepDepth = Mathf.Max(0, depth - data.DeepOceanDepth);
@@ -206,7 +204,17 @@ public static class WorldGen {
 
 				state.Canopy[index] = state.SoilFertility[index] * (state.GroundWater[index]) * (1.0f - waterCoverage) * (1.0f - iceCoverage) * Mathf.Clamp01((state.LowerAirTemperature[index] - world.Data.MinTemperatureCanopy) / (world.Data.MaxTemperatureCanopy - world.Data.MinTemperatureCanopy));
 
-				
+				// TODO: ground water energy should probably be tracked independently
+				float lowerAirHeatAbsorption = Atmosphere.GetAtmosphericHeatAbsorptionRate(world, state.LowerAirMass[index] * state.CarbonDioxide, state.Humidity[index], 0);
+				float lowerAirRadiation = Atmosphere.GetRadiationRate(world, state.LowerAirTemperature[index], 1.0f) * (1.0f - lowerAirHeatAbsorption / 2);
+				float landRadiationRate = Atmosphere.GetRadiationRate(world, state.LowerAirTemperature[index], world.Data.EmissivityDirt);
+				float groundWaterEnergy = state.GroundWater[index] * world.Data.SpecificHeatWater * world.Data.maxGroundWaterTemperature;
+				float landMass = (world.Data.MassSand - world.Data.MassSoil) * state.SoilFertility[index] + world.Data.MassSoil;
+				float heatingDepth = state.SoilFertility[index] * world.Data.SoilHeatDepth + Mathf.Clamp01( state.Canopy[index] / world.Data.FullCanopyCoverage);
+				float soilEnergy = state.LowerAirTemperature[index] * world.Data.SpecificHeatSoil * heatingDepth * landMass;
+				state.LandEnergy[index] = groundWaterEnergy + soilEnergy;
+
+
 			}
 		}
 

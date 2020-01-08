@@ -14271,7 +14271,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1016, y: 0}
+  m_AnchoredPosition: {x: 1018, y: 0}
   m_SizeDelta: {x: 150, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &167160498003851629
@@ -15211,20 +15211,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e260af3b6cbbd054aa9feda0859514c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Seed: 12
+  Seed: 13
   WorldGenData:
     Size: 100
     MaxElevation: 10000
     MinElevation: -11000
     StratosphereMass: 2583
     TroposphereMass: 7749
-    MinTemperature: 253.15
-    MaxTemperature: 300.15
+    MinTemperature: 253
+    MaxTemperature: 308
     CarbonDioxide: 0.001
     PlanetTiltAngle: -23.5
     SolarRadiation: 1.367
     PlanetRadius: 6378000
     PlanetRotationSpeed: 0.0001458
+    GeothermalHeat: 0.5
     MaxSalinity: 0.04
     MinSalinity: 0.03
     NumPlates: 12
@@ -15246,39 +15247,33 @@ MonoBehaviour:
     WindHumidityMovement: 0.1
     HumidityToCloudPercent: 0.1
     PressureGradientWindMultiplier: 1000
-    AdiabaticLapseRate: 0.0098
     GlobalCoriolisInfluenceWind: 0.75
     GlobalCoriolisInfluenceOcean: 0.5
     AtmosphericHeatAbsorption: 0.000035
     AtmosphericHeatReflection: 0.00000903
     CloudIncomingAbsorptionRate: 0.25
     CloudIncomingReflectionRate: 0.35
-    CloudOutgoingReflectionRate: 0.5
-    OceanHeatRadiation: 1.5e-10
+    CloudOutgoingReflectionRate: 0.9
     OceanAirConductionWarming: 0.016
     OceanAirConductionCooling: 0.008
     WaterAirConductionDepth: 10
     OceanIceConduction: 0.01
     IceAirConductionCooling: 0.008
-    LengthOfDaySolarRadiationExponent: 0.5
-    SunVectorSolarRadiationExponent: 2
-    AtmosphericDepthExponent: 0.65
-    LandHeatRadiation: 0.2
     maxGroundWaterTemperature: 283
+    SoilHeatDepth: 2
     CloudMassFullAbsorption: 0.5
-    EnergyEmittedByAtmosphere: 0.00000022
-    EnergyLostThroughAtmosphereWindow: 0.2
-    CloudOutgoingAbsorptionRate: 0.05
-    EnergyTrappedByGreenhouseGasses: 0.0125
-    EnergyTrappedByWaterVapor: 0.1
-    HumidityHeatAbsorption: 1
+    EnergyEmittedByAtmosphere: 0.00000175
+    EnergyLostThroughAtmosphereWindow: 0.057
+    CloudOutgoingAbsorptionRate: 1
+    EnergyTrappedByGreenhouseGasses: 0.008
+    EnergyTrappedByWaterVapor: 0.012
     DewPointTemperatureRange: 100
     DewPointZero: 213
     WaterVaporMassToAirMassAtDewPoint: 0.2
     RainfallRate: 0.02
     EvapMinTemperature: 253
     EvapMaxTemperature: 413
-    EvaporationRate: 0.005
+    EvaporationRate: 0.004
     RainDropFormationSpeedTemperature: 1
     RainDropCoalescenceWind: 0.1
     RainDropEntropy: 0.01
@@ -15326,6 +15321,7 @@ MonoBehaviour:
     MinTropopauseElevation: 9000
     TropopauseElevationSeason: 1000
     TemperatureLapseRate: -0.0065
+    AdiabaticLapseRate: 0.0098
     GravitationalAcceleration: 9.80665
     StaticPressure: 101325
     StdTemp: 288.15
@@ -15334,6 +15330,7 @@ MonoBehaviour:
     FreezingTemperature: 273.15
     DewPointElevationPerDegree: 67.73
     DewPointTemperaturePerRelativeHumidity: 20
+    StefanBoltzmannConstant: 0.00000005670373
     AlbedoWater: 0.06
     AlbedoIce: 0.5
     AlbedoLand: 0.4
@@ -15344,11 +15341,19 @@ MonoBehaviour:
     SpecificHeatWaterVapor: 1.996
     SpecificHeatSalt: 0.85
     SpecificHeatAtmosphere: 1.158
+    SpecificHeatSoil: 0.84
     LatentHeatWaterLiquid: 334
     LatentHeatWaterVapor: 2264.705
+    EmissivityWater: 0.96
+    EmissivityIce: 0.96
+    EmissivityDirt: 0.92
+    EmissivitySand: 0.76
     MassEarthAir: 1.29
     MassWater: 1000
+    MassSalt: 2170
     MassIce: 919
+    MassSoil: 1200
+    MassSand: 1600
   ShowLayers: 8600
   ElevationScale: 0.002
   MinZoom: 5
@@ -15376,6 +15381,8 @@ MonoBehaviour:
   DisplayMaxVerticalWindSpeed: 1
   MaxEvap: 5
   DisplayMaxCanopy: 2000
+  DisplayMinTemperature: 223
+  DisplayMaxTemperature: 323
   MainCamera: {fileID: 963194227}
   WorldIcons: {fileID: 870706485}
   LandMesh: {fileID: 1752473170}

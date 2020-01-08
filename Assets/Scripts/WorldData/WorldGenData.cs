@@ -20,6 +20,7 @@ public class WorldGenData {
 	public float SolarRadiation = 1.367f; // extraterrestrial solar radiation // https://en.wikipedia.org/wiki/Sunlight (1367 w/m^2)
 	public float PlanetRadius = 6378000;
 	public float PlanetRotationSpeed = 0.0001458f;
+	public float GeothermalHeat = 0.5f;
 	public float MaxSalinity = 40;
 	public float MinSalinity = 30;
 	public int NumPlates = 12;
