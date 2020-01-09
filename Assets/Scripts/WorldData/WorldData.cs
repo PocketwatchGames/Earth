@@ -39,7 +39,8 @@ public class WorldData
 	public float PressureGradientWindMultiplier = 4000;
 	// http://tornado.sfsu.edu/geosciences/classes/e260/Coriolis_rdg/GeostrophicApproximation.html
 	// states that geostrophic wind is only realistic at middle altitudes (500M), less so at 10K and at the surface, so we reduce overall coriolis effect by 25% to account
-	public float GlobalCoriolisInfluenceWind = 0.75f;
+	public float GlobalCoriolisInfluenceWindUpper = 0.75f;
+	public float GlobalCoriolisInfluenceWindLower = 0.25f;
 	public float GlobalCoriolisInfluenceOcean = 0.5f;
 
 	[Header("Atmospheric Energy Cycle")]
@@ -166,6 +167,7 @@ public class WorldData
 	public float EmissivityIce = 0.96f;
 	public float EmissivityDirt = 0.92f;
 	public float EmissivitySand = 0.76f;
+	public float EmissivityAir = 0.8f;
 	public float MassEarthAir = 1.29f;
 	public float MassWater = 1000f;
 	public float MassSalt = 2170f;

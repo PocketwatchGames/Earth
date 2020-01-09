@@ -11,7 +11,7 @@ namespace Sim {
 	static public class Wind {
 
 		static ProfilerMarker _ProfileWindTick = new ProfilerMarker("Wind Tick");
-		static public Vector2 GetHorizontalWind(World world, World.State state, int x, int y, Vector3 curWind, float latitude, float planetRotationSpeed, float coriolisParam, float inverseCoriolisParam, float[] worldPressure, float[] worldTemperature, bool isUpper, float thisPressure, float landElevation, float windElevation, float friction, float density)
+		static public Vector2 GetHorizontalWind(World world, World.State state, int x, int y, Vector3 curWind, float latitude, float planetRotationSpeed, float coriolisParam, float inverseCoriolisParam, float coriolisInfluenceAtElevation, float[] worldPressure, float[] worldTemperature, bool isUpper, float thisPressure, float landElevation, float windElevation, float friction, float density)
 		{
 			float inverseDensity = 1.0f / density;
 			float altitude = Mathf.Max(0, windElevation - landElevation);
@@ -58,7 +58,7 @@ namespace Sim {
 			var pressureWind = pressureGradientForce * world.Data.PressureGradientWindMultiplier;
 			if (coriolisParam != 0)
 			{
-				float geostrophicInfluence = Mathf.Clamp01(Mathf.Pow(Mathf.Abs(coriolisParam) * 2, 2)) * complementFrictionAtElevation * world.Data.GlobalCoriolisInfluenceWind;
+				float geostrophicInfluence = Mathf.Clamp01(Mathf.Pow(Mathf.Abs(coriolisParam) * 2, 2)) * complementFrictionAtElevation * coriolisInfluenceAtElevation;
 				var geostrophicWind = new Vector2(-pressureGradientForce.y, pressureGradientForce.x) * inverseCoriolisParam / planetRotationSpeed;
 				wind = (geostrophicWind * geostrophicInfluence + pressureWind * (1.0f - geostrophicInfluence));
 			} else
@@ -123,8 +123,8 @@ namespace Sim {
 					float tropopausePressure = upperPressure * Mathf.Pow(1 + world.Data.TemperatureLapseRate / upperTemperatureAtSeaLevel * world.Data.TropopauseElevation, -world.Data.PressureExponent);
 					float tropopauseDensity = Atmosphere.GetAirDensity(world, tropopausePressure, upperTemperature + world.Data.TemperatureLapseRate * (world.Data.TropopauseElevation - boundaryElevation));
 
-					var upperWindH = GetHorizontalWind(world, state, x, y, state.UpperWind[index], latitude, state.PlanetRotationSpeed, windInfo.coriolisParam, windInfo.inverseCoriolisParam, state.UpperAirPressure, state.UpperAirTemperature, true, tropopausePressure, elevationOrSeaLevel, world.Data.TropopauseElevation, 0, tropopauseDensity);
-					var lowerWindH = GetHorizontalWind(world, state, x, y, state.LowerWind[index], latitude, state.PlanetRotationSpeed, windInfo.coriolisParam, windInfo.inverseCoriolisParam, state.LowerAirPressure, state.LowerAirTemperature, false, lowerPressure, elevationOrSeaLevel, elevationOrSeaLevel, friction, surfaceAirDensity);
+					var upperWindH = GetHorizontalWind(world, state, x, y, state.UpperWind[index], latitude, state.PlanetRotationSpeed, windInfo.coriolisParam, windInfo.inverseCoriolisParam, world.Data.GlobalCoriolisInfluenceWindUpper, state.UpperAirPressure, state.UpperAirTemperature, true, tropopausePressure, elevationOrSeaLevel, world.Data.TropopauseElevation, 0, tropopauseDensity);
+					var lowerWindH = GetHorizontalWind(world, state, x, y, state.LowerWind[index], latitude, state.PlanetRotationSpeed, windInfo.coriolisParam, windInfo.inverseCoriolisParam, world.Data.GlobalCoriolisInfluenceWindLower, state.LowerAirPressure, state.LowerAirTemperature, false, lowerPressure, elevationOrSeaLevel, elevationOrSeaLevel, friction, surfaceAirDensity);
 
 					// within 1 km of the ground, frictional forces slow wind down
 					float neighborPressureDifferential = 0;

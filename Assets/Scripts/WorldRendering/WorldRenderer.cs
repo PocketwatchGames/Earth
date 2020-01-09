@@ -281,6 +281,19 @@ public partial class WorldComponent {
 											new CVP(Color.magenta, 1) },
 						(state.UpperAirTemperature[index] - DisplayMinTemperature) / (DisplayMaxTemperature - DisplayMinTemperature));
 				}
+				else if (showLayers.IsSet(Layers.LandTemperature))
+				{
+					float landTemperature = Atmosphere.GetLandTemperature(World, state.LandEnergy[index], state.GroundWater[index], state.SoilFertility[index], Mathf.Clamp01(state.Canopy[index] / World.Data.FullCanopyCoverage));
+					oceanColor = color = Lerp(new List<CVP> {
+											new CVP(Color.black, 0),
+											new CVP(Color.white, 0.1667f),
+											new CVP(Color.blue, 0.3333f),
+											new CVP(Color.green, 0.5f),
+											new CVP(Color.yellow, 0.6667f),
+											new CVP(Color.red, 0.8333f),
+											new CVP(Color.magenta, 1) },
+						(landTemperature - DisplayMinTemperature) / (DisplayMaxTemperature - DisplayMinTemperature));
+				}
 				else if (showLayers.IsSet(Layers.Evaporation))
 				{
 					oceanColor = color = Lerp(new List<CVP> {

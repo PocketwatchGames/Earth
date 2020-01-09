@@ -30,24 +30,30 @@ namespace Sim {
 			_ProfileAtmosphereTick.Begin();
 
 			float globalEnergyGained = 0;
-			float globalEnergy = 0;
+			float globalEnergyUpperAir = 0;
+			float globalEnergyLowerAir = 0;
+			float globalEnergyShallowWater = 0;
+			float globalEnergyDeepWater = 0;
+			float globalEnergyLand = 0;
+			float globalIceMass = 0;
+
 			float globalEnergyIncoming = 0;
-			float globalEnergyReflectedAtmosphere = 0;
-			float globalEnergyReflectedClouds = 0;
-			float globalEnergyReflectedSurface = 0;
-			float globalEnergyAbsorbedClouds = 0;
-			float globalEnergyAbsorbedAtmosphere = 0;
-			float globalEnergyAbsorbedSurface = 0;
-			float globalEnergyAbsorbedOcean = 0;
-			float globalEnergyOceanRadiation = 0;
+			float globalEnergySolarReflectedAtmosphere = 0;
+			float globalSolarEnergyReflectedClouds = 0;
+			float globalEnergySolarReflectedSurface = 0;
+			float globalEnergySolarAbsorbedClouds = 0;
+			float globalEnergySolarAbsorbedAtmosphere = 0;
+			float globalEnergySolarAbsorbedSurface = 0;
+			float globalEnergySolarAbsorbedOcean = 0;
+			float globalEnergyThermalOceanRadiation = 0;
 			float globalEnergyOceanConduction = 0;
 			float globalEnergyEvapotranspiration = 0;
-			float globalEnergySurfaceRadiation = 0;
-			float globalEnergyBackRadiation = 0;
+			float globalEnergyThermalSurfaceRadiation = 0;
+			float globalEnergyThermalBackRadiation = 0;
 			float globalEnergySurfaceConduction = 0;
-			float globalEnergyOutAtmosphericWindow = 0;
-			float globalEnergyOutEmittedAtmosphere = 0;
-			float globalEnergyIRAbsorbedAtmosphere = 0;
+			float globalEnergyThermalOutAtmosphericWindow = 0;
+			float globalEnergyThermalOutAtmosphere = 0;
+			float globalEnergyThermalAbsorbedAtmosphere = 0;
 			float globalOceanCoverage = 0;
 			float globalCloudCoverage = 0;
 			float globalOceanVolume = 0;
@@ -439,6 +445,8 @@ namespace Sim {
 							move2 = xT * (1.0f - yT);
 							move3 = xT * yT;
 
+							// TODO: move ground water energy
+
 							nextState.GroundWater[i0] += groundWater * move0;
 							nextState.GroundWater[i1] += groundWater * move1;
 							nextState.GroundWater[i2] += groundWater * move2;
@@ -498,16 +506,16 @@ namespace Sim {
 						float absorbedByCloudsIncoming = solarRadiation * cloudAbsorptionRate;
 						solarRadiation -= absorbedByCloudsIncoming;
 						newUpperAirEnergy += absorbedByCloudsIncoming;
-						globalEnergyAbsorbedClouds += absorbedByCloudsIncoming;
-						globalEnergyAbsorbedAtmosphere += absorbedByCloudsIncoming;
+						globalEnergySolarAbsorbedClouds += absorbedByCloudsIncoming;
+						globalEnergySolarAbsorbedAtmosphere += absorbedByCloudsIncoming;
 
 						float upperAtmosphereAbsorptionRate = Mathf.Min(1, world.Data.AtmosphericHeatAbsorption * upperAirMass);
 						float absorbedByUpperAtmosphereIncoming = solarRadiation * upperAtmosphereAbsorptionRate * atmosphericDepth;
 						solarRadiation -= absorbedByUpperAtmosphereIncoming;
 						newUpperAirEnergy += absorbedByUpperAtmosphereIncoming;
 
-						globalEnergyReflectedAtmosphere += energyReflectedAtmosphere;
-						globalEnergyReflectedClouds += energyReflectedClouds;
+						globalEnergySolarReflectedAtmosphere += energyReflectedAtmosphere;
+						globalSolarEnergyReflectedClouds += energyReflectedClouds;
 
 						// Absorbed by atmosphere
 						// stratosphere accounts for about a quarter of atmospheric mass
@@ -518,7 +526,7 @@ namespace Sim {
 
 						newLowerAirEnergy += absorbedByLowerAtmosphereIncoming;
 						solarRadiation -= absorbedByLowerAtmosphereIncoming;
-						globalEnergyAbsorbedAtmosphere += absorbedByLowerAtmosphereIncoming + absorbedByUpperAtmosphereIncoming;
+						globalEnergySolarAbsorbedAtmosphere += absorbedByLowerAtmosphereIncoming + absorbedByUpperAtmosphereIncoming;
 
 						// reflection off surface
 						float energyReflected = 0;
@@ -544,7 +552,7 @@ namespace Sim {
 
 							// TODO: do we absorb some of this energy on the way back out of the atmosphere?
 							//					newLowerAirEnergy += energyReflected;
-							globalEnergyReflectedSurface += energyReflected;
+							globalEnergySolarReflectedSurface += energyReflected;
 						}
 
 						solarRadiationAbsorbed += solarRadiation;
@@ -603,7 +611,7 @@ namespace Sim {
 						newShallowWaterEnergy -= oceanRadiation;
 						thermalEnergyRadiatedToIce += oceanRadiation * iceCoverage;
 						thermalEnergyRadiatedToAir += oceanRadiation - thermalEnergyRadiatedToIce;
-						globalEnergyOceanRadiation += oceanRadiation;
+						globalEnergyThermalOceanRadiation += oceanRadiation;
 					}
 
 					// TODO: track and emit heat from ice
@@ -614,41 +622,41 @@ namespace Sim {
 
 					// Thermal energy from surface to air, space, reflected off clouds
 					{
-						globalEnergySurfaceRadiation += thermalEnergyRadiatedToAir;
+						globalEnergyThermalSurfaceRadiation += thermalEnergyRadiatedToAir;
 						float energyThroughAtmosphericWindow = thermalEnergyRadiatedToAir * world.Data.EnergyLostThroughAtmosphereWindow;
 						thermalEnergyRadiatedToAir -= energyThroughAtmosphericWindow;
-						globalEnergyOutAtmosphericWindow += energyThroughAtmosphericWindow;
+						globalEnergyThermalOutAtmosphericWindow += energyThroughAtmosphericWindow;
 
 						float absorbed = thermalEnergyRadiatedToAir * lowerAtmosphereInfraredAbsorption;
 						thermalEnergyRadiatedToAir -= absorbed;
 						newLowerAirEnergy += absorbed;
-						globalEnergyAbsorbedAtmosphere += absorbed;
+						globalEnergyThermalAbsorbedAtmosphere += absorbed;
 
 						absorbed = thermalEnergyRadiatedToAir * upperAtmosphereInfraredAbsorption;
 						thermalEnergyRadiatedToAir -= absorbed;
 						newUpperAirEnergy += absorbed;
-						globalEnergyAbsorbedAtmosphere += absorbed;
+						globalEnergyThermalAbsorbedAtmosphere += absorbed;
 
 						float surfaceEnergyReflected = thermalEnergyRadiatedToAir * cloudCoverage * world.Data.CloudOutgoingReflectionRate;
 						reflected += surfaceEnergyReflected;
-						globalEnergyOutEmittedAtmosphere += thermalEnergyRadiatedToAir - surfaceEnergyReflected;
+						globalEnergyThermalOutAtmosphere += thermalEnergyRadiatedToAir - surfaceEnergyReflected;
 					}
 
 					// lower atmosphere radiation
 					{
-						float lowerEnergyEmitted = GetRadiationRate(world, lowerAirTemperature, 1.0f) * world.Data.SecondsPerTick;
+						float lowerEnergyEmitted = GetRadiationRate(world, lowerAirTemperature, world.Data.EmissivityAir) * world.Data.SecondsPerTick;
 						newLowerAirEnergy -= lowerEnergyEmitted;
 						emittedByAtmosphere += lowerEnergyEmitted;
 
 						float energyThroughAtmosphericWindow = lowerEnergyEmitted * world.Data.EnergyLostThroughAtmosphereWindow / 2;
 						lowerEnergyEmitted -= energyThroughAtmosphericWindow * 2;
 						backRadiation += energyThroughAtmosphericWindow;
-						globalEnergyOutAtmosphericWindow += energyThroughAtmosphericWindow;
+						globalEnergyThermalOutAtmosphericWindow += energyThroughAtmosphericWindow;
 
 						float absorbed = lowerEnergyEmitted * lowerAtmosphereInfraredAbsorption / 2;
 						newLowerAirEnergy += absorbed;
 						lowerEnergyEmitted -= absorbed;
-						globalEnergyAbsorbedAtmosphere += absorbed;
+						globalEnergyThermalAbsorbedAtmosphere += absorbed;
 
 						float lowerEnergyEmittedDown = lowerEnergyEmitted / 2;
 						backRadiation += lowerEnergyEmittedDown;
@@ -657,38 +665,38 @@ namespace Sim {
 						absorbed = lowerEnergyEmitted * upperAtmosphereInfraredAbsorption;
 						newUpperAirEnergy += absorbed;
 						lowerEnergyEmitted -= absorbed;
-						globalEnergyAbsorbedAtmosphere += absorbed;
+						globalEnergyThermalAbsorbedAtmosphere += absorbed;
 
 						float lowerEnergyReflected = lowerEnergyEmitted * cloudCoverage * world.Data.CloudOutgoingReflectionRate;
 						reflected += lowerEnergyReflected;
-						globalEnergyOutEmittedAtmosphere += lowerEnergyEmitted - lowerEnergyReflected;
+						globalEnergyThermalOutAtmosphere += lowerEnergyEmitted - lowerEnergyReflected;
 					}
 
 					// upper atmosphere radiation
 					{
-						float upperEnergyEmitted = GetRadiationRate(world, upperAirTemperature, 1.0f) * world.Data.SecondsPerTick;
+						float upperEnergyEmitted = GetRadiationRate(world, upperAirTemperature, world.Data.EmissivityAir) * world.Data.SecondsPerTick;
 						newUpperAirEnergy -= upperEnergyEmitted;
 						emittedByAtmosphere += upperEnergyEmitted;
 
 						float energyThroughAtmosphericWindow = upperEnergyEmitted * world.Data.EnergyLostThroughAtmosphereWindow / 2;
 						backRadiation += energyThroughAtmosphericWindow;
 						upperEnergyEmitted -= energyThroughAtmosphericWindow * 2;
-						globalEnergyOutAtmosphericWindow += energyThroughAtmosphericWindow;
+						globalEnergyThermalOutAtmosphericWindow += energyThroughAtmosphericWindow;
 
 						float absorbed = upperEnergyEmitted * upperAtmosphereInfraredAbsorption / 2;
 						newUpperAirEnergy += absorbed;
 						upperEnergyEmitted -= absorbed;
-						globalEnergyAbsorbedAtmosphere += absorbed;
+						globalEnergyThermalAbsorbedAtmosphere += absorbed;
 
 						float upperEnergyEmittedHalf = upperEnergyEmitted / 2;
 						upperEnergyEmitted -= upperEnergyEmittedHalf;
 						float upperEnergyReflected = upperEnergyEmittedHalf * cloudCoverage * world.Data.CloudOutgoingReflectionRate;
 						reflected += upperEnergyReflected;
-						globalEnergyOutEmittedAtmosphere += upperEnergyEmittedHalf - upperEnergyReflected;
+						globalEnergyThermalOutAtmosphere += upperEnergyEmittedHalf - upperEnergyReflected;
 
 						absorbed = upperEnergyEmitted * lowerAtmosphereInfraredAbsorption;
 						newLowerAirEnergy += absorbed;
-						globalEnergyAbsorbedAtmosphere += absorbed;
+						globalEnergyThermalAbsorbedAtmosphere += absorbed;
 
 						backRadiation += upperEnergyEmitted - absorbed;
 					}
@@ -698,18 +706,18 @@ namespace Sim {
 						float absorbed = reflected * upperAtmosphereInfraredAbsorption;
 						newUpperAirEnergy += absorbed;
 						reflected -= absorbed;
-						globalEnergyAbsorbedAtmosphere += absorbed;
+						globalEnergyThermalAbsorbedAtmosphere += absorbed;
 
 						absorbed = reflected * lowerAtmosphereInfraredAbsorption;
 						newLowerAirEnergy += absorbed;
 						reflected -= absorbed;
-						globalEnergyAbsorbedAtmosphere += absorbed;
+						globalEnergyThermalAbsorbedAtmosphere += absorbed;
 
 						backRadiation += reflected;
 					}
 
-					globalEnergyBackRadiation += backRadiation;
-					globalEnergyAbsorbedSurface += solarRadiationAbsorbed;
+					globalEnergyThermalBackRadiation += backRadiation;
+					globalEnergySolarAbsorbedSurface += solarRadiationAbsorbed;
 
 					float radiationToSurface = solarRadiationAbsorbed + backRadiation;
 
@@ -819,7 +827,7 @@ namespace Sim {
 							// absorb remaining incoming radiation (we've already absorbed radiation in surface ice above)
 							float absorbedByWater = waterCoverage * radiationToSurface;
 							newShallowWaterEnergy += absorbedByWater;
-							globalEnergyAbsorbedOcean += absorbedByWater;
+							globalEnergySolarAbsorbedOcean += absorbedByWater;
 
 							// heat transfer (both ways) based on temperature differential
 							// conduction to ice from below
@@ -1209,7 +1217,12 @@ namespace Sim {
 				nextState.UpperAirTemperature[index] = GetAirTemperature(world, nextState.UpperAirEnergy[index], nextState.UpperAirMass[index], nextState.CloudMass[index], world.Data.SpecificHeatWater);
 				nextState.UpperAirPressure[index] = Mathf.Max(0, GetAirPressure(world, nextState.UpperAirMass[index] + nextState.StratosphereMass + nextState.CloudMass[index], elevationOrSeaLevel + world.Data.BoundaryZoneElevation, nextState.UpperAirTemperature[index]));
 
-				globalEnergy += nextState.LowerAirEnergy[index] + nextState.UpperAirEnergy[index] + nextState.DeepWaterEnergy[index] + nextState.ShallowWaterEnergy[index];
+				globalIceMass += nextState.IceMass[index];
+				globalEnergyDeepWater += nextState.DeepWaterEnergy[index];
+				globalEnergyShallowWater += nextState.ShallowWaterEnergy[index];
+				globalEnergyLand += nextState.LandEnergy[index];
+				globalEnergyLowerAir += nextState.LowerAirEnergy[index];
+				globalEnergyUpperAir += nextState.UpperAirEnergy[index];
 				atmosphericMass += nextState.LowerAirMass[index] + nextState.UpperAirMass[index];
 
 
@@ -1222,23 +1235,27 @@ namespace Sim {
 
 
 			nextState.GlobalEnergyGained = globalEnergyGained;
-			nextState.GlobalEnergy = globalEnergy;
+			nextState.GlobalEnergyUpperAir = globalEnergyUpperAir;
+			nextState.GlobalEnergyLowerAir = globalEnergyLowerAir;
+			nextState.GlobalEnergyShallowWater = globalEnergyShallowWater;
+			nextState.GlobalEnergyDeepWater = globalEnergyDeepWater;
+			nextState.GlobalEnergyLand = globalEnergyLand;
 			nextState.GlobalEnergyIncoming = globalEnergyIncoming;
-			nextState.GlobalEnergyReflectedAtmosphere = globalEnergyReflectedAtmosphere;
-			nextState.GlobalEnergyReflectedCloud = globalEnergyReflectedClouds;
-			nextState.GlobalEnergyReflectedSurface = globalEnergyReflectedSurface;
-			nextState.GlobalEnergyAbsorbedCloud = globalEnergyAbsorbedClouds;
-			nextState.GlobalEnergyAbsorbedAtmosphere = globalEnergyAbsorbedAtmosphere;
-			nextState.GlobalEnergyAbsorbedSurface = globalEnergyAbsorbedSurface;
-			nextState.GlobalEnergyAbsorbedOcean = globalEnergyAbsorbedOcean;
-			nextState.GlobalEnergyOceanRadiation = globalEnergyOceanRadiation;
-			nextState.GlobalEnergyOceanConduction = globalEnergyOceanConduction;
-			nextState.GlobalEnergyBackRadiation = globalEnergyBackRadiation;
-			nextState.GlobalEnergySurfaceRadiation = globalEnergySurfaceRadiation;
+			nextState.GlobalEnergySolarReflectedAtmosphere = globalEnergySolarReflectedAtmosphere;
+			nextState.GlobalEnergySolarReflectedCloud = globalSolarEnergyReflectedClouds;
+			nextState.GlobalEnergySolarReflectedSurface = globalEnergySolarReflectedSurface;
+			nextState.GlobalEnergySolarAbsorbedCloud = globalEnergySolarAbsorbedClouds;
+			nextState.GlobalEnergySolarAbsorbedAtmosphere = globalEnergySolarAbsorbedAtmosphere;
+			nextState.GlobalEnergySolarAbsorbedSurface = globalEnergySolarAbsorbedSurface;
+			nextState.GlobalEnergySolarAbsorbedOcean = globalEnergySolarAbsorbedOcean;
+			nextState.GlobalEnergyThermalOceanRadiation = globalEnergyThermalOceanRadiation;
+			nextState.GlobalEnergyThermalBackRadiation = globalEnergyThermalBackRadiation;
+			nextState.GlobalEnergyThermalSurfaceRadiation = globalEnergyThermalSurfaceRadiation;
+			nextState.GlobalEnergyThermalOutAtmosphericWindow = globalEnergyThermalOutAtmosphericWindow;
+			nextState.GlobalEnergyThermalOutAtmosphere = globalEnergyThermalOutAtmosphere;
+			nextState.GlobalEnergyThermalAbsorbedAtmosphere = globalEnergyThermalAbsorbedAtmosphere;
 			nextState.GlobalEnergyEvapotranspiration = globalEnergyEvapotranspiration;
-			nextState.GlobalEnergyOutAtmosphericWindow = globalEnergyOutAtmosphericWindow;
-			nextState.GlobalEnergyOutEmittedAtmosphere = globalEnergyOutEmittedAtmosphere;
-			nextState.GlobalEnergyIRAbsorbedAtmosphere = globalEnergyIRAbsorbedAtmosphere;
+			nextState.GlobalEnergyOceanConduction = globalEnergyOceanConduction;
 			nextState.GlobalEnergySurfaceConduction = globalEnergySurfaceConduction;
 			nextState.GlobalTemperature = globalTemperature;
 			nextState.GlobalOceanCoverage = globalOceanCoverage * inverseWorldSize * inverseWorldSize;
@@ -1246,6 +1263,7 @@ namespace Sim {
 			nextState.GlobalEvaporation = globalEvaporation;
 			nextState.GlobalRainfall = globalRainfall;
 			nextState.GlobalCloudMass = globalCloudMass;
+			nextState.GlobalIceMass = globalIceMass;
 			nextState.GlobalWaterVapor = globalWaterVapor;
 			nextState.GlobalOceanVolume = globalOceanVolume;
 			nextState.GlobalSeaLevel = seaLevel / seaLevelTiles;
@@ -1392,7 +1410,6 @@ namespace Sim {
 
 				if (rainDropVelocity < 0 && rainDropMass > 0)
 				{
-					// TODO: rainfall mass isnt a true mass, it doesnt cap at cloud mass, so transfer of cloudmass and humidity should be based on a percentage
 					newRainfall = cloudMass * Mathf.Clamp01(-rainDropVelocity * world.Data.RainfallRate);
 					newCloudMass -= newRainfall;
 					newRainDropMass -= newRainfall / cloudMass;
@@ -1442,7 +1459,7 @@ namespace Sim {
 				newGroundEnergy -= energyTransfer;
 			} else if (shallowWaterMass > 0)
 			{
-				float massTransfer = Mathf.Min(shallowWaterMass, Math.Min(soilFertility * world.Data.GroundWaterReplenishmentSpeed, maxGroundWater - groundWater));
+				float massTransfer = Mathf.Min(shallowWaterMass, Math.Min(soilFertility * world.Data.GroundWaterReplenishmentSpeed * world.Data.SecondsPerTick, maxGroundWater - groundWater));
 				newGroundWater += massTransfer;
 				newShallowWater -= massTransfer;
 				float energyTransfer = massTransfer * shallowWaterTemperature * world.Data.SpecificHeatWater;
@@ -1691,16 +1708,21 @@ namespace Sim {
 
 		static public float GetLandRadiationRate(World world, float landEnergy, float groundWater, float soilFertility, float canopyCoverage)
 		{
-			float soilEnergy = landEnergy - groundWater * world.Data.maxGroundWaterTemperature * world.Data.SpecificHeatWater;
-			float landMass = (world.Data.MassSand - world.Data.MassSoil) * soilFertility + world.Data.MassSoil;
-			float heatingDepth = soilFertility * world.Data.SoilHeatDepth + canopyCoverage;
-			float soilTemperature = Mathf.Max(0, soilEnergy / (world.Data.SpecificHeatSoil * heatingDepth * landMass));
+			float soilTemperature = GetLandTemperature(world, landEnergy, groundWater, soilFertility, canopyCoverage);
 			return GetRadiationRate(world, soilTemperature, world.Data.EmissivityDirt);
 		}
 
 		static public float GetRadiationRate(World world, float temperature, float emissivity)
 		{
 			return temperature * temperature * temperature * temperature * emissivity * 0.001f * world.Data.StefanBoltzmannConstant;
+		}
+
+		static public float GetLandTemperature(World world, float landEnergy, float groundWater, float soilFertility, float canopyCoverage)
+		{
+			float soilEnergy = landEnergy - groundWater * world.Data.maxGroundWaterTemperature * world.Data.SpecificHeatWater;
+			float landMass = (world.Data.MassSand - world.Data.MassSoil) * soilFertility + world.Data.MassSoil;
+			float heatingDepth = soilFertility * world.Data.SoilHeatDepth;
+			return Mathf.Max(0, soilEnergy / (world.Data.SpecificHeatSoil * heatingDepth * landMass));
 		}
 
 		static public float RepeatExclusive(float x, float y)

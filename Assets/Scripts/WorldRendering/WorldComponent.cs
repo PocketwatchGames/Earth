@@ -42,6 +42,7 @@ public partial class WorldComponent : MonoBehaviour
 		Evaporation = 1 << 31,
 		WindVert = 1 << 32,
 		CurrentVert = 1 << 33,
+		LandTemperature = 1 << 34,
 	}
 	public enum TemperatureDisplayType {
 		Kelvin,

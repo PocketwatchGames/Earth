@@ -202,16 +202,26 @@ public static class WorldGen {
 				float waterCoverage = Mathf.Clamp01(state.WaterDepth[index] / world.Data.FullWaterCoverage);
 				float iceCoverage = Mathf.Clamp01(state.IceMass[index] / (world.Data.MassIce * world.Data.FullIceCoverage));
 
-				state.Canopy[index] = state.SoilFertility[index] * (state.GroundWater[index]) * (1.0f - waterCoverage) * (1.0f - iceCoverage) * Mathf.Clamp01((state.LowerAirTemperature[index] - world.Data.MinTemperatureCanopy) / (world.Data.MaxTemperatureCanopy - world.Data.MinTemperatureCanopy));
+				if (depth == 0)
+				{
+					state.Canopy[index] = state.SoilFertility[index] * (state.GroundWater[index]) * (1.0f - waterCoverage) * (1.0f - iceCoverage) * Mathf.Clamp01((state.LowerAirTemperature[index] - world.Data.MinTemperatureCanopy) / (world.Data.MaxTemperatureCanopy - world.Data.MinTemperatureCanopy));
+				}
 
 				// TODO: ground water energy should probably be tracked independently
 				float lowerAirHeatAbsorption = Atmosphere.GetAtmosphericHeatAbsorptionRate(world, state.LowerAirMass[index] * state.CarbonDioxide, state.Humidity[index], 0);
-				float lowerAirRadiation = Atmosphere.GetRadiationRate(world, state.LowerAirTemperature[index], 1.0f) * (1.0f - lowerAirHeatAbsorption / 2);
+				float lowerAirRadiation = Atmosphere.GetRadiationRate(world, state.LowerAirTemperature[index], world.Data.EmissivityAir) * (1.0f - lowerAirHeatAbsorption / 2);
 				float landRadiationRate = Atmosphere.GetRadiationRate(world, state.LowerAirTemperature[index], world.Data.EmissivityDirt);
 				float groundWaterEnergy = state.GroundWater[index] * world.Data.SpecificHeatWater * world.Data.maxGroundWaterTemperature;
 				float landMass = (world.Data.MassSand - world.Data.MassSoil) * state.SoilFertility[index] + world.Data.MassSoil;
-				float heatingDepth = state.SoilFertility[index] * world.Data.SoilHeatDepth + Mathf.Clamp01( state.Canopy[index] / world.Data.FullCanopyCoverage);
-				float soilEnergy = state.LowerAirTemperature[index] * world.Data.SpecificHeatSoil * heatingDepth * landMass;
+				float heatingDepth = state.SoilFertility[index] * world.Data.SoilHeatDepth;
+				float soilTemperature;
+				if (deepOceanMass > 0) {
+					soilTemperature = deepOceanTemperature;
+				} else
+				{
+					soilTemperature = state.LowerAirTemperature[index];
+				}
+				float soilEnergy = soilTemperature * world.Data.SpecificHeatSoil * heatingDepth * landMass;
 				state.LandEnergy[index] = groundWaterEnergy + soilEnergy;
 
 
