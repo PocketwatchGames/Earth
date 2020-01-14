@@ -151,7 +151,7 @@ namespace Sim {
 			groundWaterFlowDirection = g * world.Data.InverseMetersPerTile * world.Data.GroundWaterFlowSpeed * soilFertility * world.Data.GravitationalAcceleration;
 
 			shallowWaterFlow = Vector4.zero;
-			float depth = state.WaterDepth[index];
+			float depth = state.WaterAndIceDepth[index];
 			if (depth > 0)
 			{
 				west += (depth - state.WaterAndIceDepth[indexW]);

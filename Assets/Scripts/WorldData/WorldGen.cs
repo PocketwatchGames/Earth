@@ -118,14 +118,14 @@ public static class WorldGen {
 				float upperAirElevation = elevationOrSeaLevel + data.BoundaryZoneElevation;
 
 				float regionalTemperatureVariation =
-					GetPerlinMinMax(world, noise, x, y, 0.25f, 60, -5, 5) +
-					GetPerlinMinMax(world, noise, x, y, 0.5f, 60, -10, 10) +
-					GetPerlinMinMax(world, noise, x, y, 2.0f, 60, -10, 10);
+					GetPerlinMinMax(world, noise, x, y, 0.1f, 60, -5, 5) +
+					GetPerlinMinMax(world, noise, x, y, 0.2f, 61, -10, 10) +
+					GetPerlinMinMax(world, noise, x, y, 0.5f, 62, -10, 10);
 				state.LowerAirTemperature[index] =
-					regionalTemperatureVariation + GetPerlinMinMax(world, noise, x, y, 0.25f, 80, -5, 5) +
+					regionalTemperatureVariation + GetPerlinMinMax(world, noise, x, y, 0.15f, 80, -5, 5) +
 					(1.0f - latitude * latitude) * (worldGenData.MaxTemperature - worldGenData.MinTemperature) + worldGenData.MinTemperature + data.TemperatureLapseRate * elevationOrSeaLevel;
 				state.UpperAirTemperature[index] =
-					GetPerlinMinMax(world, noise, x, y, 0.25f, 90, -5, 5) +
+					GetPerlinMinMax(world, noise, x, y, 0.15f, 90, -5, 5) +
 					state.LowerAirTemperature[index] + data.TemperatureLapseRate * upperAirElevation;
 
 				state.UpperAirPressure[index] = data.StaticPressure - regionalTemperatureVariation * 1000;
@@ -142,14 +142,15 @@ public static class WorldGen {
 
 				float relativeHumidity = Mathf.Pow(GetPerlinNormalized(world, noise, x, y, 1.0f, 400), 3);
 				state.CloudMass[index] = Mathf.Pow(GetPerlinMinMax(world, noise, x, y, 1.0f, 2000, 0, 1), 0.85f) * Mathf.Pow(relativeHumidity, 0.5f);
-				float totalAirMassUpper = Atmosphere.GetAirMass(world, state.UpperAirPressure[index], upperAirElevation, state.UpperAirTemperature[index]) - state.StratosphereMass;
-				float totalAirMassLower = Atmosphere.GetAirMass(world, state.LowerAirPressure[index], elevationOrSeaLevel, state.LowerAirTemperature[index]) - state.StratosphereMass - totalAirMassUpper;
+				state.RainDropMass[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 2001, 0, 1) * relativeHumidity * Mathf.Pow(state.CloudMass[index],2) * world.Data.rainDropMaxSize;
+				float totalAirMassUpper = Atmosphere.GetAirMass(world, state.UpperAirPressure[index], upperAirElevation, state.UpperAirTemperature[index], world.Data.MolarMassAir) - state.StratosphereMass;
+				float totalAirMassLower = Atmosphere.GetAirMass(world, state.LowerAirPressure[index], elevationOrSeaLevel, state.LowerAirTemperature[index], world.Data.MolarMassAir * (1.0f - relativeHumidity) + world.Data.MolarMassWater * relativeHumidity) - state.StratosphereMass - totalAirMassUpper;
 				state.Humidity[index] = Atmosphere.GetAbsoluteHumidity(world, state.LowerAirTemperature[index], relativeHumidity, totalAirMassLower, inverseDewPointTemperatureRange);
 
 				state.UpperAirMass[index] = totalAirMassUpper - state.CloudMass[index];
 				state.LowerAirMass[index] = totalAirMassLower - state.Humidity[index];
-				state.UpperAirPressure[index] = Atmosphere.GetAirPressure(world, state.UpperAirMass[index] + state.StratosphereMass + state.CloudMass[index], elevationOrSeaLevel + world.Data.BoundaryZoneElevation, state.UpperAirTemperature[index]);
-				state.LowerAirPressure[index] = Atmosphere.GetAirPressure(world, state.LowerAirMass[index] + state.UpperAirMass[index] + state.StratosphereMass + state.Humidity[index] + state.CloudMass[index], elevationOrSeaLevel, state.LowerAirTemperature[index]);
+				state.UpperAirPressure[index] = Atmosphere.GetAirPressure(world, state.UpperAirMass[index] + state.StratosphereMass + state.CloudMass[index], elevationOrSeaLevel + world.Data.BoundaryZoneElevation, state.UpperAirTemperature[index], Atmosphere.GetMolarMassAir(world, state.UpperAirMass[index] + state.StratosphereMass, state.CloudMass[index]));
+				state.LowerAirPressure[index] = Atmosphere.GetAirPressure(world, state.LowerAirMass[index] + state.UpperAirMass[index] + state.StratosphereMass + state.Humidity[index] + state.CloudMass[index], elevationOrSeaLevel, state.LowerAirTemperature[index], Atmosphere.GetMolarMassAir(world, state.LowerAirMass[index] + state.UpperAirMass[index] + state.StratosphereMass, state.Humidity[index] + state.CloudMass[index]));
 
 				state.WaterTableDepth[index] = GetPerlinMinMax(world, noise, x, y, 1.0f, 200, data.MinWaterTableDepth, data.MaxWaterTableDepth);
 				state.SoilFertility[index] = GetPerlinNormalized(world, noise, x, y, 1.0f, 400);
@@ -208,8 +209,6 @@ public static class WorldGen {
 				}
 
 				// TODO: ground water energy should probably be tracked independently
-				float lowerAirHeatAbsorption = Atmosphere.GetAtmosphericHeatAbsorptionRate(world, state.LowerAirMass[index] * state.CarbonDioxide, state.Humidity[index], 0);
-				float lowerAirRadiation = Atmosphere.GetRadiationRate(world, state.LowerAirTemperature[index], world.Data.EmissivityAir) * (1.0f - lowerAirHeatAbsorption / 2);
 				float landRadiationRate = Atmosphere.GetRadiationRate(world, state.LowerAirTemperature[index], world.Data.EmissivityDirt);
 				float groundWaterEnergy = state.GroundWater[index] * world.Data.SpecificHeatWater * world.Data.maxGroundWaterTemperature;
 				float landMass = (world.Data.MassSand - world.Data.MassSoil) * state.SoilFertility[index] + world.Data.MassSoil;

@@ -48,9 +48,8 @@ public class WorldData
 	// https://en.wikipedia.org/wiki/Earth%27s_energy_budget
 	public float AtmosphericHeatAbsorption = 0.297f; // total absorbed by atmosphere AFTER reflection about 30%
 	public float AtmosphericHeatReflection = 0.07f; // 7% is reflected due to atmospheric scattering 
-	public float CloudIncomingAbsorptionRate = 0.06f; // 6% absorbed by clouds
-	public float CloudIncomingReflectionRate = 0.50f; // 24% incoming  reflected back to space by clouds (avg, globally)
-	public float CloudOutgoingReflectionRate = 0.50f;
+	public float CloudSolarAbsorptivity = 0.06f; // 6% absorbed by clouds
+	public float CloudOutgoingReflectionRate = 0.90f;
 	//public float EvaporativeHeatLoss = 0.6f; // global average = 78 watts
 	// Net Back Radiation: The ocean transmits electromagnetic radiation into the atmosphere in proportion to the fourth power of the sea surface temperature(black-body radiation)
 	// https://eesc.columbia.edu/courses/ees/climate/lectures/o_atm.html
@@ -66,9 +65,6 @@ public class WorldData
 	public float CloudMassFullAbsorption = 0.5f; // how much heat gain/loss is caused by cloud cover (cumulus cloud is 0.3g/cubic meter, and about 3 kilometers high)
 	public float EnergyEmittedByAtmosphere = 0.000000199f; // how fast a cell loses heat an min elevation, no cloud cover, global average = 199 watts
 	public float EnergyLostThroughAtmosphereWindow = 0.067f; // AKA Atmospheric window global average = 40 watts = 6.7% of all surface and atmospheric radiation
-	public float CloudOutgoingAbsorptionRate = 0.05f;
-	public float EnergyTrappedByGreenhouseGasses = 0.1f;
-	public float EnergyTrappedByWaterVapor = 0.1f;
 
 	[Header("Evap, Humidity and Clouds")]
 	public float DewPointTemperatureRange = 100.0f;
@@ -80,12 +76,11 @@ public class WorldData
 	public float EvaporationRate = 0.002f; // TODO: evaporation on earth maxes out around 2.5M per year 
 	public float RainDropFormationSpeedTemperature = 10f;
 	public float RainDropCoalescenceWind = 0.00001f;
-	public float RainDropEntropy = 0.1f;
 	public float rainDropDragCoefficient = 0.5f;
-	public float rainDropMinSize = 0.1f;
+	public float rainDropMaxSize = 0.004f;
+	public float rainDropMinSize = 0.00001f;
 	public float airDensity = 1.21f;
 	public float waterDensity = 997;
-	public float rainDropEvapRate = 0.000001f;
 	public float CloudDissapationRateWind = 0.1f;
 	public float CloudDissapationRateDryAir = 0.1f;
 
@@ -140,21 +135,22 @@ public class WorldData
 	public float StaticPressure = 101325;
 	public float StdTemp = 288.15f;
 	public float MolarMassEarthAir = 0.0289644f;
+	public float MolarMassAir = 0.02857f;
+	public float MolarMassWater = 0.01802f;
 	public float UniversalGasConstant = 8.3144598f;
 	public float FreezingTemperature = 273.15f;
 	public float DewPointElevationPerDegree = 67.73f;
 	public float DewPointTemperaturePerRelativeHumidity = 20;
 	public float StefanBoltzmannConstant = 0.00000005670373f;
 
-	[Header("Albedo")]
+	// specific heat is joules to raise one degree
+	[Header("Specific Heats")] // in kJ/kgK
 	public float AlbedoWater = 0.06f; // How much heat is reflected back by the water
 	public float AlbedoIce = 0.5f; // How much heat is reflected back by the water
 	public float AlbedoLand = 0.4f;
 	public float AlbedoReductionSoilQuality = 0.15f;
 	public float AlbedoFoliage = 0.1f;
-
-	// specific heat is joules to raise one degree
-	[Header("Specific Heats")] // in kJ/kgK
+	//public float AlbedoCloud = 0.05f; // 24% incoming  reflected back to space by clouds (avg, globally)
 	public float SpecificHeatIce = 2.108f; 
 	public float SpecificHeatWater = 4.187f;
 	public float SpecificHeatWaterVapor = 1.996f;
@@ -174,6 +170,10 @@ public class WorldData
 	public float MassIce = 919f;
 	public float MassSoil = 1200f;
 	public float MassSand = 1600f;
+	public float AbsorptivityWaterLiquid = 0.05f;
+	public float AbsorptivityCarbonDioxide = 0.25f;
+	public float AbsorptivityWaterVapor = 0.00155f;
+	public float AbsorptivityAir = 0.0005f;
 
 
 
@@ -214,7 +214,7 @@ public class WorldData
 
 		EvapTemperatureRange = EvapMaxTemperature - EvapMinTemperature;
 		SpecificGasConstantDryAir = UniversalGasConstant / MolarMassEarthAir;
-		PressureExponent = GravitationalAcceleration * MolarMassEarthAir / (UniversalGasConstant * TemperatureLapseRate);
+		PressureExponent = GravitationalAcceleration / (UniversalGasConstant * TemperatureLapseRate);
 
 		DryAirAdiabaticLapseRate = AdiabaticLapseRate / SpecificHeatAtmosphere;
 

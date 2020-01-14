@@ -15579,17 +15579,16 @@ MonoBehaviour:
     WindIceFriction: 0.1
     WindLandFriction: 0.6
     WindAirMovementHorizontal: 0.005
-    WindAirMovementVertical: 0.002
+    WindAirMovementVertical: 0.001
     WindHumidityMovement: 0.1
-    HumidityToCloudPercent: 0.02
-    PressureGradientWindMultiplier: 1000
+    HumidityToCloudPercent: 0.01
+    PressureGradientWindMultiplier: 2000
     GlobalCoriolisInfluenceWindUpper: 0.75
-    GlobalCoriolisInfluenceWindLower: 0.25
+    GlobalCoriolisInfluenceWindLower: 0.5
     GlobalCoriolisInfluenceOcean: 0.5
     AtmosphericHeatAbsorption: 0.000035
     AtmosphericHeatReflection: 0.00000903
-    CloudIncomingAbsorptionRate: 0.25
-    CloudIncomingReflectionRate: 0.35
+    CloudSolarAbsorptivity: 0.1
     CloudOutgoingReflectionRate: 0.9
     OceanAirConductionWarming: 0.016
     OceanAirConductionCooling: 0.008
@@ -15601,9 +15600,6 @@ MonoBehaviour:
     CloudMassFullAbsorption: 0.5
     EnergyEmittedByAtmosphere: 0.00000175
     EnergyLostThroughAtmosphereWindow: 0.057
-    CloudOutgoingAbsorptionRate: 1
-    EnergyTrappedByGreenhouseGasses: 0.008
-    EnergyTrappedByWaterVapor: 0.012
     DewPointTemperatureRange: 100
     DewPointZero: 213
     WaterVaporMassToAirMassAtDewPoint: 0.2
@@ -15613,12 +15609,11 @@ MonoBehaviour:
     EvaporationRate: 0.004
     RainDropFormationSpeedTemperature: 1
     RainDropCoalescenceWind: 0.1
-    RainDropEntropy: 0.01
     rainDropDragCoefficient: 0.5
-    rainDropMinSize: 0.002
+    rainDropMaxSize: 0.004
+    rainDropMinSize: 0.00001
     airDensity: 1.21
     waterDensity: 997
-    rainDropEvapRate: 0.000001
     CloudDissapationRateWind: 0.1
     CloudDissapationRateDryAir: 0.1
     DeepOceanDepth: 500
@@ -15663,6 +15658,8 @@ MonoBehaviour:
     StaticPressure: 101325
     StdTemp: 288.15
     MolarMassEarthAir: 0.0289644
+    MolarMassAir: 0.02857
+    MolarMassWater: 0.01802
     UniversalGasConstant: 8.31446
     FreezingTemperature: 273.15
     DewPointElevationPerDegree: 67.73
@@ -15692,6 +15689,10 @@ MonoBehaviour:
     MassIce: 919
     MassSoil: 1200
     MassSand: 1600
+    AbsorptivityWaterLiquid: 0.05
+    AbsorptivityCarbonDioxide: 0.25
+    AbsorptivityWaterVapor: 0.00155
+    AbsorptivityAir: 0.0005
   ShowLayers: 8600
   ElevationScale: 0.002
   MinZoom: 5
